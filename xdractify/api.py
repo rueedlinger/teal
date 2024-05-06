@@ -1,13 +1,11 @@
+import base64
 import binascii
-from typing import Union, Annotated
+import logging
 
-from fastapi import FastAPI, UploadFile, File, Request
-from pydantic import BaseModel
+from fastapi import FastAPI, UploadFile, Request
 from starlette.responses import JSONResponse
 
 from xdractify.model import Document, PdfDocument, DataEncoding
-import logging
-import base64
 
 # get root logger
 logger = logging.getLogger('xdractify.api')
