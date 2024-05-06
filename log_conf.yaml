@@ -12,11 +12,11 @@ handlers:
         formatter: simple
         stream: ext://sys.stdout
 
-    file:
-        class: logging.FileHandler
-        formatter: simple
-        filename: myapp.log
-        mode: a
+    # file:
+    #    class: logging.FileHandler
+    #    formatter: simple
+    #    filename: myapp.log
+    #    mode: a
 
 loggers:
     'xdractify.api':
