@@ -34,6 +34,7 @@ async def read_item(doc: PdfDocument):
 
 @app.post("/base64/encode")
 async def input_request(file: UploadFile) -> Document:
+    logger.debug(f"base64 encode: filename='{file.filename}', size='{file.size}', content_type='{file.content_type}'")
     contents = await file.read()
     encoded = base64.b64encode(contents)
     return Document.parse_obj({'name': file.filename, 'data': encoded, 'encoding': DataEncoding.base64})
