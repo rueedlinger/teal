@@ -5,10 +5,11 @@ import logging
 from fastapi import FastAPI, UploadFile, Request
 from starlette.responses import JSONResponse
 
-from xdractify.model import Document, PdfDocument, DataEncoding
+from xdractify.model import Document, PdfDocument, DataEncoding, Data, Extracts
+from xdractify.pdf import extract_pypdf
 
 # get root logger
-logger = logging.getLogger('xdractify.api')
+logger = logging.getLogger("xdractify.api")
 
 app = FastAPI()
 
@@ -22,20 +23,31 @@ async def unicorn_exception_handler(request: Request, ex: binascii.Error):
 
 
 @app.post("/pdf")
-async def read_item(doc: PdfDocument):
-    logger.debug(f"processing pdf: {doc}")
-    if doc.encoding == DataEncoding.base64:
-        raw = base64.b64decode(doc.data)
-        logger.debug(raw)
+async def read_item(doc: PdfDocument) -> Extracts:
+    logger.debug(f"processing pdf: {doc.engine}")
+    if doc.data.encoding == DataEncoding.base64:
+        raw = base64.b64decode(doc.data.content)
+        # return extract_pypdfium2(raw)
+        return extract_pypdf(raw)
+        # logger.debug(raw)
     return {}
 
 
 @app.post("/base64/encode")
 async def input_request(file: UploadFile) -> Document:
-    logger.debug(f"base64 encode: filename='{file.filename}', size='{file.size}', content_type='{file.content_type}'")
+    logger.debug(
+        f"base64 encode: filename='{file.filename}', size='{file.size}', content_type='{file.content_type}'"
+    )
     contents = await file.read()
     encoded = base64.b64encode(contents)
-    return Document.parse_obj({'name': file.filename, 'data': encoded, 'encoding': DataEncoding.base64})
+    return Document.parse_obj(
+        {
+            "name": file.filename,
+            "data": Data.parse_obj(
+                {"encoding": DataEncoding.base64, "content": encoded}
+            ),
+        }
+    )
 
 
 """

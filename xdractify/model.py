@@ -1,7 +1,6 @@
 from enum import Enum
-from typing import Union, List, Annotated
+from typing import List
 
-from fastapi import File
 from pydantic import BaseModel
 
 
@@ -10,16 +9,34 @@ class DataEncoding(str, Enum):
     text = "text"
 
 
+class Data(BaseModel):
+    encoding: DataEncoding
+    content: str
+
+
 class PdfAction(str, Enum):
-    table = "table"
     text = "text"
+    table = "table"
+
+
+class PdfEngine(str, Enum):
+    pdfium = "pdfium"
 
 
 class Document(BaseModel):
     name: str
-    data: str
-    encoding: DataEncoding
+    data: Data
 
 
 class PdfDocument(Document):
+    engine: PdfEngine
     actions: List[PdfAction]
+
+
+class TextExtract(BaseModel):
+    page: int
+    text: str
+
+
+class Extracts(BaseModel):
+    extracted_text: List[TextExtract]
