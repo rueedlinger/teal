@@ -1,6 +1,7 @@
 fastapi
 python-multipart
 uvicorn[standard]
+gunicorn
 pyyaml
 pypdfium2
 pypdf

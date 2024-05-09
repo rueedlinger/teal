@@ -51,7 +51,7 @@ class PdfTextExtractor:
         for p in range(len(pdf)):
             textpage = pdf[p].get_textpage()
             text_all = textpage.get_text_bounded()
-            extracts.append(TextExtract.parse_obj({"text": text_all, "page": p}))
+            extracts.append(TextExtract.parse_obj({"text": text_all, "page": p + 1}))
 
         return extracts
 
@@ -67,7 +67,7 @@ class PdfOcrExtractor:
 
         for i, page in enumerate(images):
             text = pytesseract.image_to_string(page, lang=lang)
-            extracts.append(TextExtract.parse_obj({"text": text, "page": i}))
+            extracts.append(TextExtract.parse_obj({"text": text, "page": i + 1}))
         return extracts
 
 

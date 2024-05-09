@@ -1,7 +1,8 @@
 import binascii
-import logging
+import logging.config
 from typing import Any, List
 
+import yaml
 from fastapi import FastAPI, UploadFile, Request
 from starlette.responses import JSONResponse
 
@@ -11,10 +12,13 @@ from xdractify.model import (
 )
 from xdractify.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor
 
+app = FastAPI()
+with open('log_conf.yaml', 'rt') as f:
+    config = yaml.safe_load(f.read())
+logging.config.dictConfig(config)
+
 # get root logger
 logger = logging.getLogger("xdractify.api")
-
-app = FastAPI()
 
 
 @app.exception_handler(binascii.Error)

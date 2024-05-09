@@ -9,7 +9,7 @@ pyenv activate xdractify
 ```
 
 ```bash
-uvicorn xdractify.api:app --reload --log-config=log_conf.yaml
+uvicorn xdractify.api:app --reload
 ```
 
 http://127.0.0.1:8000/
