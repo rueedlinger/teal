@@ -4,6 +4,11 @@ uvicorn[standard]
 pyyaml
 pypdfium2
 pypdf
-nose
+pytesseract
+pdf2image
+PyPDF2<3.0
+camelot-py[base]
+opencv-python
+pytest
 sphinx
 black

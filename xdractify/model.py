@@ -6,21 +6,29 @@ from pydantic import BaseModel
 
 class DataEncoding(str, Enum):
     base64 = "base64"
-    text = "text"
+    text = "raw"
 
 
 class Data(BaseModel):
     encoding: DataEncoding
+
     content: str
 
 
-class PdfAction(str, Enum):
+class PdfActionType(str, Enum):
     text = "text"
     table = "table"
 
 
 class PdfEngine(str, Enum):
     pdfium = "pdfium"
+    pypdf = "pypdf"
+    tesseract = "tesseract"
+
+
+class PdfModule(BaseModel):
+    engine: PdfEngine
+    params: dict | None = None
 
 
 class Document(BaseModel):
@@ -28,9 +36,9 @@ class Document(BaseModel):
     data: Data
 
 
-class PdfDocument(Document):
-    engine: PdfEngine
-    actions: List[PdfAction]
+class PdfExtract(BaseModel):
+    pdf: Data
+    module: PdfModule
 
 
 class TextExtract(BaseModel):
@@ -38,5 +46,10 @@ class TextExtract(BaseModel):
     text: str
 
 
+class TableExtract(BaseModel):
+    index: int
+    table: List[dict]
+
+
 class Extracts(BaseModel):
-    extracted_text: List[TextExtract]
+    extracts: List[TextExtract] = []
