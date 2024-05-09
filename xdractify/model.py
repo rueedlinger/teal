@@ -47,7 +47,8 @@ class TextExtract(BaseModel):
 
 
 class TableExtract(BaseModel):
-    index: int
+    page: int
+    index: int = 0
     table: List[dict]
 
 

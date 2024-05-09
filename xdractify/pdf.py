@@ -67,17 +67,25 @@ def extract_table(data, params):
 
     with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
         tmp_pdf_file.write(data)
-        tables = camelot.read_pdf(tmp_pdf_file.name)
+        tables = camelot.read_pdf(tmp_pdf_file.name, pages="all")
         _logger.debug(f"found {len(tables)} tables with camelot")
         extracts = []
 
         for p in range(len(tables)):
             with tempfile.NamedTemporaryFile(suffix=".json") as tmp_json_file:
                 tables[p].to_json(tmp_json_file.name)
+                report = tables[p].parsing_report
+                _logger.debug(f"parsing tables report {report}")
                 f = open(tmp_json_file.name)
                 table_json = json.load(f)
                 extracts.append(
-                    TableExtract.parse_obj({"index": p, "table": table_json})
+                    TableExtract.parse_obj(
+                        {
+                            "page": report["page"],
+                            "index": report["order"],
+                            "table": table_json,
+                        }
+                    )
                 )
                 f.close()
 
