@@ -8,3 +8,4 @@ services:
       XDR_LOG_CONF: "log_conf.yaml"
       XDR_WORKERS: 1
       XDR_PORT: 8000
+      #XDR_IP_BIND: 0.0.0.0
