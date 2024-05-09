@@ -1,70 +1,18 @@
-import io
 import json
 import logging
 import tempfile
 
-from starlette.responses import JSONResponse
+import camelot.io as camelot
+import pypdfium2 as pdfium
+import pytesseract
+from pdf2image import convert_from_bytes
 
 from xdractify.model import TextExtract, TableExtract
-
-_ACTION_TEXT = "text"
-_ACTION_TABLE = "table"
-_ENGINE_PDFIUM = "pdfium"
-_ENGINE_PYPDF = "pypdf"
-_ENGINE_TESSERACT = "tesseract"
-_ENGINE_CAMELOT = "camelot"
 
 _logger = logging.getLogger("xdractify.pdf")
 
 
-def extract_text_tesseract(data, params):
-    from pdf2image import convert_from_bytes
-    import pytesseract
-
-    extracts = []
-    images = convert_from_bytes(data)
-    _logger.debug(f"found images {len(images)} with pdf2images")
-    lang = None
-    if "lang" in params:
-        lang = params["lang"]
-    _logger.debug(f"using lang {len(lang)} with pytesseract")
-
-    for i, page in enumerate(images):
-        text = pytesseract.image_to_string(page, lang=lang)
-        extracts.append(TextExtract.parse_obj({"text": text, "page": i}))
-    return extracts
-
-
-def extract_text_pypdf(data, params):
-    from pypdf import PdfReader
-
-    extracts = []
-    reader = PdfReader(io.BytesIO(data))
-    _logger.debug(f"found {len(reader.pages)} pages with pypdf")
-    for p in range(len(reader.pages)):
-        page = reader.pages[p]
-        text = page.extract_text()
-        extracts.append(TextExtract.parse_obj({"text": text, "page": p}))
-    return extracts
-
-
-def extract_text_pypdfium(data, params):
-    import pypdfium2 as pdfium
-
-    extracts = []
-    pdf = pdfium.PdfDocument(data)
-    _logger.debug(f"found {len(pdf)} pages with pdf")
-    for p in range(len(pdf)):
-        textpage = pdf[p].get_textpage()
-        text_all = textpage.get_text_bounded()
-        extracts.append(TextExtract.parse_obj({"text": text_all, "page": p}))
-
-    return extracts
-
-
 def extract_table(data, params):
-    import camelot.io as camelot
-
     with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
         tmp_pdf_file.write(data)
         tables = camelot.read_pdf(tmp_pdf_file.name, pages="all")
@@ -92,28 +40,64 @@ def extract_table(data, params):
     return extracts
 
 
-class PdfModule:
-
+class PdfTextExtractor:
     def __init__(self):
+        pass
 
-        self.modules = {
-            (_ENGINE_PDFIUM, _ACTION_TEXT): extract_text_pypdfium,
-            (_ENGINE_PYPDF, _ACTION_TEXT): extract_text_pypdf,
-            (_ENGINE_TESSERACT, _ACTION_TEXT): extract_text_tesseract,
-            (_ENGINE_CAMELOT, _ACTION_TABLE): extract_table,
-        }
+    def extract_text_pypdfium(self, data):
+        extracts = []
+        pdf = pdfium.PdfDocument(data)
+        _logger.debug(f"found {len(pdf)} pages with pdf")
+        for p in range(len(pdf)):
+            textpage = pdf[p].get_textpage()
+            text_all = textpage.get_text_bounded()
+            extracts.append(TextExtract.parse_obj({"text": text_all, "page": p}))
 
-    def run(self, module, action, data, params):
-        _logger.debug(f"module: {module}, action: {action}, params: {params}")
-        if (module, action) in self.modules:
-            return self.modules[(module, action)](data, params)
-        else:
-            return JSONResponse(
-                status_code=400,
-                content={
-                    "message": f"module {module} and action ${action} is not supported"
-                },
-            )
+        return extracts
 
-    def get_modules(self):
-        return self.modules.keys()
+
+class PdfOcrExtractor:
+    def __init__(self):
+        pass
+
+    def extract_text(self, data, lang=None, first_page=None, last_page=None):
+        extracts = []
+        images = convert_from_bytes(data)
+        _logger.debug(f"made {len(images)} images with pdf2images")
+
+        for i, page in enumerate(images):
+            text = pytesseract.image_to_string(page, lang=lang)
+            extracts.append(TextExtract.parse_obj({"text": text, "page": i}))
+        return extracts
+
+
+class PdfTableExtractor:
+    def __init__(self):
+        pass
+
+    def extract_table(self, data):
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
+            tmp_pdf_file.write(data)
+            tables = camelot.read_pdf(tmp_pdf_file.name, pages="all")
+            _logger.debug(f"found {len(tables)} tables with camelot")
+            extracts = []
+
+            for p in range(len(tables)):
+                with tempfile.NamedTemporaryFile(suffix=".json") as tmp_json_file:
+                    tables[p].to_json(tmp_json_file.name)
+                    report = tables[p].parsing_report
+                    _logger.debug(f"parsing tables report {report}")
+                    f = open(tmp_json_file.name)
+                    table_json = json.load(f)
+                    extracts.append(
+                        TableExtract.parse_obj(
+                            {
+                                "page": report["page"],
+                                "index": report["order"] - 1,
+                                "table": table_json,
+                            }
+                        )
+                    )
+                    f.close()
+
+        return extracts
