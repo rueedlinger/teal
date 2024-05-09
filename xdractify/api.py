@@ -10,7 +10,7 @@ from xdractify.model import (
     TextExtract,
     TableExtract,
 )
-from xdractify.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor
+from xdractify.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor, PdfMetaDataExtractor
 
 app = FastAPI()
 with open('log_conf.yaml', 'rt') as f:
@@ -62,6 +62,15 @@ async def extract_table_from_pdf(
     logger.debug(f"extract table from pdf file='{file.filename}'")
     pdf = PdfTableExtractor()
     return pdf.extract_table(data=await file.read())
+
+
+@app.post("/pdf/meta", response_model=List[dict])
+async def extract_meta_data_from_pdf(
+        file: UploadFile,
+) -> Any:
+    logger.debug(f"extract meta data from pdf file='{file.filename}'")
+    pdf = PdfMetaDataExtractor()
+    return pdf.extract_metadata(data=await file.read())
 
 
 """

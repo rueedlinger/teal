@@ -1,8 +1,10 @@
 import json
 import logging
 import tempfile
+from io import BytesIO
 
 import camelot.io as camelot
+import pikepdf
 import pypdfium2 as pdfium
 import pytesseract
 from pdf2image import convert_from_bytes
@@ -101,3 +103,21 @@ class PdfTableExtractor:
                     f.close()
 
         return extracts
+
+
+class PdfMetaDataExtractor:
+    def __init__(self):
+        pass
+
+    def extract_metadata(self, data):
+        pdf = pikepdf.open(BytesIO(data))
+        extarct = []
+
+        doc_info = {}
+        for k in pdf.docinfo.keys():
+            doc_info[k] = str(pdf.docinfo.get(k))
+        extarct.append({'DocumentInfo': doc_info})
+
+        meta = pdf.open_metadata()
+
+        return extarct
