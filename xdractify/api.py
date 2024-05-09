@@ -1,10 +1,11 @@
 import binascii
 import logging.config
+import os
 from typing import Any, List
 
 import yaml
 from fastapi import FastAPI, UploadFile, Request
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, RedirectResponse
 
 from xdractify.model import (
     TextExtract,
@@ -13,7 +14,11 @@ from xdractify.model import (
 from xdractify.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor, PdfMetaDataExtractor
 
 app = FastAPI()
-with open('log_conf.yaml', 'rt') as f:
+log_conf_file = "log_conf.yaml"
+if 'XDR_LOG_CONF' in os.environ:
+    log_conf_file = os.environ['XDR_LOG_CONF']
+
+with open(log_conf_file, 'rt') as f:
     config = yaml.safe_load(f.read())
 logging.config.dictConfig(config)
 
@@ -35,6 +40,11 @@ async def unicorn_exception_handler(request: Request, ex: binascii.Error):
         status_code=500,
         content={"message": f"{ex}"},
     )
+
+
+@app.get("/")
+async def redirect_typer():
+    return RedirectResponse("/docs")
 
 
 @app.post("/pdf/text", response_model=List[TextExtract])

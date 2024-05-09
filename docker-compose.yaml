@@ -4,3 +4,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8000:8000
+    environment:
+      XDR_LOG_CONF: "log_conf.yaml"
+      XDR_WORKERS: 1
+      XDR_PORT: 8000
