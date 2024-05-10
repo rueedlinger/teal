@@ -6,8 +6,6 @@ workflow. The main features are:
 - Digitalized documents to searchable or achievable PDF (PDF/A) .
 - Extract meta data, text and tables as structured data.
 
-$${\color{red}Red}$$
-
 **teal** uses other open source libraries and provide these functionally as convince API.
 
 | Feature                                   | Library     |
