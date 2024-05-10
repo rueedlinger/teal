@@ -1,19 +1,21 @@
 # teal - a convenient REST API for working with PDF's
 
-*teal* aims to provide a user-friendly API for working with PDFs which can be easily integrated in an existing
-workflow. The main feature are:
+**teal** aims to provide a user-friendly API for working with PDFs which can be easily integrated in an existing
+workflow. The main features are:
 
 - Digitalized documents to searchable or achievable PDF (PDF/A) .
 - Extract meta data, text and tables as structured data.
 
+<span style="color:blue">some *blue* text</span>.
+
 *teal* uses other open source libraries and provide these functionally as convince API.
 
-| Format | Feature                                   | Library     | 
-|--------|-------------------------------------------|-------------|
-| PDF    | Extract text                              | pdfium      |
-| PDF    | Extract text from scanned documents (OCR) | pytesseract |
-| PDF    | Extract tables                            | camelot     |
-| PDF    | Extract meta data                         | pikepdf     |
+| Feature                                   | Library     |
+|-------------------------------------------|-------------|
+| Extract text                              | pdfium      |
+| Extract text from scanned documents (OCR) | pytesseract |
+| Extract tables                            | camelot     |
+| Extract meta data                         | pikepdf     |
 
 ## Setup
 
