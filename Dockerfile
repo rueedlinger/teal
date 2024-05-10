@@ -3,7 +3,7 @@ ARG USERNAME=worker
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-LABEL ch.yax.xtra.name="xdratoify"
+LABEL ch.yax.xtra.url="https://github.com/rueedlinger/xtra"
 
 WORKDIR /usr/src/app
 
@@ -21,6 +21,7 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     apt-get install -y tesseract-ocr-por && \
     apt-get install -y tesseract-ocr-spa && \
     apt-get install -y poppler-utils && \
+    apt-get install -y ocrmypdf && \
     apt-get install -y ghostscript python3-tk && \
     apt-get install -y libgl1
 

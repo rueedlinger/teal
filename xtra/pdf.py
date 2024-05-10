@@ -46,7 +46,7 @@ class PdfTextExtractor:
     def __init__(self):
         pass
 
-    def extract_text_pypdfium(self, data):
+    def extract_text(self, data):
         extracts = []
         pdf = pdfium.PdfDocument(data)
         _logger.debug(f"found {len(pdf)} pages with pdf")
@@ -68,6 +68,7 @@ class PdfOcrExtractor:
         _logger.debug(f"made {len(images)} images with pdf2images")
 
         for i, page in enumerate(images):
+            # multi lang eg. eng+chi_tra
             text = pytesseract.image_to_string(page, lang=lang)
             extracts.append(TextExtract.parse_obj({"text": text, "page": i + 1}))
         return extracts
