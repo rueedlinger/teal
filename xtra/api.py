@@ -7,23 +7,24 @@ import yaml
 from fastapi import FastAPI, UploadFile, Request
 from starlette.responses import JSONResponse
 
-from xfy.model import (
+from xtra.model import (
     TextExtract,
     TableExtract,
 )
-from xfy.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor, PdfMetaDataExtractor
+from xtra.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor, PdfMetaDataExtractor
 
 app = FastAPI()
+
 log_conf_file = "log_conf.yaml"
-if 'XFY_LOG_CONF' in os.environ:
-    log_conf_file = os.environ['XFY_LOG_CONF']
+if 'XTRA_LOG_CONF' in os.environ:
+    log_conf_file = os.environ['XTRA_LOG_CONF']
 
 with open(log_conf_file, 'rt') as f:
     config = yaml.safe_load(f.read())
 logging.config.dictConfig(config)
 
 # get root logger
-logger = logging.getLogger("xfy.api")
+logger = logging.getLogger("xtra.api")
 
 
 @app.exception_handler(binascii.Error)

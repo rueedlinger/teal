@@ -9,9 +9,9 @@ import pypdfium2 as pdfium
 import pytesseract
 from pdf2image import convert_from_bytes
 
-from xfy.model import TextExtract, TableExtract
+from xtra.model import TextExtract, TableExtract
 
-_logger = logging.getLogger("xfy.pdf")
+_logger = logging.getLogger("xtra.pdf")
 
 
 def extract_table(data, params):
@@ -116,8 +116,10 @@ class PdfMetaDataExtractor:
         doc_info = {}
         for k in pdf.docinfo.keys():
             doc_info[k] = str(pdf.docinfo.get(k))
-        extarct.append({'DocumentInfo': doc_info})
+        extarct.append({'document_info': doc_info})
 
         meta = pdf.open_metadata()
+        extarct.append({'claimn_pdfa': meta.pdfa_status})
+        extarct.append({'claimn_pdfx': meta.pdfx_status})
 
         return extarct

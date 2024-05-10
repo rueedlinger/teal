@@ -3,6 +3,8 @@ ARG USERNAME=worker
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
+LABEL ch.yax.xtra.name="xdratoify"
+
 WORKDIR /usr/src/app
 
 # supported tesseract languages https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html
@@ -29,15 +31,15 @@ COPY log_conf.yaml ./
 COPY run.sh ./
 RUN chmod 755 run.sh
 
-RUN mkdir /usr/src/app/xfy
-COPY xfy ./xfy
+RUN mkdir /usr/src/app/xtra
+COPY xtra ./xtra
 
 
 
 USER $USERNAME
 # Runs "/usr/bin/dumb-init -- /my/script --with --args"
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
-#CMD ["uvicorn",  "xfy.api:app", "--log-config=log_conf.yaml", "--host", "0.0.0.0", "--port", "8000"]
-#CMD ["gunicorn", "xfy.api:app", "--workers",  "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--access-logfile=-", "--error-logfile=-"]
+#CMD ["uvicorn",  "xtra.api:app", "--log-config=log_conf.yaml", "--host", "0.0.0.0", "--port", "8000"]
+#CMD ["gunicorn", "xtra.api:app", "--workers",  "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--access-logfile=-", "--error-logfile=-"]
 
 CMD ["/usr/src/app/run.sh"]

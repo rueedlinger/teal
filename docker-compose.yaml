@@ -5,7 +5,7 @@ services:
     ports:
       - 8000:8000
     environment:
-      XDR_LOG_CONF: "log_conf.yaml"
-      XDR_WORKERS: 1
-      XDR_PORT: 8000
-      #XDR_IP_BIND: 0.0.0.0
+      XTRALOG_CONF: "log_conf.yaml"
+      XTRA_WORKERS: 1
+      XTRA_PORT: 8000
+      #XTRA_IP_BIND: 0.0.0.0

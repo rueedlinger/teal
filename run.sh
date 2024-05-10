@@ -1,28 +1,28 @@
 #!/bin/bash
 
-if [ -z ${XFY_WORKERS+x} ]; then
-  XFY_WORKERS=1
-  echo "env XFY_WORKERS is unset, will set to $XFY_WORKERS"
+if [ -z ${XTRA_WORKERS+x} ]; then
+  XTRA_WORKERS=1
+  echo "env XTRA_WORKERS is unset, will set to $XTRA_WORKERS"
 
 else
-    echo "env XFY_WORKERS is set to '$XFY_WORKERS'"
+    echo "env XTRA_WORKERS is set to '$XTRA_WORKERS'"
 fi
 
-if [ -z ${XFY_PORT+x} ]; then
-  XFY_PORT=8000
-  echo "env XFY_PORT is unset, will set port to $XFY_PORT"
+if [ -z ${XTRA_PORT+x} ]; then
+  XTRA_PORT=8000
+  echo "env XFY_PORT is unset, will set port to $XTRA_PORT"
 else
-  echo "env XFY_PORT is set to '$XFY_PORT'"
+  echo "env XFY_PORT is set to '$XTRA_PORT'"
 fi
 
-if [ -z ${XFY_IP_BIND+x} ]; then
-  XFY_IP_BIND=0.0.0.0
-  echo "env XFY_IP_BIND is unset, will set IP to $XFY_IP_BIND"
+if [ -z ${XTRA_IP_BIND+x} ]; then
+  XTRA_IP_BIND=0.0.0.0
+  echo "env XTRA_IP_BIND is unset, will set IP to $XTRA_IP_BIND"
 else
-  echo "env XDR_IP_BIND is set to '$XFY_IP_BIND'"
+  echo "env XTRA_IP_BIND is set to '$XTRA_IP_BIND'"
 fi
 
 
-gunicorn xfy.api:app --workers "$XFY_WORKERS" \
-  --worker-class uvicorn.workers.UvicornWorker --bind "$XFY_IP_BIND":"$XFY_PORT" \
+gunicorn xtra.api:app --workers "$XTRA_WORKERS" \
+  --worker-class uvicorn.workers.UvicornWorker --bind "$XTRA_IP_BIND":"$XTRA_PORT" \
   --access-logfile="-" --error-logfile="-"

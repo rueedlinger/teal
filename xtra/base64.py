@@ -1,6 +1,6 @@
 import base64
 
-from xfy.model import Document, Data, DataEncoding
+from xtra.model import Document, Data, DataEncoding
 
 
 class Base64:

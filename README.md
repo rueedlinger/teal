@@ -16,13 +16,13 @@ docker comppose up
 
 ```bash
 pyenv install 3.12.0 
-pyenv virtualenv 3.12.0 xfy 
-pyenv activate xfy  
+pyenv virtualenv 3.12.0 xtra 
+pyenv activate xtra  
 pip install -r requiremnts.txt
 ```
 
 ```bash
-uvicorn xfy.api:app --reload
+uvicorn xtra.api:app --reload
 ```
 
 ## API
