@@ -1,6 +1,6 @@
 import base64
 
-from xdractify.model import Document, Data, DataEncoding
+from xfy.model import Document, Data, DataEncoding
 
 
 class Base64:
@@ -18,5 +18,3 @@ class Base64:
                 ),
             }
         )
-
-

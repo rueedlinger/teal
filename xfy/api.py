@@ -5,25 +5,25 @@ from typing import Any, List
 
 import yaml
 from fastapi import FastAPI, UploadFile, Request
-from starlette.responses import JSONResponse, RedirectResponse
+from starlette.responses import JSONResponse
 
-from xdractify.model import (
+from xfy.model import (
     TextExtract,
     TableExtract,
 )
-from xdractify.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor, PdfMetaDataExtractor
+from xfy.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor, PdfMetaDataExtractor
 
 app = FastAPI()
 log_conf_file = "log_conf.yaml"
-if 'XDR_LOG_CONF' in os.environ:
-    log_conf_file = os.environ['XDR_LOG_CONF']
+if 'XFY_LOG_CONF' in os.environ:
+    log_conf_file = os.environ['XFY_LOG_CONF']
 
 with open(log_conf_file, 'rt') as f:
     config = yaml.safe_load(f.read())
 logging.config.dictConfig(config)
 
 # get root logger
-logger = logging.getLogger("xdractify.api")
+logger = logging.getLogger("xfy.api")
 
 
 @app.exception_handler(binascii.Error)
@@ -42,9 +42,11 @@ async def unicorn_exception_handler(request: Request, ex: binascii.Error):
     )
 
 
+"""
 @app.get("/")
 async def redirect_typer():
     return RedirectResponse("/docs")
+"""
 
 
 @app.post("/pdf/text", response_model=List[TextExtract])

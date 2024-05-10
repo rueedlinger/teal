@@ -1,5 +1,5 @@
 services:
-  app:
+  xdr:
     build:
       dockerfile: Dockerfile
     ports:

@@ -19,11 +19,11 @@ handlers:
   #    mode: a
 
 loggers:
-  'xdractify.api':
+  'xfy.api':
     level: DEBUG
     handlers: [ console ]
     propagate: no
-  'xdractify.pdf':
+  'xfy.pdf':
     level: DEBUG
     handlers: [ console ]
     propagate: no

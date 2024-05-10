@@ -1,20 +1,34 @@
-# xtractify
+# xfy - extract structured data from pdf files
 
 ## Setup
 
+### Docker
+
+```bash
+docker compose build
+```
+
+```bash
+docker comppose up
+```
+
+### Python
+
 ```bash
 pyenv install 3.12.0 
-pyenv virtualenv 3.12.0 xdractify 
-pyenv activate xdractify  
+pyenv virtualenv 3.12.0 xfy 
+pyenv activate xfy  
+pip install -r requiremnts.txt
 ```
 
 ```bash
-uvicorn xdractify.api:app --reload
+uvicorn xfy.api:app --reload
 ```
 
-http://127.0.0.1:8000/
-http://127.0.0.1:8000/docs
-http://127.0.0.1:8000/redoc
+## API
+
+- OpenAPI http://127.0.0.1:8000/docs
+- Redoc, http://127.0.0.1:8000/redoc
 
 mac
 brew install poppler (pdf2image)
