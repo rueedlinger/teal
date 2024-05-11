@@ -43,7 +43,7 @@ class LibreOfficeAdapter:
 
                 else:
                     _logger.debug(f"file was not written {result}")
-                    raise RuntimeError(f"could convert file: {result}")
+                    raise Exception(f"could convert file {filename}, got code {result.returncode}")
 
 
 def _cleanup(tmp_dir):
