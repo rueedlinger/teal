@@ -87,13 +87,12 @@ async def convert_pdf(
     return []
 
 
-@app.post("/libreoffice/convert", response_class=FileResponse)
+@app.post("/libreoffice/pdf", response_class=FileResponse)
 async def convert_libreoffice_to_pdf(
         file: UploadFile,
 ) -> Any:
     logger.debug(f"libreoffice convert file='{file.filename}' to pdf")
     libreoffice = LibreOfficeAdapter()
-
     return libreoffice.convert_to_pdf(data=await file.read(), filename=file.filename)
 
 
