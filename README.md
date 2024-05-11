@@ -8,16 +8,16 @@ workflow. The main features are:
 
 **teal** uses other open source libraries and provide these functionally as convince API.
 
-| Feature                                   | Library     |
-|-------------------------------------------|-------------|
-| Extract text                              | pdfium      |
-| Extract text from scanned documents (OCR) | pytesseract |
-| Extract tables                            | camelot     |
-| Extract meta data                         | pikepdf     |
+| Feature                              | Library     |
+|--------------------------------------|-------------|
+| Extract text from PDFs               | pypdfium2   |
+| Extract text from scanned PDFs (OCR) | pytesseract |
+| Extract tables from PDFs             | camelot     |
+| Extract meta data from PDFs          | pikepdf     |
 
 ## Setup
 
-### Docker
+### Docker Container
 
 ```bash
 docker compose build
@@ -31,13 +31,13 @@ docker comppose up
 
 ```bash
 pyenv install 3.12.0 
-pyenv virtualenv 3.12.0 xtra 
-pyenv activate xtra  
+pyenv virtualenv 3.12.0 teal 
+pyenv activate teal  
 pip install -r requiremnts.txt
 ```
 
 ```bash
-uvicorn xtra.api:app --reload
+uvicorn teal.api:app --reload
 ```
 
 ## API

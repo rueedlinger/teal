@@ -1,6 +1,6 @@
 import base64
 
-from xtra.model import Document, Data, DataEncoding
+from teal.model import Document, Data, DataEncoding
 
 
 class Base64:

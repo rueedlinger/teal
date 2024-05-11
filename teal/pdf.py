@@ -9,9 +9,9 @@ import pypdfium2 as pdfium
 import pytesseract
 from pdf2image import convert_from_bytes
 
-from xtra.model import TextExtract, TableExtract
+from teal.model import TextExtract, TableExtract
 
-_logger = logging.getLogger("xtra.pdf")
+_logger = logging.getLogger("teal.pdf")
 
 
 def extract_table(data, params):

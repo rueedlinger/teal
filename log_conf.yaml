@@ -19,11 +19,19 @@ handlers:
   #    mode: a
 
 loggers:
-  'xfy.api':
+  'teal.api':
     level: DEBUG
     handlers: [ console ]
     propagate: no
-  'xfy.pdf':
+  'teal.pdf':
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
+  'teal.office':
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
+  'teal.ocr':
     level: DEBUG
     handlers: [ console ]
     propagate: no

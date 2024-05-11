@@ -8,8 +8,8 @@ from fastapi import FastAPI, UploadFile, Request
 from fastapi.openapi.utils import get_openapi
 from starlette.responses import JSONResponse
 
-from xtra.model import TextExtract, TableExtract
-from xtra.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor, PdfMetaDataExtractor
+from teal.model import TextExtract, TableExtract
+from teal.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor, PdfMetaDataExtractor
 
 app = FastAPI()
 
@@ -22,7 +22,7 @@ with open(log_conf_file, 'rt') as f:
 logging.config.dictConfig(config)
 
 # get root logger
-logger = logging.getLogger("xtra.api")
+logger = logging.getLogger("teal.api")
 
 
 @app.exception_handler(binascii.Error)
@@ -100,10 +100,10 @@ def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
-        title="xtra",
+        title="teal",
         version="0.1.0",
-        summary="API's for extracting structured data and convert PDF files",
-        description="Here's a longer description of the custom **OpenAPI** schema",
+        summary="A convenient REST API for working with PDF's",
+        description="**teal** aims to provide a user-friendly API for working with PDFs which can be easily integrated in an existing workflow. ",
         routes=app.routes,
     )
     openapi_schema["info"]["x-logo"] = {
