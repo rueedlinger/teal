@@ -6,20 +6,23 @@ from typing import Any, List
 import yaml
 from fastapi import FastAPI, UploadFile, Request
 from fastapi.openapi.utils import get_openapi
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, FileResponse
 
+from teal.libreoffice import LibreOfficeAdapter
 from teal.model import TextExtract, TableExtract
-from teal.pdf import PdfTextExtractor, PdfTableExtractor, PdfOcrExtractor, PdfMetaDataExtractor
+from teal.pdf import PdfDataExtractor
 
 app = FastAPI()
 
 log_conf_file = "log_conf.yaml"
-if 'XTRA_LOG_CONF' in os.environ:
-    log_conf_file = os.environ['XTRA_LOG_CONF']
+if 'TEAL_LOG_CONF' in os.environ:
+    log_conf_file = os.environ['TEAL_LOG_CONF']
+
+print(f"using TEAL_LOG_CONF {log_conf_file}")
 
 with open(log_conf_file, 'rt') as f:
     config = yaml.safe_load(f.read())
-logging.config.dictConfig(config)
+    logging.config.dictConfig(config)
 
 # get root logger
 logger = logging.getLogger("teal.api")
@@ -53,7 +56,7 @@ async def extract_text_from_pdf(
         file: UploadFile,
 ) -> Any:
     logger.debug(f"extract text from pdf file='{file.filename}'")
-    pdf = PdfTextExtractor()
+    pdf = PdfDataExtractor()
     return pdf.extract_text(data=await file.read())
 
 
@@ -62,8 +65,8 @@ async def extract_text_with_ocr_from_pdf(
         file: UploadFile,
 ) -> Any:
     logger.debug(f"extract text with ocr from pdf file='{file.filename}'")
-    pdf = PdfOcrExtractor()
-    return pdf.extract_text(data=await file.read())
+    pdf = PdfDataExtractor()
+    return pdf.extract_text_with_ocr(data=await file.read())
 
 
 @app.post("/pdf/table", response_model=List[TableExtract])
@@ -71,10 +74,30 @@ async def extract_table_from_pdf(
         file: UploadFile,
 ) -> Any:
     logger.debug(f"extract table from pdf file='{file.filename}'")
-    pdf = PdfTableExtractor()
+    pdf = PdfDataExtractor()
     return pdf.extract_table(data=await file.read())
 
 
+@app.post("/pdf/convert", response_model=List[str])
+async def convert_pdf(
+        file: UploadFile,
+) -> Any:
+    logger.debug(f"extract table from pdf file='{file.filename}'")
+
+    return []
+
+
+@app.post("/libreoffice/convert", response_class=FileResponse)
+async def convert_libreoffice_to_pdf(
+        file: UploadFile,
+) -> Any:
+    logger.debug(f"extract table from pdf file='{file.filename}'")
+    libreoffice = LibreOfficeAdapter()
+
+    return libreoffice.convert_to_pdf(data=await file.read(), filename=file.filename)
+
+
+"""
 @app.post("/pdf/meta", response_model=List[dict])
 async def extract_meta_data_from_pdf(
         file: UploadFile,
@@ -82,9 +105,6 @@ async def extract_meta_data_from_pdf(
     logger.debug(f"extract meta data from pdf file='{file.filename}'")
     pdf = PdfMetaDataExtractor()
     return pdf.extract_metadata(data=await file.read())
-
-
-"""
 
 @app.post("/base64/encode", response_model=Document)
 async def encode_file_to_base64(file: UploadFile) -> Any:

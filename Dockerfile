@@ -24,7 +24,8 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     apt-get install -y ocrmypdf && \
     apt-get install -y ghostscript python3-tk && \
     apt-get install -y libgl1 && \
-    apt-get install -y libreoffice-core-nogui
+    apt-get --no-install-recommends install -y libreoffice && \
+    apt-get install -y default-jre libreoffice-java-common jodconverter
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
@@ -36,12 +37,15 @@ RUN chmod 755 run.sh
 RUN mkdir /usr/src/app/teal
 COPY teal ./teal
 
-
+RUN
+RUN apt-get install -y
 
 USER $USERNAME
 # Runs "/usr/bin/dumb-init -- /my/script --with --args"
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 #CMD ["uvicorn",  "teal.api:app", "--log-config=log_conf.yaml", "--host", "0.0.0.0", "--port", "8000"]
 #CMD ["gunicorn", "teal.api:app", "--workers",  "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--access-logfile=-", "--error-logfile=-"]
+
+
 
 CMD ["/usr/src/app/run.sh"]

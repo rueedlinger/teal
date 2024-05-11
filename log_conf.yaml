@@ -19,19 +19,15 @@ handlers:
   #    mode: a
 
 loggers:
-  'teal.api':
+  teal.api:
     level: DEBUG
     handlers: [ console ]
     propagate: no
-  'teal.pdf':
+  teal.pdf:
     level: DEBUG
     handlers: [ console ]
     propagate: no
-  'teal.office':
-    level: DEBUG
-    handlers: [ console ]
-    propagate: no
-  'teal.ocr':
+  teal.libreoffice:
     level: DEBUG
     handlers: [ console ]
     propagate: no

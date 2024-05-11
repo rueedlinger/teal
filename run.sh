@@ -1,11 +1,11 @@
 #!/bin/bash
 
 if [ -z ${TEAL_WORKERS+x} ]; then
-  XTRA_WORKERS=1
+  TEAL_WORKERS=1
   echo "env TEAL_WORKERS is unset, will set to $TEAL_WORKERS"
 
 else
-    echo "env TEAL_WORKERS is set to '$XTRA_WORKERS'"
+    echo "env TEAL_WORKERS is set to '$TEAL_WORKERS'"
 fi
 
 if [ -z ${TEAL_PORT+x} ]; then
@@ -16,7 +16,7 @@ else
 fi
 
 if [ -z ${TEAL_IP_BIND+x} ]; then
-  XTRA_IP_BIND=0.0.0.0
+  TEAL_IP_BIND=0.0.0.0
   echo "env TEAL_IP_BIND is unset, will set IP to $TEAL_IP_BIND"
 else
   echo "env TEAL_IP_BIND is set to '$TEAL_IP_BIND'"
