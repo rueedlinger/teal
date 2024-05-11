@@ -23,10 +23,8 @@ class LibreOfficeAdapter:
             new_file_name = Path(filename).stem + ".pdf"
             out_file = os.path.join(tmp_out_path, new_file_name)
 
-            _logger.debug(f"writing tmp file {tmp_file_in_path}")
-            _logger.debug(f"out {out_file}")
-
             with open(tmp_file_in_path, 'wb') as tmp_file:
+                _logger.debug(f"writing tmp file for input {tmp_file_in_path}")
                 tmp_file.write(data)
 
                 result = subprocess.run(
@@ -39,6 +37,7 @@ class LibreOfficeAdapter:
                     env={"HOME": "/tmp"})
 
                 if os.path.exists(out_file):
+                    _logger.debug(f"out was written {out_file}")
                     return FileResponse(out_file, media_type='application/pdf', filename=new_file_name,
                                         background=BackgroundTask(_cleanup, tmp_out_path))
 

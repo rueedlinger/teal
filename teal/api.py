@@ -91,7 +91,7 @@ async def convert_pdf(
 async def convert_libreoffice_to_pdf(
         file: UploadFile,
 ) -> Any:
-    logger.debug(f"extract table from pdf file='{file.filename}'")
+    logger.debug(f"libreoffice convert file='{file.filename}' to pdf")
     libreoffice = LibreOfficeAdapter()
 
     return libreoffice.convert_to_pdf(data=await file.read(), filename=file.filename)
