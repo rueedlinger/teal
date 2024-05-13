@@ -1,4 +1,3 @@
-import binascii
 import logging.config
 import os
 from typing import Any, List
@@ -6,8 +5,9 @@ from typing import Any, List
 import yaml
 from fastapi import FastAPI, UploadFile, Request
 from fastapi.openapi.utils import get_openapi
-from starlette.responses import JSONResponse, FileResponse
+from starlette.responses import FileResponse
 
+from teal.core import create_json_err_response_from_exception
 from teal.libreoffice import LibreOfficeAdapter
 from teal.model import TextExtract, TableExtract
 from teal.pdf import PdfDataExtractor
@@ -28,20 +28,9 @@ with open(log_conf_file, 'rt') as f:
 logger = logging.getLogger("teal.api")
 
 
-@app.exception_handler(binascii.Error)
-async def unicorn_exception_handler(request: Request, ex: binascii.Error):
-    return JSONResponse(
-        status_code=400,
-        content={"message": f"bas46 error, {ex}"},
-    )
-
-
 @app.exception_handler(Exception)
-async def unicorn_exception_handler(request: Request, ex: binascii.Error):
-    return JSONResponse(
-        status_code=500,
-        content={"message": f"{ex}"},
-    )
+async def unicorn_exception_handler(request: Request, ex: Exception):
+    return create_json_err_response_from_exception(ex)
 
 
 """
