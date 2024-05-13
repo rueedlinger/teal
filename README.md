@@ -49,12 +49,6 @@ uvicorn teal.api:app --reload
 - OpenAPI http://127.0.0.1:8000/docs
 - Redoc, http://127.0.0.1:8000/redoc
 
-mac
-brew install poppler (pdf2image)
-brew install tesseract
-brew install tesseract-lang
-brew install ghostscript tcl-tk (camelot)
-
 ## Understanding Different Types of PDFs
 
 Digitally created PDFs:
