@@ -1,6 +1,5 @@
 import logging
 import os
-import shutil
 import subprocess
 import tempfile
 
@@ -45,34 +44,34 @@ class LibreOfficeAdapter:
         os.mkdir(tmp_dir)
 
         tmp_file_in_path = os.path.join(tmp_dir, f"tmp{file_ext}")
-        tmp_file_out_path = os.path.join(tmp_dir, "tmp.pdf")
-        _logger.debug(f"in_file: {tmp_file_in_path}, out_file: {tmp_file_out_path}")
+        tmp_out_dir = os.path.join(tmp_dir, "out")
 
         with open(tmp_file_in_path, 'wb') as tmp_file_in:
             _logger.debug(f"writing file {filename} to {tmp_file_in_path}")
             tmp_file_in.write(data)
 
         _logger.debug(f"expecting out pdf {tmp_file_in_path}")
-        cmd_convert_pdf = f'{self.libreoffice_path} --headless --convert-to pdf --outdir "{tmp_dir}" "{tmp_file_in_path}"'
+        cmd_convert_pdf = f'{self.libreoffice_path} --headless --convert-to pdf --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(cmd_convert_pdf, shell=True, capture_output=True, env={'HOME': '/tmp'})
 
-        if os.path.exists(tmp_file_out_path):
-            _logger.debug(f"out was written {tmp_file_out_path}")
-            return FileResponse(tmp_file_out_path, media_type='application/pdf',
+        converted_file_out = os.path.join(tmp_dir, "out", "tmp.pdf")
+        if os.path.exists(converted_file_out):
+            _logger.debug(f"out was written {converted_file_out}")
+            return FileResponse(converted_file_out, media_type='application/pdf',
                                 filename=f"{os.path.splitext(filename)[0]}.pdf",
-                                background=BackgroundTask(_cleanup, tmp_dir))
+                                background=BackgroundTask(_cleanup_tmp_dir, tmp_dir))
 
         else:
             _logger.debug(f"file was not written {result}")
             return create_json_err_response(500, f"could not convert file '{filename}' ({result}).")
 
 
-def _cleanup(tmp_dir: str):
+def _cleanup_tmp_dir(tmp_dir: str):
     teal_tmp_dir_prefix = '/tmp/teal-'
     if tmp_dir.startswith(teal_tmp_dir_prefix):
         _logger.debug(f"cleanup tmp dir {tmp_dir}")
-        shutil.rmtree(tmp_dir)
+        # shutil.rmtree(tmp_dir)
     else:
         _logger.warning(f"will not delete '{tmp_dir}', tmp dir mus start with '{teal_tmp_dir_prefix}'")
