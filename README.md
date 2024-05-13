@@ -21,12 +21,12 @@ workflow. The main features are:
 
 ## Docker
 
-| ENV           | Description                     | Default       |
-|---------------|---------------------------------|---------------|
-| TEAL_LOG_CONF | The python logging conf (yaml)  | log_conf.yaml |
-| TEAL_WORKERS  | The number of worker processes. | 1             |
-| TEAL_PORT     | Bind socket to this port        | 8000          |
-| TEAL_IP_BIND  | Bind socket to this host.       | 0.0.0.0       |
+| ENV           | Default       | Description                     |
+|---------------|---------------|---------------------------------|
+| TEAL_LOG_CONF | log_conf.yaml | The python logging conf (yaml)  |
+| TEAL_WORKERS  | 1             | The number of worker processes. |
+| TEAL_PORT     | 8000          | Bind socket to this port        |
+| TEAL_IP_BIND  | 0.0.0.0       | Bind socket to this host.       |
 
 ## API
 
