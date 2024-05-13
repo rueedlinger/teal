@@ -33,14 +33,7 @@ async def unicorn_exception_handler(request: Request, ex: Exception):
     return create_json_err_response_from_exception(ex)
 
 
-"""
-@app.get("/")
-async def redirect_typer():
-    return RedirectResponse("/docs")
-"""
-
-
-@app.post("/pdf/text", response_model=List[TextExtract])
+@app.post("/pdf/text", response_model=List[TextExtract], tags=['pdf'])
 async def extract_text_from_pdf(
         file: UploadFile,
 ) -> Any:
@@ -49,7 +42,7 @@ async def extract_text_from_pdf(
     return pdf.extract_text(data=await file.read(), filename=file.filename)
 
 
-@app.post("/pdf/ocr", response_model=List[TextExtract])
+@app.post("/pdf/ocr", response_model=List[TextExtract], tags=['pdf'])
 async def extract_text_with_ocr_from_pdf(
         file: UploadFile,
 ) -> Any:
@@ -58,7 +51,7 @@ async def extract_text_with_ocr_from_pdf(
     return pdf.extract_text_with_ocr(data=await file.read(), filename=file.filename)
 
 
-@app.post("/pdf/table", response_model=List[TableExtract])
+@app.post("/pdf/table", response_model=List[TableExtract], tags=['pdf'])
 async def extract_table_from_pdf(
         file: UploadFile,
 ) -> Any:
@@ -67,7 +60,7 @@ async def extract_table_from_pdf(
     return pdf.extract_table(data=await file.read(), filename=file.filename)
 
 
-@app.post("/pdf/convert", response_class=FileResponse)
+@app.post("/pdf/convert", response_class=FileResponse, tags=['pdf'])
 async def convert_to_pdfa_with_ocr(
         file: UploadFile,
 ) -> Any:
@@ -76,7 +69,7 @@ async def convert_to_pdfa_with_ocr(
     return pdf.convert_pdf(data=await file.read(), filename=file.filename)
 
 
-@app.post("/libreoffice/pdf", response_class=FileResponse)
+@app.post("/libreoffice/pdf", response_class=FileResponse, tags=['libreoffice'])
 async def convert_libreoffice_to_pdf(
         file: UploadFile,
 ) -> Any:
@@ -86,6 +79,17 @@ async def convert_libreoffice_to_pdf(
 
 
 def custom_openapi():
+    tags_metadata = [
+        {
+            "name": "pdf",
+            "description": "Operations with users. The **login** logic is also here.",
+        },
+        {
+            "name": "libreoffice",
+            "description": "Manage items. So _fancy_ they have their own docs.",
+        },
+    ]
+
     if app.openapi_schema:
         return app.openapi_schema
     openapi_schema = get_openapi(
@@ -94,6 +98,7 @@ def custom_openapi():
         summary="A convenient REST API for working with PDF's",
         description="**teal** aims to provide a user-friendly API for working with PDFs which can be easily integrated in an existing workflow. ",
         routes=app.routes,
+        tags=tags_metadata
     )
     openapi_schema["info"]["x-logo"] = {
         "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"

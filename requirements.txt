@@ -4,8 +4,6 @@ uvicorn[standard]
 gunicorn
 pyyaml
 pypdfium2
-pypdf
-pikepdf
 pytesseract
 pdf2image
 PyPDF2<3.0
