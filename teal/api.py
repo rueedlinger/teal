@@ -85,25 +85,6 @@ async def convert_libreoffice_to_pdf(
     return libreoffice.convert_to_pdf(data=await file.read(), filename=file.filename)
 
 
-"""
-@app.post("/pdf/meta", response_model=List[dict])
-async def extract_meta_data_from_pdf(
-        file: UploadFile,
-) -> Any:
-    logger.debug(f"extract meta data from pdf file='{file.filename}'")
-    pdf = PdfMetaDataExtractor()
-    return pdf.extract_metadata(data=await file.read())
-
-@app.post("/base64/encode", response_model=Document)
-async def encode_file_to_base64(file: UploadFile) -> Any:
-    logger.debug(
-        f"base64 encode: filename='{file.filename}', size='{file.size}', content_type='{file.content_type}'"
-    )
-    b64 = Base64()
-    return b64.encode(data=await file.read(), filename=file.filename)
-"""
-
-
 def custom_openapi():
     if app.openapi_schema:
         return app.openapi_schema

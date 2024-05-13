@@ -41,9 +41,4 @@ COPY teal ./teal
 USER $USERNAME
 # Runs "/usr/bin/dumb-init -- /my/script --with --args"
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
-#CMD ["uvicorn",  "teal.api:app", "--log-config=log_conf.yaml", "--host", "0.0.0.0", "--port", "8000"]
-#CMD ["gunicorn", "teal.api:app", "--workers",  "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--access-logfile=-", "--error-logfile=-"]
-
-
-
 CMD ["/usr/src/app/run.sh"]
