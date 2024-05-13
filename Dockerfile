@@ -25,7 +25,7 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     apt-get install -y ghostscript python3-tk && \
     apt-get install -y libgl1 && \
     apt-get --no-install-recommends install -y libreoffice && \
-    apt-get install -y default-jre libreoffice-java-common jodconverter
+    apt-get install -y default-jre-headless libreoffice-java-common jodconverter
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
