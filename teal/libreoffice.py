@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 import subprocess
 import tempfile
 
@@ -39,7 +40,7 @@ class LibreOfficeAdapter:
             return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
 
         # create tmp dir for all files
-        tmp_dir = tempfile.mktemp()
+        tmp_dir = tempfile.mktemp(prefix='teal-')
         _logger.debug(f"creating tmp dir: {tmp_dir}")
         os.mkdir(tmp_dir)
 
@@ -68,6 +69,10 @@ class LibreOfficeAdapter:
             return create_json_err_response(500, f"could not convert file '{filename}' ({result}).")
 
 
-def _cleanup(tmp_dir):
-    _logger.debug(f"cleanup tmp dir {tmp_dir}")
-    # shutil.rmtree(tmp_dir)
+def _cleanup(tmp_dir: str):
+    teal_tmp_dir_prefix = '/tmp/teal-'
+    if tmp_dir.startswith(teal_tmp_dir_prefix):
+        _logger.debug(f"cleanup tmp dir {tmp_dir}")
+        shutil.rmtree(tmp_dir)
+    else:
+        _logger.warning(f"will not delete '{tmp_dir}', tmp dir mus start with '{teal_tmp_dir_prefix}'")
