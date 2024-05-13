@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import tempfile
 
 import camelot.io as camelot
@@ -7,6 +8,7 @@ import pypdfium2 as pdfium
 import pytesseract
 from pdf2image import convert_from_bytes
 
+from teal.core import create_json_err_response
 from teal.model import TextExtract, TableExtract
 
 _logger = logging.getLogger("teal.pdf")
@@ -14,9 +16,13 @@ _logger = logging.getLogger("teal.pdf")
 
 class PdfDataExtractor:
     def __init__(self):
-        pass
+        self.supported_file_extensions = ['.pdf']
 
-    def extract_text(self, data):
+    def extract_text(self, data, filename):
+        file_ext = os.path.splitext(filename)[1]
+        if file_ext not in self.supported_file_extensions:
+            return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
+
         extracts = []
         pdf = pdfium.PdfDocument(data)
         _logger.debug(f"found {len(pdf)} pages with pdf")
@@ -27,7 +33,11 @@ class PdfDataExtractor:
 
         return extracts
 
-    def extract_text_with_ocr(self, data, lang=None, first_page=None, last_page=None):
+    def extract_text_with_ocr(self, data, filename, lang=None, first_page=None, last_page=None):
+        file_ext = os.path.splitext(filename)[1]
+        if file_ext not in self.supported_file_extensions:
+            return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
+
         extracts = []
         images = convert_from_bytes(data)
         _logger.debug(f"made {len(images)} images with pdf2images")
@@ -38,7 +48,11 @@ class PdfDataExtractor:
             extracts.append(TextExtract.parse_obj({"text": text, "page": i + 1}))
         return extracts
 
-    def extract_table(self, data):
+    def extract_table(self, data, filename):
+        file_ext = os.path.splitext(filename)[1]
+        if file_ext not in self.supported_file_extensions:
+            return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
+
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
             tmp_pdf_file.write(data)
             tables = camelot.read_pdf(tmp_pdf_file.name, pages="all")
@@ -64,5 +78,3 @@ class PdfDataExtractor:
                     f.close()
 
         return extracts
-
-# pdf converter --> https://github.com/ocrmypdf/OCRmyPDF

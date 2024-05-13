@@ -55,7 +55,7 @@ class LibreOfficeAdapter:
         cmd_convert_pdf = f'{self.libreoffice_path} --headless --convert-to pdf --outdir "{tmp_dir}" "{tmp_file_in_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
-        result = subprocess.run(cmd_convert_pdf, shell=True, capture_output=True)
+        result = subprocess.run(cmd_convert_pdf, shell=True, capture_output=True, env={'HOME': '/tmp'})
 
         if os.path.exists(tmp_file_out_path):
             _logger.debug(f"out was written {tmp_file_out_path}")

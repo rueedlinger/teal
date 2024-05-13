@@ -46,7 +46,7 @@ async def extract_text_from_pdf(
 ) -> Any:
     logger.debug(f"extract text from pdf file='{file.filename}'")
     pdf = PdfDataExtractor()
-    return pdf.extract_text(data=await file.read())
+    return pdf.extract_text(data=await file.read(), filename=file.filename)
 
 
 @app.post("/pdf/ocr", response_model=List[TextExtract])
@@ -55,7 +55,7 @@ async def extract_text_with_ocr_from_pdf(
 ) -> Any:
     logger.debug(f"extract text with ocr from pdf file='{file.filename}'")
     pdf = PdfDataExtractor()
-    return pdf.extract_text_with_ocr(data=await file.read())
+    return pdf.extract_text_with_ocr(data=await file.read(), filename=file.filename)
 
 
 @app.post("/pdf/table", response_model=List[TableExtract])
@@ -64,7 +64,7 @@ async def extract_table_from_pdf(
 ) -> Any:
     logger.debug(f"extract table from pdf file='{file.filename}'")
     pdf = PdfDataExtractor()
-    return pdf.extract_table(data=await file.read())
+    return pdf.extract_table(data=await file.read(), filename=file.filename)
 
 
 @app.post("/pdf/convert", response_model=List[str])
