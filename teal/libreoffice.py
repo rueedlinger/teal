@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 import subprocess
 import tempfile
 
@@ -13,7 +14,7 @@ _logger = logging.getLogger("teal.libreoffice")
 
 class LibreOfficeAdapter:
     def __init__(self, libreoffice_cmd='soffice'):
-        self.libreoffice_path = libreoffice_cmd
+        self.libreoffice_cmd = libreoffice_cmd
         # copied from goetenberg, not sure if all are supported
         self.supported_file_extensions = ['.123', '.602', '.abw', '.bib', '.bmp', '.cdr', '.cgm', '.cmx', '.csv',
                                           '.cwk', '.dbf', '.dif', '.doc', '.docm', '.docx', '.dot', '.dotm', '.dotx',
@@ -51,7 +52,7 @@ class LibreOfficeAdapter:
             tmp_file_in.write(data)
 
         _logger.debug(f"expecting out pdf {tmp_file_in_path}")
-        cmd_convert_pdf = f'{self.libreoffice_path} --headless --convert-to pdf --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
+        cmd_convert_pdf = f'{self.libreoffice_cmd} --headless --convert-to pdf --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(cmd_convert_pdf, shell=True, capture_output=True, env={'HOME': '/tmp'})
@@ -72,6 +73,6 @@ def _cleanup_tmp_dir(tmp_dir: str):
     teal_tmp_dir_prefix = '/tmp/teal-'
     if tmp_dir.startswith(teal_tmp_dir_prefix):
         _logger.debug(f"cleanup tmp dir {tmp_dir}")
-        # shutil.rmtree(tmp_dir)
+        shutil.rmtree(tmp_dir)
     else:
         _logger.warning(f"will not delete '{tmp_dir}', tmp dir mus start with '{teal_tmp_dir_prefix}'")

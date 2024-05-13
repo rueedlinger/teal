@@ -24,6 +24,7 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     apt-get install -y ocrmypdf && \
     apt-get install -y ghostscript python3-tk && \
     apt-get install -y libgl1 && \
+    apt-get install -y ocrmypdf && \
     apt-get --no-install-recommends install -y libreoffice && \
     apt-get install -y default-jre-headless libreoffice-java-common jodconverter
 
@@ -36,9 +37,6 @@ RUN chmod 755 run.sh
 
 RUN mkdir /usr/src/app/teal
 COPY teal ./teal
-
-RUN
-RUN apt-get install -y
 
 USER $USERNAME
 # Runs "/usr/bin/dumb-init -- /my/script --with --args"

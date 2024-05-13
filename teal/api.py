@@ -10,7 +10,7 @@ from starlette.responses import FileResponse
 from teal.core import create_json_err_response_from_exception
 from teal.libreoffice import LibreOfficeAdapter
 from teal.model import TextExtract, TableExtract
-from teal.pdf import PdfDataExtractor
+from teal.pdf import PdfDataExtractor, PdfAConverter
 
 app = FastAPI()
 
@@ -67,13 +67,13 @@ async def extract_table_from_pdf(
     return pdf.extract_table(data=await file.read(), filename=file.filename)
 
 
-@app.post("/pdf/convert", response_model=List[str])
-async def convert_pdf(
+@app.post("/pdf/convert", response_class=FileResponse)
+async def convert_to_pdfa_with_ocr(
         file: UploadFile,
 ) -> Any:
     logger.debug(f"extract table from pdf file='{file.filename}'")
-
-    return []
+    pdf = PdfAConverter()
+    return pdf.convert_pdf(data=await file.read(), filename=file.filename)
 
 
 @app.post("/libreoffice/pdf", response_class=FileResponse)
