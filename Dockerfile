@@ -2,8 +2,13 @@ FROM python:3.12
 ARG USERNAME=worker
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
+ARG VERSION="latest"
 
-LABEL ch.yax.teal.url="https://github.com/rueedlinger/teal"
+LABEL org.opencontainers.image.title="teal" \
+      org.opencontainers.image.description="A convenient REST API for working with PDF's." \
+      org.opencontainers.image.version="$VERSION" \
+      org.opencontainers.image.documentation="https://github.com/rueedlinger/teal" \
+      org.opencontainers.image.source="https://github.com/rueedlinger/teal"
 
 WORKDIR /usr/src/app
 
@@ -39,6 +44,7 @@ RUN mkdir /usr/src/app/teal
 COPY teal ./teal
 
 USER $USERNAME
+ENV TEAL_VERSION="$VERSION"
 # Runs "/usr/bin/dumb-init -- /my/script --with --args"
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 CMD ["/usr/src/app/run.sh"]

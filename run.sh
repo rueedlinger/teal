@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "env TEAL_VERSION is '$TEAL_VERSION'"
+
 if [ -z ${TEAL_WORKERS+x} ]; then
   TEAL_WORKERS=1
   echo "env TEAL_WORKERS is unset, will set to $TEAL_WORKERS"
