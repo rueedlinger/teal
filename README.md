@@ -19,17 +19,21 @@ workflow. The main features are:
 
 > **Note:** At the moment this version is not optimized and tested in production. Any feedback is welcomed.
 
-## Setup
+## Docker
 
-### Docker Container
+| ENV           | Description | Default |
+|---------------|-------------|---------|
+| TEAL_LOG_CONF | tbd         |         |
+| TEAL_WORKERS  | tbd         |         |
+| TEAL_PORT     | tbd         |         |
+| TEAL_IP_BIND  | tbd         |         |
 
-```bash
-docker compose build
-```
+## API
 
-```bash
-docker comppose up
-```
+- OpenAPI http://127.0.0.1:8000/docs
+- Redoc, http://127.0.0.1:8000/redoc
+
+## Development Setup
 
 ### Python
 
@@ -44,10 +48,19 @@ pip install -r requiremnts.txt
 uvicorn teal.api:app --reload
 ```
 
-## API
+### Docker Container
 
-- OpenAPI http://127.0.0.1:8000/docs
-- Redoc, http://127.0.0.1:8000/redoc
+First build the docker image with all dependencies.
+
+```bash
+docker compose build
+```
+
+Next you can start teal
+
+```bash
+docker comppose up
+```
 
 ## Understanding Different Types of PDFs
 

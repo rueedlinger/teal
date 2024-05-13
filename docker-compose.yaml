@@ -9,11 +9,12 @@ services:
       TEAL_WORKERS: 1
       TEAL_PORT: 8000
       #TEAL_IP_BIND: 0.0.0.0
-      #TEAL_LIBREOFFICE_PATH: /usr/bin/libreoffice
 
   #gotenberg:
   #  image: gotenberg/gotenberg:8
   #  ports:
   #    - 3000:3000
-
-  #  apache/tika:<tag> 2.9.2.0-full 2.9.2.0
+  #tika:
+  #  image: tika/2.9.2.0-full
+  #  ports:
+  #    - 9998:9998
