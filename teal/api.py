@@ -82,11 +82,11 @@ def custom_openapi():
     tags_metadata = [
         {
             "name": "pdf",
-            "description": "Operations with users. The **login** logic is also here.",
+            "description": "Extract text, tables or convert to PDF/A from a given PDF",
         },
         {
             "name": "libreoffice",
-            "description": "Manage items. So _fancy_ they have their own docs.",
+            "description": "Convert office documents to PDF.",
         },
     ]
 
