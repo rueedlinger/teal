@@ -60,8 +60,8 @@ async def extract_table_from_pdf(
     return pdf.extract_table(data=await file.read(), filename=file.filename)
 
 
-@app.post("/pdf/convert", response_class=FileResponse, tags=['pdf'])
-async def convert_to_pdfa_with_ocr(
+@app.post("/convert/pdf", response_class=FileResponse, tags=['convert'])
+async def convert_pdf_to_pdfa_with_ocr(
         file: UploadFile,
 ) -> Any:
     logger.debug(f"extract table from pdf file='{file.filename}'")
@@ -69,8 +69,8 @@ async def convert_to_pdfa_with_ocr(
     return pdf.convert_pdf(data=await file.read(), filename=file.filename)
 
 
-@app.post("/libreoffice/pdf", response_class=FileResponse, tags=['libreoffice'])
-async def convert_libreoffice_to_pdf(
+@app.post("/convert/libreoffice", response_class=FileResponse, tags=['convert'])
+async def convert_libreoffice_docs_to_pdf(
         file: UploadFile,
 ) -> Any:
     logger.debug(f"libreoffice convert file='{file.filename}' to pdf")
@@ -82,11 +82,11 @@ def custom_openapi():
     tags_metadata = [
         {
             "name": "pdf",
-            "description": "Extract text, tables or convert to PDF/A from a given PDF",
+            "description": "Extract text, OCR or tables from PDFs",
         },
         {
-            "name": "libreoffice",
-            "description": "Convert office documents to PDF.",
+            "name": "convert",
+            "description": "Convert documents to PDF or PDFs to PDF/A.",
         },
     ]
 
