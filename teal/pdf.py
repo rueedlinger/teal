@@ -64,3 +64,5 @@ class PdfDataExtractor:
                     f.close()
 
         return extracts
+
+# pdf converter --> https://github.com/ocrmypdf/OCRmyPDF
