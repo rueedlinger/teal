@@ -1,8 +1,11 @@
-FROM python:3.12
+ARG PYTHON_VERSION=3.12
+FROM python:$PYTHON_VERSION
+
 ARG USERNAME=worker
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 ARG VERSION="latest"
+ARG TESSERACT_LANGUAGES="tesseract-ocr-deu tesseract-ocr-fra tesseract-ocr-ita tesseract-ocr-eng tesseract-ocr-por tesseract-ocr-spa"
 
 LABEL org.opencontainers.image.title="teal" \
       org.opencontainers.image.description="A convenient REST API for working with PDF's." \
@@ -19,12 +22,7 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     chmod +x /usr/local/bin/dumb-init && \
     apt-get update && \
     apt-get install -y tesseract-ocr && \
-    apt-get install -y tesseract-ocr-deu && \
-    apt-get install -y tesseract-ocr-fra && \
-    apt-get install -y tesseract-ocr-ita && \
-    apt-get install -y tesseract-ocr-eng && \
-    apt-get install -y tesseract-ocr-por && \
-    apt-get install -y tesseract-ocr-spa && \
+    apt-get install -y $TESSERACT_LANGUAGES && \
     apt-get install -y poppler-utils && \
     apt-get install -y ocrmypdf && \
     apt-get install -y ghostscript python3-tk && \
