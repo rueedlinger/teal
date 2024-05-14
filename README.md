@@ -9,13 +9,15 @@ workflow. The main features are:
 
 **teal** uses other open source libraries and provide these functionally as convince API.
 
-| Feature                                      | Library     |
-|----------------------------------------------|-------------|
-| Extract text from PDFs                       | pypdfium2   |
-| Extract text from scanned PDFs (OCR)         | pytesseract |
-| Extract tables from PDFs                     | camelot     |
-| Convert PDF to PDF/A (with OCR when no text) | ocrmypdf    |
-| Convert Office documents to PDF              | libreoffice |
+| Feature                                           | Library                 |
+|---------------------------------------------------|-------------------------|
+| Extract text from PDFs                            | pypdfium2               |
+| Extract text from scanned PDFs (OCR)              | pytesseract             |
+| Extract tables from PDFs                          | camelot                 |
+| Convert PDF to PDF/A (with OCR when no text)      | ocrmypdf                |
+| Convert Office documents to PDF                   | libreoffice             |
+| Extract meta data from PDF                        | **not yet implemented** |
+| Process documents from a remote repository (HTTP) | **not yet implemented** |
 
 > **Note:** At the moment this version is not optimized and tested in production. Any feedback is welcomed.
 
