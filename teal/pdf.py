@@ -117,17 +117,20 @@ class PdfAConverter:
         cmd_convert_pdf = f'{self.ocrmypdf_cmd} --skip-text --output-type pdfa "{tmp_file_in_path}" "{tmp_file_out_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
-        result = subprocess.run(cmd_convert_pdf, shell=True, capture_output=True, env={'HOME': '/tmp'})
+        result = subprocess.run(cmd_convert_pdf, shell=True, capture_output=True, text=True, env={'HOME': '/tmp'})
 
-        if os.path.exists(tmp_file_out_path):
-            _logger.debug(f"out was written {tmp_file_out_path}")
-            return FileResponse(tmp_file_out_path, media_type='application/pdf',
-                                filename=f"{os.path.splitext(filename)[0]}.pdf",
-                                background=BackgroundTask(_cleanup_tmp_dir, tmp_dir))
-
+        if result.returncode == 0:
+            if os.path.exists(tmp_file_out_path):
+                return FileResponse(tmp_file_out_path, media_type='application/pdf',
+                                    filename=f"{os.path.splitext(filename)[0]}.pdf",
+                                    background=BackgroundTask(_cleanup_tmp_dir, tmp_dir))
+            else:
+                _logger.debug(f"file was not written {result}")
+                return create_json_err_response(500, f"could not convert file '{filename}' ({result.stderr}).")
         else:
-            _logger.debug(f"file was not written {result}")
-            return create_json_err_response(500, f"could not convert file '{filename}' ({result}).")
+            _logger.debug(f"cmd was not successful {result}")
+            return create_json_err_response(500,
+                                            f"got return code {result.returncode} '{filename}' ({result.stderr}).")
 
 
 def _cleanup_tmp_dir(tmp_dir: str):

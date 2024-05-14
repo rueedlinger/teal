@@ -55,18 +55,22 @@ class LibreOfficeAdapter:
         cmd_convert_pdf = f'{self.libreoffice_cmd} --headless --convert-to pdf --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
-        result = subprocess.run(cmd_convert_pdf, shell=True, capture_output=True, env={'HOME': '/tmp'})
+        result = subprocess.run(cmd_convert_pdf, shell=True, capture_output=True, text=True, env={'HOME': '/tmp'})
 
         converted_file_out = os.path.join(tmp_dir, "out", "tmp.pdf")
-        if os.path.exists(converted_file_out):
-            _logger.debug(f"out was written {converted_file_out}")
-            return FileResponse(converted_file_out, media_type='application/pdf',
-                                filename=f"{os.path.splitext(filename)[0]}.pdf",
-                                background=BackgroundTask(_cleanup_tmp_dir, tmp_dir))
 
+        if result.returncode == 0:
+            if os.path.exists(converted_file_out):
+                return FileResponse(converted_file_out, media_type='application/pdf',
+                                    filename=f"{os.path.splitext(filename)[0]}.pdf",
+                                    background=BackgroundTask(_cleanup_tmp_dir, tmp_dir))
+
+            else:
+                _logger.debug(f"file was not written {result}")
+                return create_json_err_response(500, f"could not convert file '{filename}' ({result.stderr}).")
         else:
-            _logger.debug(f"file was not written {result}")
-            return create_json_err_response(500, f"could not convert file '{filename}' ({result}).")
+            _logger.debug(f"cmd was not successful {result}")
+            return create_json_err_response(500, f"got return code {result.returncode} '{filename}' ({result.stderr}).")
 
 
 def _cleanup_tmp_dir(tmp_dir: str):
