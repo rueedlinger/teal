@@ -1,0 +1,45 @@
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: simple
+    stream: ext://sys.stdout
+
+  # file:
+  #    class: logging.FileHandler
+  #    formatter: simple
+  #    filename: myapp.log
+  #    mode: a
+
+loggers:
+  teal.api:
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
+  teal.pdf:
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
+  teal.libreoffice:
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
+  uvicorn.error:
+    level: INFO
+    handlers: [ console ]
+    propagate: no
+  uvicorn.access:
+    level: INFO
+    handlers: [ console ]
+    propagate: no
+
+root:
+  handlers: [ console ]
+  level: WARN

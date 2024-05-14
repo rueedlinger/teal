@@ -1,0 +1,14 @@
+fastapi
+python-multipart
+uvicorn[standard]
+gunicorn
+pyyaml
+pypdfium2
+pytesseract
+pdf2image
+PyPDF2<3.0
+camelot-py[base]
+opencv-python
+pytest
+sphinx
+black
