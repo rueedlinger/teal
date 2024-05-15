@@ -8,7 +8,7 @@ if [ "$TEAL_TEST_MODE" = true ] ; then
 
   if [ -z ${TEAL_PYTEST_ARGS+x} ]; then
     export COVERAGE_FILE=/tmp/coverage
-    pytest --cov=teal --no-header -v --disable-warnings
+    pytest --cov=teal --cov-report term-missing --no-header -v --disable-warnings
   else
     pytest $TEAL_PYTEST_ARGS
   fi
