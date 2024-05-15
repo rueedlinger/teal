@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 
 from starlette.background import BackgroundTask
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, JSONResponse
 
 from teal.core import create_json_err_response
 
@@ -33,7 +33,7 @@ class LibreOfficeAdapter:
                                           '.xltx', '.xlw', '.xml'
                                           ]
 
-    def convert_to_pdf(self, data, filename):
+    def convert_to_pdf(self, data, filename) -> FileResponse | JSONResponse:
 
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:

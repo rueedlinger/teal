@@ -9,13 +9,15 @@ workflow. The main features are:
 
 **teal** uses other open source libraries and provide these functionally as convince API.
 
-| Feature                                      | Library     |
-|----------------------------------------------|-------------|
-| Extract text from PDFs                       | pypdfium2   |
-| Extract text from scanned PDFs (OCR)         | pytesseract |
-| Extract tables from PDFs                     | camelot     |
-| Convert PDF to PDF/A (with OCR when no text) | ocrmypdf    |
-| Convert Office documents to PDF              | libreoffice |
+| Feature                                           | Library                 |
+|---------------------------------------------------|-------------------------|
+| Extract text from PDFs                            | pypdfium2               |
+| Extract text from scanned PDFs (OCR)              | pytesseract             |
+| Extract tables from PDFs                          | camelot                 |
+| Convert PDF to PDF/A (with OCR when no text)      | ocrmypdf                |
+| Convert Office documents to PDF                   | libreoffice             |
+| Extract meta data from PDF                        | **not yet implemented** |
+| Process documents from a remote repository (HTTP) | **not yet implemented** |
 
 > **Note:** At the moment this version is not optimized and tested in production. Any feedback is welcomed.
 
@@ -28,10 +30,15 @@ workflow. The main features are:
 | TEAL_PORT     | 8000          | Bind socket to this port        |
 | TEAL_IP_BIND  | 0.0.0.0       | Bind socket to this host.       |
 
+### Feature flags
+
+You can disable different features in teal with the env `TEA_FEATURE_<PATH>`. For example to disable the libreoffice
+feature (`/convert/libreoffice`) you can set `TEA_FEATURE_CONVERT_LIBREOFFICE=false`.
+
 ## API
 
 - OpenAPI http://127.0.0.1:8000/docs
-- Redoc, http://127.0.0.1:8000/redoc
+- Redoc http://127.0.0.1:8000/redoc
 
 ## Development Setup
 
@@ -50,16 +57,19 @@ uvicorn teal.api:app --reload
 
 ### Docker Container
 
-First build the docker image with all dependencies.
+To start up the whole app just build and run the container with `docker compose`.
 
 ```bash
-docker compose build
+docker compose up --build
 ```
 
-Next you can start teal
+### Testing
+
+To run the pytest inside the docker container just pass the env `TEAL_TEST_MODE=true`. When you want to pass
+arguments to pytest you can use the env `TEAL_PYTEST_ARGS`.
 
 ```bash
-docker comppose up
+docker compose run --build --name teal_pytest --rm -e TEAL_TEST_MODE=true teal
 ```
 
 ## Understanding Different Types of PDFs
