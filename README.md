@@ -30,10 +30,15 @@ workflow. The main features are:
 | TEAL_PORT     | 8000          | Bind socket to this port        |
 | TEAL_IP_BIND  | 0.0.0.0       | Bind socket to this host.       |
 
+### Feature flags
+
+You can disable different features in teal with the env `TEA_FEATURE_<PATH>`. For example to disable the libreoffice
+feature (`/convert/libreoffice`) you can set `TEA_FEATURE_CONVERT_LIBREOFFICE=false`.
+
 ## API
 
 - OpenAPI http://127.0.0.1:8000/docs
-- Redoc, http://127.0.0.1:8000/redoc
+- Redoc http://127.0.0.1:8000/redoc
 
 ## Development Setup
 

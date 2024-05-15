@@ -1,3 +1,5 @@
+import os
+
 from starlette.responses import JSONResponse
 
 
@@ -15,3 +17,11 @@ def create_json_err_response(code: int, message: str):
         content={
             "message": message,
         })
+
+
+def is_feature_enabled(feature_flag) -> bool:
+    if feature_flag not in os.environ:
+        return True
+
+    if feature_flag in os.environ:
+        return os.environ[feature_flag].lower() == 'true'
