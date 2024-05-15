@@ -13,6 +13,17 @@ def test_extract_text():
     assert len(out[1].text) > 2000
 
 
+def test_extract_text_scanned_doc():
+    extractor = pdf.PdfDataExtractor()
+    out = extractor.extract_text(load_file('data/ocr/scanned_document.pdf'), 'test.pdf')
+
+    assert len(out) == 2
+    assert out[0].page == 1
+    assert len(out[0].text) == 0
+    assert out[1].page == 2
+    assert len(out[1].text) == 0
+
+
 def test_extract_text_small():
     extractor = pdf.PdfDataExtractor()
     out = extractor.extract_text(load_file('data/digital_pdf/small_document.pdf'), 'test.pdf')
@@ -26,6 +37,17 @@ def test_extract_text_small():
 def test_extract_text_with_ocr_digital_pdf():
     extractor = pdf.PdfDataExtractor()
     out = extractor.extract_text_with_ocr(load_file('data/digital_pdf/normal_document.pdf'), 'test.pdf')
+
+    assert len(out) == 2
+    assert out[0].page == 1
+    assert len(out[0].text) > 2000
+    assert out[1].page == 2
+    assert len(out[1].text) > 2000
+
+
+def test_extract_text_with_ocr_scanned_pdf():
+    extractor = pdf.PdfDataExtractor()
+    out = extractor.extract_text_with_ocr(load_file('data/ocr/scanned_document.pdf'), 'test.pdf')
 
     assert len(out) == 2
     assert out[0].page == 1
