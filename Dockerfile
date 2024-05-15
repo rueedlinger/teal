@@ -40,6 +40,7 @@ RUN chmod 755 run.sh
 
 RUN mkdir /usr/src/app/teal
 COPY teal ./teal
+COPY tests ./tests
 
 USER $USERNAME
 ENV TEAL_VERSION="$VERSION"

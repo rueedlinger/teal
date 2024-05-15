@@ -2,6 +2,15 @@
 
 echo "env TEAL_VERSION is '$TEAL_VERSION'"
 
+if [ "$TEAL_TEST_MODE" = true ] ; then
+  echo "env TEAL_TEST_MODE ist set to '$TEAL_TEST_MODE'"
+  echo "running in test mode"
+  #pytest --disable-warnings
+  pytest
+  exit
+fi
+
+
 if [ -z ${TEAL_WORKERS+x} ]; then
   TEAL_WORKERS=1
   echo "env TEAL_WORKERS is unset, will set to $TEAL_WORKERS"
@@ -25,6 +34,9 @@ else
 fi
 
 
+
 gunicorn teal.api:app --workers "$TEAL_WORKERS" \
-  --worker-class uvicorn.workers.UvicornWorker --bind "$TEAL_IP_BIND":"$TEAL_PORT" \
-  --access-logfile="-" --error-logfile="-"
+    --worker-class uvicorn.workers.UvicornWorker --bind "$TEAL_IP_BIND":"$TEAL_PORT" \
+    --access-logfile="-" --error-logfile="-"
+
+

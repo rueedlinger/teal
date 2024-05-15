@@ -52,16 +52,16 @@ uvicorn teal.api:app --reload
 
 ### Docker Container
 
-First build the docker image with all dependencies.
+run the app
 
 ```bash
-docker compose build
+docker compose up --build
 ```
 
-Next you can start teal
+run tests inside the docker container
 
 ```bash
-docker comppose up
+docker compose run --build --name teal_pytest --rm -e TEAL_TEST_MODE=true teal
 ```
 
 ## Understanding Different Types of PDFs
