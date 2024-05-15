@@ -1,9 +1,18 @@
+import json
 import os
 
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, JSONResponse
 
 import teal.pdf as pdf
 from tests import load_file
+
+
+def test_not_supported_types():
+    converter = pdf.PdfAConverter()
+    resp = converter.convert_pdf("", 'test.txt')
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 400
+    assert json.loads(resp.body) == {'message': "file extension '.txt' is not supported (test.txt)."}
 
 
 def test_convert_pdf_from_digital_pdf():

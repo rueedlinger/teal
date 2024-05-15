@@ -10,7 +10,7 @@ import pypdfium2 as pdfium
 import pytesseract
 from pdf2image import convert_from_bytes
 from starlette.background import BackgroundTask
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, JSONResponse
 
 from teal.core import create_json_err_response
 from teal.model import TextExtract, TableExtract
@@ -22,7 +22,7 @@ class PdfDataExtractor:
     def __init__(self):
         self.supported_file_extensions = ['.pdf']
 
-    def extract_text(self, data, filename) -> list[TextExtract]:
+    def extract_text(self, data, filename) -> list[TextExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
@@ -37,7 +37,8 @@ class PdfDataExtractor:
 
         return extracts
 
-    def extract_text_with_ocr(self, data, filename, lang=None, first_page=None, last_page=None) -> list[TextExtract]:
+    def extract_text_with_ocr(self, data, filename, lang=None, first_page=None, last_page=None) -> list[
+                                                                                                       TextExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
@@ -52,7 +53,7 @@ class PdfDataExtractor:
             extracts.append(TextExtract.model_validate({"text": text, "page": i + 1}))
         return extracts
 
-    def extract_table(self, data, filename) -> list[TableExtract]:
+    def extract_table(self, data, filename) -> list[TableExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
@@ -89,7 +90,7 @@ class PdfAConverter:
         self.ocrmypdf_cmd = ocrmypdf_cmd
         self.supported_file_extensions = ['.pdf']
 
-    def convert_pdf(self, data, filename):
+    def convert_pdf(self, data, filename) -> FileResponse | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")

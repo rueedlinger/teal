@@ -1,5 +1,27 @@
+import json
+
+from starlette.responses import JSONResponse
+
 import teal.pdf as pdf
 from tests import load_file
+
+
+def test_not_supported_types():
+    extractor = pdf.PdfDataExtractor()
+    resp = extractor.extract_text("", 'test.txt')
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 400
+    assert json.loads(resp.body) == {'message': "file extension '.txt' is not supported (test.txt)."}
+
+    resp = extractor.extract_table("", 'test.txt')
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 400
+    assert json.loads(resp.body) == {'message': "file extension '.txt' is not supported (test.txt)."}
+
+    resp = extractor.extract_text_with_ocr("", 'test.txt')
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 400
+    assert json.loads(resp.body) == {'message': "file extension '.txt' is not supported (test.txt)."}
 
 
 def test_extract_text_from_digital_pdf():

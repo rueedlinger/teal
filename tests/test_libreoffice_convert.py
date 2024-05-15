@@ -1,10 +1,19 @@
+import json
 import os
 
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, JSONResponse
 
 import teal.libreoffice as libreoffice
 import teal.pdf as pdf
 from tests import load_file
+
+
+def test_not_supported_types():
+    converter = libreoffice.LibreOfficeAdapter()
+    resp = converter.convert_to_pdf("", 'test.zip')
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 400
+    assert json.loads(resp.body) == {'message': "file extension '.zip' is not supported (test.zip)."}
 
 
 def test_convert_to_pdf_from_docx():
