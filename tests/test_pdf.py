@@ -46,5 +46,14 @@ def test_extract_text_with_ocr_small_digital_pdf():
 
 def test_extract_tables():
     extractor = pdf.PdfDataExtractor()
+    out = extractor.extract_table(load_file('data/digital_pdf/simple_tables.pdf'), 'test.pdf')
+    assert len(out) == 1
+    assert out[0].page == 1
+    assert out[0].table == [{'0': 'A', '1': 'B', '2': 'C'}, {'0': 'A1', '1': 'B11', '2': 'C111'},
+                            {'0': 'A2', '1': 'B22', '2': 'C222'}, {'0': 'A3', '1': 'B33', '2': 'C333'}]
+
+
+def test_extract_when_no_tables():
+    extractor = pdf.PdfDataExtractor()
     out = extractor.extract_table(load_file('data/digital_pdf/small_document.pdf'), 'test.pdf')
     assert len(out) == 0
