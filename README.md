@@ -52,13 +52,16 @@ uvicorn teal.api:app --reload
 
 ### Docker Container
 
-run the app
+To start up the whole app just build and run the container with `docker compose`.
 
 ```bash
 docker compose up --build
 ```
 
-run tests inside the docker container
+### Testing
+
+To run the pytest inside the docker container just pass the env `TEAL_TEST_MODE=true`. When you want to pass pytest
+arguments you can use the env `TEAL_PYTEST_ARGS`.
 
 ```bash
 docker compose run --build --name teal_pytest --rm -e TEAL_TEST_MODE=true teal

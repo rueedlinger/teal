@@ -5,7 +5,13 @@ echo "env TEAL_VERSION is '$TEAL_VERSION'"
 if [ "$TEAL_TEST_MODE" = true ] ; then
   echo "env TEAL_TEST_MODE ist set to '$TEAL_TEST_MODE'"
   echo "running in test mode"
-  pytest --no-header -v --disable-warnings
+
+  if [ -z ${TEAL_PYTEST_ARGS+x} ]; then
+    pytest --no-header -v --disable-warnings
+  else
+    pytest $TEAL_PYTEST_ARGS
+  fi
+
   #pytest --no-header -v --disable-warnings --log-cli-level debug
   echo "shutting container down..."
   exit
