@@ -39,6 +39,7 @@ feature (`/convert/libreoffice`) you can set `TEA_FEATURE_CONVERT_LIBREOFFICE=fa
 
 - OpenAPI http://127.0.0.1:8000/docs
 - Redoc http://127.0.0.1:8000/redoc
+- Markdown, [api.md](api.md)
 
 ## Development Setup
 
