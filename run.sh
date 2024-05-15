@@ -7,7 +7,8 @@ if [ "$TEAL_TEST_MODE" = true ] ; then
   echo "running in test mode"
 
   if [ -z ${TEAL_PYTEST_ARGS+x} ]; then
-    pytest --no-header -v --disable-warnings
+    export COVERAGE_FILE=/tmp/coverage
+    pytest --cov=teal --no-header -v --disable-warnings
   else
     pytest $TEAL_PYTEST_ARGS
   fi
