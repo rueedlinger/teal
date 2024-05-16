@@ -90,7 +90,7 @@ class PdfAConverter:
         self.ocrmypdf_cmd = ocrmypdf_cmd
         self.supported_file_extensions = ['.pdf']
 
-    def convert_pdf(self, data, filename) -> FileResponse | JSONResponse:
+    def convert_pdfa(self, data, filename) -> FileResponse | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
@@ -127,11 +127,11 @@ class PdfAConverter:
                                     background=BackgroundTask(_cleanup_tmp_dir, tmp_dir))
             else:
                 _logger.debug(f"file was not written {result}")
-                return create_json_err_response(500, f"could not convert file '{filename}' ({result.stderr}).")
+                return create_json_err_response(500, f"could not convert file '{filename}' {result.stderr}")
         else:
             _logger.debug(f"cmd was not successful {result}")
             return create_json_err_response(500,
-                                            f"got return code {result.returncode} '{filename}' ({result.stderr}).")
+                                            f"got return code {result.returncode} '{filename}' {result.stderr}")
 
 
 def _cleanup_tmp_dir(tmp_dir: str):
@@ -140,4 +140,4 @@ def _cleanup_tmp_dir(tmp_dir: str):
         _logger.debug(f"cleanup tmp dir {tmp_dir}")
         shutil.rmtree(tmp_dir)
     else:
-        _logger.warning(f"will not delete '{tmp_dir}', tmp dir mus start with '{teal_tmp_dir_prefix}'")
+        _logger.warning(f"will not delete '{tmp_dir}', tmp dir must start with '{teal_tmp_dir_prefix}'")

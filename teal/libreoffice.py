@@ -15,7 +15,7 @@ _logger = logging.getLogger("teal.libreoffice")
 class LibreOfficeAdapter:
     def __init__(self, libreoffice_cmd='soffice'):
         self.libreoffice_cmd = libreoffice_cmd
-        # copied from goetenberg, not sure if all are supported
+        # copied from gotenberg, not sure if all are supported
         self.supported_file_extensions = ['.123', '.602', '.abw', '.bib', '.bmp', '.cdr', '.cgm', '.cmx', '.csv',
                                           '.cwk', '.dbf', '.dif', '.doc', '.docm', '.docx', '.dot', '.dotm', '.dotx',
                                           '.dxf', '.emf', '.eps', '.epub', '.fodg', '.fodp', '.fods', '.fodt', '.fopd',
@@ -67,10 +67,10 @@ class LibreOfficeAdapter:
 
             else:
                 _logger.debug(f"file was not written {result}")
-                return create_json_err_response(500, f"could not convert file '{filename}' ({result.stderr}).")
+                return create_json_err_response(500, f"could not convert file '{filename}' {result.stderr}")
         else:
             _logger.debug(f"cmd was not successful {result}")
-            return create_json_err_response(500, f"got return code {result.returncode} '{filename}' ({result.stderr}).")
+            return create_json_err_response(500, f"got return code {result.returncode} '{filename}' {result.stderr}")
 
 
 def _cleanup_tmp_dir(tmp_dir: str):
@@ -79,4 +79,4 @@ def _cleanup_tmp_dir(tmp_dir: str):
         _logger.debug(f"cleanup tmp dir {tmp_dir}")
         shutil.rmtree(tmp_dir)
     else:
-        _logger.warning(f"will not delete '{tmp_dir}', tmp dir mus start with '{teal_tmp_dir_prefix}'")
+        _logger.warning(f"will not delete '{tmp_dir}', tmp dir must start with '{teal_tmp_dir_prefix}'")

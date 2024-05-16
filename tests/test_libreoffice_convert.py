@@ -8,6 +8,16 @@ import teal.pdf as pdf
 from tests import load_file
 
 
+def test_non_zero_return_code():
+    converter = libreoffice.LibreOfficeAdapter()
+    converter.libreoffice_cmd = 'foo'
+    resp = converter.convert_to_pdf(load_file('data/doc/normal_document.docx'), 'test.docx')
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 500
+    print(json.loads(resp.body))
+    assert json.loads(resp.body) == {'message': "got return code 127 'test.docx' /bin/sh: 1: foo: not found\n"}
+
+
 def test_not_supported_types():
     converter = libreoffice.LibreOfficeAdapter()
     resp = converter.convert_to_pdf("", 'test.zip')
