@@ -7,9 +7,19 @@ import teal.pdf as pdf
 from tests import load_file
 
 
+def test_non_zero_return_code():
+    converter = pdf.PdfAConverter()
+    converter.ocrmypdf_cmd = 'foo'
+    resp = converter.convert_pdfa(load_file('data/digital_pdf/normal_document.pdf'), 'test.pdf')
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 500
+    print(json.loads(resp.body))
+    assert json.loads(resp.body) == {'message': "got return code 127 'test.pdf' /bin/sh: 1: foo: not found\n"}
+
+
 def test_not_supported_types():
     converter = pdf.PdfAConverter()
-    resp = converter.convert_pdf("", 'test.txt')
+    resp = converter.convert_pdfa("", 'test.txt')
     assert type(resp) is JSONResponse
     assert resp.status_code == 400
     assert json.loads(resp.body) == {'message': "file extension '.txt' is not supported (test.txt)."}
@@ -17,7 +27,7 @@ def test_not_supported_types():
 
 def test_convert_pdf_from_digital_pdf():
     converter = pdf.PdfAConverter()
-    out = converter.convert_pdf(load_file('data/digital_pdf/normal_document.pdf'), 'test.pdf')
+    out = converter.convert_pdfa(load_file('data/digital_pdf/normal_document.pdf'), 'test.pdf')
     assert type(out) is FileResponse
     assert out.filename == 'test.pdf'
     assert out.media_type == 'application/pdf'
@@ -41,7 +51,7 @@ def test_convert_pdf_from_digital_pdf():
 
 def test_convert_pdf_from_scanned_pdf():
     converter = pdf.PdfAConverter()
-    out = converter.convert_pdf(load_file('data/ocr/scanned_document.pdf'), 'test.pdf')
+    out = converter.convert_pdfa(load_file('data/ocr/scanned_document.pdf'), 'test.pdf')
     assert type(out) is FileResponse
     assert out.filename == 'test.pdf'
     assert out.media_type == 'application/pdf'
@@ -65,7 +75,7 @@ def test_convert_pdf_from_scanned_pdf():
 
 def test_convert_pdf_from_scanned_pdf_with_table():
     converter = pdf.PdfAConverter()
-    out = converter.convert_pdf(load_file('data/ocr/scanned_document_with_table.pdf'), 'test.pdf')
+    out = converter.convert_pdfa(load_file('data/ocr/scanned_document_with_table.pdf'), 'test.pdf')
     assert type(out) is FileResponse
     assert out.filename == 'test.pdf'
     assert out.media_type == 'application/pdf'

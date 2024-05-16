@@ -67,7 +67,7 @@ if is_feature_enabled('TEA_FEATURE_CONVERT_PDFA'):
     ) -> Any:
         logger.debug(f"extract table from pdf file='{file.filename}'")
         pdf = PdfAConverter()
-        return pdf.convert_pdf(data=await file.read(), filename=file.filename)
+        return pdf.convert_pdfa(data=await file.read(), filename=file.filename)
 
 if is_feature_enabled('TEA_FEATURE_CONVERT_LIBREOFFICE'):
     @app.post("/convert/libreoffice", response_class=FileResponse, tags=['convert'])

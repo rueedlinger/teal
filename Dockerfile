@@ -36,7 +36,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY log_conf.yaml ./
 COPY run.sh ./
-RUN chmod 755 run.sh
+RUN chmod a+x run.sh
 
 COPY teal ./teal
 COPY tests ./tests
