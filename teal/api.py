@@ -5,12 +5,13 @@ from typing import Any, List
 import yaml
 from fastapi import FastAPI, UploadFile, Request
 from fastapi.openapi.utils import get_openapi
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, JSONResponse
 
 from teal.core import create_json_err_response_from_exception, is_feature_enabled
 from teal.libreoffice import LibreOfficeAdapter
-from teal.model import TextExtract, TableExtract
+from teal.model import TextExtract, TableExtract, HttpRemoteRepository
 from teal.pdf import PdfDataExtractor, PdfAConverter
+from teal.pdfa import PdfAValidator
 
 app = FastAPI()
 
@@ -60,8 +61,8 @@ if is_feature_enabled('TEA_FEATURE_PDF_TABLE'):
         pdf = PdfDataExtractor()
         return pdf.extract_table(data=await file.read(), filename=file.filename)
 
-if is_feature_enabled('TEA_FEATURE_CONVERT_PDFA'):
-    @app.post("/convert/pdfa", response_class=FileResponse, tags=['convert'])
+if is_feature_enabled('TEA_FEATURE_CONVERT_PDFA_CONVERT'):
+    @app.post("/pdfa/convert", response_class=FileResponse, tags=['pdfa'])
     async def convert_pdf_to_pdfa_with_ocr(
             file: UploadFile,
     ) -> Any:
@@ -69,14 +70,32 @@ if is_feature_enabled('TEA_FEATURE_CONVERT_PDFA'):
         pdf = PdfAConverter()
         return pdf.convert_pdfa(data=await file.read(), filename=file.filename)
 
+if is_feature_enabled('TEA_FEATURE_CONVERT_PDFA_VALIDATE'):
+    @app.post("/pdfa/validate", response_class=JSONResponse, tags=['pdfa'])
+    async def convert_pdf_to_pdfa_with_ocr(
+            file: UploadFile,
+    ) -> Any:
+        logger.debug(f"extract table from pdf file='{file.filename}'")
+        pdf = PdfAValidator()
+        return pdf.validate_pdf(data=await file.read(), filename=file.filename)
+
 if is_feature_enabled('TEA_FEATURE_CONVERT_LIBREOFFICE'):
-    @app.post("/convert/libreoffice", response_class=FileResponse, tags=['convert'])
+    @app.post("/libreoffice/convert", response_class=FileResponse, tags=['libreoffice'])
     async def convert_libreoffice_docs_to_pdf(
             file: UploadFile,
     ) -> Any:
         logger.debug(f"libreoffice convert file='{file.filename}' to pdf")
         libreoffice = LibreOfficeAdapter()
         return libreoffice.convert_to_pdf(data=await file.read(), filename=file.filename)
+
+
+@app.post("/libreoffice/convert/remote", response_class=FileResponse, tags=['libreoffice'])
+async def convert_libreoffice_docs_to_pdf(
+        repo: HttpRemoteRepository,
+) -> Any:
+    file = None
+    libreoffice = LibreOfficeAdapter()
+    return libreoffice.convert_to_pdf(data=await file.read(), filename=file.filename)
 
 
 def custom_openapi():
@@ -86,8 +105,12 @@ def custom_openapi():
             "description": "Extract text, OCR or tables from PDFs",
         },
         {
-            "name": "convert",
-            "description": "Convert documents to PDF or PDFs to PDF/A.",
+            "name": "pdfa",
+            "description": "Convert PDFs to PDF/A.",
+        },
+        {
+            "name": "libreoffice",
+            "description": "Convert documents to PDF.",
         },
     ]
 
