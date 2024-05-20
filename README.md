@@ -45,7 +45,7 @@ tbd
 
 ## API
 
-- see [API.md](doc/API.md)
+- tbd
 
 ## Libraries Used in Teal
 

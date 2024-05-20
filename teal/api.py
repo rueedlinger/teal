@@ -5,13 +5,13 @@ from typing import Any, List
 import yaml
 from fastapi import FastAPI, UploadFile, Request
 from fastapi.openapi.utils import get_openapi
-from starlette.responses import FileResponse, JSONResponse
+from starlette.responses import FileResponse
 
 from teal.core import create_json_err_response_from_exception, is_feature_enabled
 from teal.libreoffice import LibreOfficeAdapter
-from teal.model import TextExtract, TableExtract, HttpRemoteRepository
-from teal.pdf import PdfDataExtractor, PdfAConverter
-from teal.pdfa import PdfAValidator
+from teal.model import TextExtract, TableExtract, HttpRemoteRepository, PdfAReport
+from teal.pdf import PdfDataExtractor
+from teal.pdfa import PdfAValidator, PdfAConverter
 
 app = FastAPI()
 
@@ -21,9 +21,14 @@ if 'TEAL_LOG_CONF' in os.environ:
 
 print(f"using TEAL_LOG_CONF {log_conf_file}")
 
-with open(log_conf_file, 'rt') as f:
-    config = yaml.safe_load(f.read())
-    logging.config.dictConfig(config)
+if os.path.exists(log_conf_file):
+    with open(log_conf_file, 'rt') as f:
+        config = yaml.safe_load(f.read())
+        logging.config.dictConfig(config)
+else:
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S',
+                        level=logging.WARNING)
 
 # get root logger
 logger = logging.getLogger("teal.api")
@@ -71,7 +76,7 @@ if is_feature_enabled('TEA_FEATURE_CONVERT_PDFA_CONVERT'):
         return pdf.convert_pdfa(data=await file.read(), filename=file.filename)
 
 if is_feature_enabled('TEA_FEATURE_CONVERT_PDFA_VALIDATE'):
-    @app.post("/pdfa/validate", response_class=JSONResponse, tags=['pdfa'])
+    @app.post("/pdfa/validate", response_model=PdfAReport, tags=['pdfa'])
     async def convert_pdf_to_pdfa_with_ocr(
             file: UploadFile,
     ) -> Any:

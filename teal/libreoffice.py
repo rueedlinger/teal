@@ -1,13 +1,12 @@
 import logging
 import os
-import shutil
 import subprocess
 import tempfile
 
 from starlette.background import BackgroundTask
 from starlette.responses import FileResponse, JSONResponse
 
-from teal.core import create_json_err_response
+from teal.core import create_json_err_response, cleanup_tmp_dir
 
 _logger = logging.getLogger("teal.libreoffice")
 
@@ -63,20 +62,13 @@ class LibreOfficeAdapter:
             if os.path.exists(converted_file_out):
                 return FileResponse(converted_file_out, media_type='application/pdf',
                                     filename=f"{os.path.splitext(filename)[0]}.pdf",
-                                    background=BackgroundTask(_cleanup_tmp_dir, tmp_dir))
+                                    background=BackgroundTask(cleanup_tmp_dir, tmp_dir))
 
             else:
                 _logger.debug(f"file was not written {result}")
-                return create_json_err_response(500, f"could not convert file '{filename}' {result.stderr}")
+                return create_json_err_response(500, f"could not convert file '{filename}' {result.stderr}",
+                                                background=BackgroundTask(cleanup_tmp_dir, tmp_dir))
         else:
             _logger.debug(f"cmd was not successful {result}")
-            return create_json_err_response(500, f"got return code {result.returncode} '{filename}' {result.stderr}")
-
-
-def _cleanup_tmp_dir(tmp_dir: str):
-    teal_tmp_dir_prefix = '/tmp/teal-'
-    if tmp_dir.startswith(teal_tmp_dir_prefix):
-        _logger.debug(f"cleanup tmp dir {tmp_dir}")
-        shutil.rmtree(tmp_dir)
-    else:
-        _logger.warning(f"will not delete '{tmp_dir}', tmp dir must start with '{teal_tmp_dir_prefix}'")
+            return create_json_err_response(500, f"got return code {result.returncode} '{filename}' {result.stderr}",
+                                            background=BackgroundTask(cleanup_tmp_dir, tmp_dir))
