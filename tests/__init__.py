@@ -8,3 +8,9 @@ def load_file(file):
     data = pdf_file.read()
     pdf_file.close()
     return data
+
+
+def get_path(file):
+    dirname = os.path.dirname(__file__)
+    filename = os.path.join(dirname, file)
+    return filename
