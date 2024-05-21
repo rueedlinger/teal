@@ -23,11 +23,23 @@ loggers:
     level: DEBUG
     handlers: [ console ]
     propagate: no
+  teal.core:
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
   teal.pdf:
     level: DEBUG
     handlers: [ console ]
     propagate: no
+  teal.pdfa:
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
   teal.libreoffice:
+    level: DEBUG
+    handlers: [ console ]
+    propagate: no
+  teal.remote:
     level: DEBUG
     handlers: [ console ]
     propagate: no

@@ -1,44 +1,6 @@
-from enum import Enum
 from typing import List
 
 from pydantic import BaseModel
-
-
-class DataEncoding(str, Enum):
-    base64 = "base64"
-    text = "raw"
-
-
-class Data(BaseModel):
-    encoding: DataEncoding
-
-    content: str
-
-
-class PdfActionType(str, Enum):
-    text = "text"
-    table = "table"
-
-
-class PdfEngine(str, Enum):
-    pdfium = "pdfium"
-    pypdf = "pypdf"
-    tesseract = "tesseract"
-
-
-class PdfModule(BaseModel):
-    engine: PdfEngine
-    params: dict | None = None
-
-
-class Document(BaseModel):
-    name: str
-    data: Data
-
-
-class PdfExtract(BaseModel):
-    pdf: Data
-    module: PdfModule
 
 
 class TextExtract(BaseModel):
@@ -52,5 +14,13 @@ class TableExtract(BaseModel):
     table: List[dict]
 
 
-class Extracts(BaseModel):
-    extracts: List[TextExtract] = []
+class HttpRemoteRepository(BaseModel):
+    url: str
+    params: dict
+
+
+class PdfAReport(BaseModel):
+    profile: str
+    statement: str
+    compliant: bool
+    details: dict

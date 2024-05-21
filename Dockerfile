@@ -31,15 +31,25 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     apt-get --no-install-recommends install -y libreoffice && \
     apt-get install -y default-jre-headless libreoffice-java-common jodconverter
 
+# verapdf
+COPY dist/auto-install.xml /tmp
+RUN wget -O /tmp/verapdf-installer.zip https://software.verapdf.org/releases/verapdf-installer.zip && \
+    unzip -d /tmp /tmp/verapdf-installer.zip && \
+    /tmp/verapdf-greenfield-1.26.2/verapdf-install /tmp/auto-install.xml && \
+    rm -rf /tmp/verapdf*  && \
+    rm -rf /tmp/auto-install.xml
+
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY log_conf.yaml ./
-COPY run.sh ./
+COPY dist/log_conf.yaml ./
+COPY dist/run.sh ./
 RUN chmod a+x run.sh
 
 COPY teal ./teal
 COPY tests ./tests
+
+ENV PATH="${PATH}:/usr/local/verapdf"
 
 USER $USERNAME
 ENV TEAL_VERSION="$VERSION"

@@ -9,20 +9,28 @@ from starlette.responses import FileResponse
 
 from teal.core import create_json_err_response_from_exception, is_feature_enabled
 from teal.libreoffice import LibreOfficeAdapter
-from teal.model import TextExtract, TableExtract
-from teal.pdf import PdfDataExtractor, PdfAConverter
+from teal.model import TextExtract, TableExtract, PdfAReport
+from teal.pdf import PdfDataExtractor
+from teal.pdfa import PdfAValidator, PdfAConverter
 
 app = FastAPI()
 
 log_conf_file = "log_conf.yaml"
-if 'TEAL_LOG_CONF' in os.environ:
-    log_conf_file = os.environ['TEAL_LOG_CONF']
+if "TEAL_LOG_CONF" in os.environ:
+    log_conf_file = os.environ["TEAL_LOG_CONF"]
 
 print(f"using TEAL_LOG_CONF {log_conf_file}")
 
-with open(log_conf_file, 'rt') as f:
-    config = yaml.safe_load(f.read())
-    logging.config.dictConfig(config)
+if os.path.exists(log_conf_file):
+    with open(log_conf_file, "rt") as f:
+        config = yaml.safe_load(f.read())
+        logging.config.dictConfig(config)
+else:
+    logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+        level=logging.WARNING,
+    )
 
 # get root logger
 logger = logging.getLogger("teal.api")
@@ -33,50 +41,72 @@ async def unicorn_exception_handler(request: Request, ex: Exception):
     return create_json_err_response_from_exception(ex)
 
 
-if is_feature_enabled('TEA_FEATURE_PDF_TEXT'):
-    @app.post("/pdf/text", response_model=List[TextExtract], tags=['pdf'])
+if is_feature_enabled("TEA_FEATURE_PDF_TEXT"):
+
+    @app.post("/pdf/text", response_model=List[TextExtract], tags=["pdf"])
     async def extract_text_from_pdf(
-            file: UploadFile,
+        file: UploadFile,
     ) -> Any:
         logger.debug(f"extract text from pdf file='{file.filename}'")
         pdf = PdfDataExtractor()
         return pdf.extract_text(data=await file.read(), filename=file.filename)
 
-if is_feature_enabled('TEA_FEATURE_PDF_OCR'):
-    @app.post("/pdf/ocr", response_model=List[TextExtract], tags=['pdf'])
+
+if is_feature_enabled("TEA_FEATURE_PDF_OCR"):
+
+    @app.post("/pdf/ocr", response_model=List[TextExtract], tags=["pdf"])
     async def extract_text_with_ocr_from_pdf(
-            file: UploadFile,
+        file: UploadFile,
     ) -> Any:
         logger.debug(f"extract text with ocr from pdf file='{file.filename}'")
         pdf = PdfDataExtractor()
         return pdf.extract_text_with_ocr(data=await file.read(), filename=file.filename)
 
-if is_feature_enabled('TEA_FEATURE_PDF_TABLE'):
-    @app.post("/pdf/table", response_model=List[TableExtract], tags=['pdf'])
+
+if is_feature_enabled("TEA_FEATURE_PDF_TABLE"):
+
+    @app.post("/pdf/table", response_model=List[TableExtract], tags=["pdf"])
     async def extract_table_from_pdf(
-            file: UploadFile,
+        file: UploadFile,
     ) -> Any:
         logger.debug(f"extract table from pdf file='{file.filename}'")
         pdf = PdfDataExtractor()
         return pdf.extract_table(data=await file.read(), filename=file.filename)
 
-if is_feature_enabled('TEA_FEATURE_CONVERT_PDFA'):
-    @app.post("/convert/pdfa", response_class=FileResponse, tags=['convert'])
+
+if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
+
+    @app.post("/pdfa/convert", response_class=FileResponse, tags=["pdfa"])
     async def convert_pdf_to_pdfa_with_ocr(
-            file: UploadFile,
+        file: UploadFile,
     ) -> Any:
         logger.debug(f"extract table from pdf file='{file.filename}'")
         pdf = PdfAConverter()
         return pdf.convert_pdfa(data=await file.read(), filename=file.filename)
 
-if is_feature_enabled('TEA_FEATURE_CONVERT_LIBREOFFICE'):
-    @app.post("/convert/libreoffice", response_class=FileResponse, tags=['convert'])
+
+if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_VALIDATE"):
+
+    @app.post("/pdfa/validate", response_model=PdfAReport, tags=["pdfa"])
+    async def convert_pdf_to_pdfa_with_ocr(
+        file: UploadFile,
+    ) -> Any:
+        logger.debug(f"extract table from pdf file='{file.filename}'")
+        pdf = PdfAValidator()
+        return pdf.validate_pdf(data=await file.read(), filename=file.filename)
+
+
+if is_feature_enabled("TEA_FEATURE_CONVERT_LIBREOFFICE"):
+
+    @app.post("/libreoffice/convert", response_class=FileResponse, tags=["libreoffice"])
     async def convert_libreoffice_docs_to_pdf(
-            file: UploadFile,
+        file: UploadFile,
     ) -> Any:
         logger.debug(f"libreoffice convert file='{file.filename}' to pdf")
         libreoffice = LibreOfficeAdapter()
-        return libreoffice.convert_to_pdf(data=await file.read(), filename=file.filename)
+        return libreoffice.convert_to_pdf(
+            data=await file.read(), filename=file.filename
+        )
 
 
 def custom_openapi():
@@ -86,8 +116,12 @@ def custom_openapi():
             "description": "Extract text, OCR or tables from PDFs",
         },
         {
-            "name": "convert",
-            "description": "Convert documents to PDF or PDFs to PDF/A.",
+            "name": "pdfa",
+            "description": "Convert PDFs to PDF/A.",
+        },
+        {
+            "name": "libreoffice",
+            "description": "Convert documents to PDF.",
         },
     ]
 
@@ -99,7 +133,7 @@ def custom_openapi():
         summary="A convenient REST API for working with PDF's",
         description="**teal** aims to provide a user-friendly API for working with PDFs which can be easily integrated in an existing workflow. ",
         routes=app.routes,
-        tags=tags_metadata
+        tags=tags_metadata,
     )
     openapi_schema["info"]["x-logo"] = {
         "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
