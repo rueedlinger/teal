@@ -6,18 +6,29 @@ a seamless and efficient solution.
 
 ## Getting Started
 
+### Running Teal in App Mode
+
 Here's a quick example of how easy it is to work with Teal:
 
-To begin using Teal, check out our detailed documentation which covers installation, usage examples, and comprehensive
-guides on all API features.
+```bash
+docker run --rm -it -p 8000:8000 --name teal ghcr.io/rueedlinger/teal:latest
+```
 
-## Deployment
+Next you can use the api with the openapoi ui.
 
-tbd
+- http://127.0.0.1:8000/docs
 
-## API
+### Running Teal in Test Mode
 
-- tbd
+Teal is packed with unit and integration tests. These test can be run and verified with teh following command.
+
+```bash
+docker run --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:latest
+```
+
+## Documentation
+
+see tbd
 
 
 
