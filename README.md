@@ -14,13 +14,13 @@ Here's a quick example of how easy it is to work with Teal:
 docker run --rm -it -p 8000:8000 --name teal ghcr.io/rueedlinger/teal:latest
 ```
 
-Next you can use the api with the openapoi ui.
+Next you can use the api with the openapi ui.
 
 - http://127.0.0.1:8000/docs
 
 ### Running Teal in Test Mode
 
-Teal is packed with unit and integration tests. These test can be run and verified with teh following command.
+Teal is packed with unit and integration tests. These tests can be run and verified with teh following command.
 
 ```bash
 docker run --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:latest
