@@ -16,6 +16,8 @@ if [ "$TEAL_TEST_MODE" = true ] ; then
   #pytest --no-header -v --disable-warnings --log-cli-level debug
   echo "shutting container down..."
   exit
+else
+  echo "running in app mode"
 fi
 
 
