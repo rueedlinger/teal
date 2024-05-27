@@ -1,4 +1,4 @@
-# Development Setup
+# Developer Guide
 
 ## Python
 
@@ -30,4 +30,14 @@ arguments to pytest you can use the env `TEAL_PYTEST_ARGS`.
 
 ```bash
 docker compose run --build --name teal_pytest --rm -e TEAL_TEST_MODE=true teal
+```
+
+## Publish
+
+```bash
+docker build . --tag ghcr.io/rueedlinger/teal:latest 
+```
+
+```bash
+docker push ghcr.io/rueedlinger/teal:latest 
 ```

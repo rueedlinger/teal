@@ -1,6 +1,8 @@
-# Configuration
+# User Guide
 
-## Environment Variables
+## Configuration
+
+### Environment Variables
 
 | ENV           | Default       | Description                     |
 |---------------|---------------|---------------------------------|
