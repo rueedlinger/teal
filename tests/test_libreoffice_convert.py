@@ -10,28 +10,36 @@ from tests import load_file
 
 def test_non_zero_return_code():
     converter = libreoffice.LibreOfficeAdapter()
-    converter.libreoffice_cmd = 'foo'
-    resp = converter.convert_to_pdf(load_file('data/doc/normal_document.docx'), 'test.docx')
+    converter.libreoffice_cmd = "foo"
+    resp = converter.convert_to_pdf(
+        load_file("data/doc/normal_document.docx"), "test.docx"
+    )
     assert type(resp) is JSONResponse
     assert resp.status_code == 500
     print(json.loads(resp.body))
-    assert json.loads(resp.body) == {'message': "got return code 127 'test.docx' /bin/sh: 1: foo: not found\n"}
+    assert json.loads(resp.body) == {
+        "message": "got return code 127 'test.docx' /bin/sh: 1: foo: not found\n"
+    }
 
 
 def test_not_supported_types():
     converter = libreoffice.LibreOfficeAdapter()
-    resp = converter.convert_to_pdf("", 'test.zip')
+    resp = converter.convert_to_pdf("", "test.zip")
     assert type(resp) is JSONResponse
     assert resp.status_code == 400
-    assert json.loads(resp.body) == {'message': "file extension '.zip' is not supported (test.zip)."}
+    assert json.loads(resp.body) == {
+        "message": "file extension '.zip' is not supported (test.zip)."
+    }
 
 
 def test_convert_to_pdf_from_docx():
     converter = libreoffice.LibreOfficeAdapter()
-    out = converter.convert_to_pdf(load_file('data/doc/normal_document.docx'), 'test.docx')
+    out = converter.convert_to_pdf(
+        load_file("data/doc/normal_document.docx"), "test.docx"
+    )
     assert type(out) is FileResponse
-    assert out.filename == 'test.pdf'
-    assert out.media_type == 'application/pdf'
+    assert out.filename == "test.pdf"
+    assert out.media_type == "application/pdf"
     converted_pdf = load_file(out.path)
 
     # simulate background thread
@@ -41,7 +49,7 @@ def test_convert_to_pdf_from_docx():
 
     # test if OCR worked
     extractor = pdf.PdfDataExtractor()
-    txt_extracts = extractor.extract_text(converted_pdf, 'test.pdf')
+    txt_extracts = extractor.extract_text(converted_pdf, "test.pdf")
 
     assert len(txt_extracts) == 3
     assert len(txt_extracts[0].text) > 1000

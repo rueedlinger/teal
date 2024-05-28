@@ -17,12 +17,14 @@ _logger = logging.getLogger("teal.pdf")
 
 class PdfDataExtractor:
     def __init__(self):
-        self.supported_file_extensions = ['.pdf']
+        self.supported_file_extensions = [".pdf"]
 
     def extract_text(self, data, filename) -> list[TextExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
-            return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
+            return create_json_err_response(
+                400, f"file extension '{file_ext}' is not supported ({filename})."
+            )
 
         extracts = []
         pdf = pdfium.PdfDocument(data)
@@ -30,15 +32,20 @@ class PdfDataExtractor:
         for p in range(len(pdf)):
             textpage = pdf[p].get_textpage()
             text_all = textpage.get_text_bounded()
-            extracts.append(TextExtract.model_validate({"text": text_all, "page": p + 1}))
+            extracts.append(
+                TextExtract.model_validate({"text": text_all, "page": p + 1})
+            )
 
         return extracts
 
-    def extract_text_with_ocr(self, data, filename, lang=None, first_page=None, last_page=None) -> list[
-                                                                                                       TextExtract] | JSONResponse:
+    def extract_text_with_ocr(
+        self, data, filename, lang=None, first_page=None, last_page=None
+    ) -> list[TextExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
-            return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
+            return create_json_err_response(
+                400, f"file extension '{file_ext}' is not supported ({filename})."
+            )
 
         extracts = []
         images = convert_from_bytes(data)
@@ -53,7 +60,9 @@ class PdfDataExtractor:
     def extract_table(self, data, filename) -> list[TableExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
-            return create_json_err_response(400, f"file extension '{file_ext}' is not supported ({filename}).")
+            return create_json_err_response(
+                400, f"file extension '{file_ext}' is not supported ({filename})."
+            )
 
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
             tmp_pdf_file.write(data)

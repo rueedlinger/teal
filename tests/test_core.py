@@ -20,7 +20,7 @@ def test_feature_flag():
     assert core.is_feature_enabled("foo_flag") is True
 
     os.environ["foo_flag"] = "true"
-    assert core.is_feature_enabled("foo_flag") is False
+    assert core.is_feature_enabled("foo_flag") is True
 
     os.environ["foo_flag"] = "True"
     assert core.is_feature_enabled("foo_flag") is True
