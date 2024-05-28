@@ -4,13 +4,12 @@ FROM python:$PYTHON_VERSION
 ARG USERNAME=worker
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
-ARG VERSION="latest"
+ARG VERSION
 ARG TESSERACT_LANGUAGES="tesseract-ocr-deu tesseract-ocr-fra tesseract-ocr-ita tesseract-ocr-eng tesseract-ocr-por tesseract-ocr-spa"
 
 LABEL org.opencontainers.image.title="teal" \
       org.opencontainers.image.description="A convenient REST API for working with PDF's." \
-      org.opencontainers.image.version="$VERSION" \
-      org.opencontainers.image.documentation="https://github.com/rueedlinger/teal" \
+      org.opencontainers.image.documentation="https://rueedlinger.github.io/teal" \
       org.opencontainers.image.source="https://github.com/rueedlinger/teal"
 
 WORKDIR /usr/src/app

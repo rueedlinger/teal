@@ -7,7 +7,11 @@ from fastapi import FastAPI, UploadFile, Request
 from fastapi.openapi.utils import get_openapi
 from starlette.responses import FileResponse
 
-from teal.core import create_json_err_response_from_exception, is_feature_enabled
+from teal.core import (
+    create_json_err_response_from_exception,
+    is_feature_enabled,
+    get_version,
+)
 from teal.libreoffice import LibreOfficeAdapter
 from teal.model import TextExtract, TableExtract, PdfAReport
 from teal.pdf import PdfDataExtractor
@@ -129,7 +133,7 @@ def custom_openapi():
         return app.openapi_schema
     openapi_schema = get_openapi(
         title="teal",
-        version="0.1.0",
+        version=get_version(),
         summary="A convenient REST API for working with PDF's",
         description="**teal** aims to provide a user-friendly API for working with PDFs which can be easily integrated in an existing workflow. ",
         routes=app.routes,
