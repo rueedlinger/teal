@@ -11,7 +11,7 @@ a seamless and efficient solution.
 Here's a quick example of how easy it is to work with Teal:
 
 ```bash
-docker run --rm -it -p 8000:8000 --name teal ghcr.io/rueedlinger/teal:latest
+docker run --rm -it -p 8000:8000 --name teal ghcr.io/rueedlinger/teal:main
 ```
 
 Next you can use the api with the openapi ui.
@@ -23,7 +23,7 @@ Next you can use the api with the openapi ui.
 Teal is packed with unit and integration tests. These tests can be run and verified with teh following command.
 
 ```bash
-docker run --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:latest
+docker run --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:main
 ```
 
 ## Documentation

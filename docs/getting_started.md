@@ -10,7 +10,7 @@ Teal has two modes:
 Here's a quick example of how easy it is to work with Teal:
 
 ```bash
-docker run --rm -it -p 8000:8000 --name teal ghcr.io/rueedlinger/teal:latest
+docker run --rm -it -p 8000:8000 --name teal ghcr.io/rueedlinger/teal:main
 ```
 
 Next you can use the api with the openapi ui.
@@ -82,5 +82,5 @@ curl -X 'POST' \
 Teal is packed with unit and integration tests. These tests can be run and verified with teh following command.
 
 ```bash
-docker run --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:latest
+docker run --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:main
 ```
