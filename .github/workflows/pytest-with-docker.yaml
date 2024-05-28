@@ -21,4 +21,4 @@ jobs:
       - name: Test with pytest
         env:
           COMPOSE_INTERACTIVE_NO_CLI: 1
-        run: docker-compose exec teal ls
+        run: docker-compose run teal ls
