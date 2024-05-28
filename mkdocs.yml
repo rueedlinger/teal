@@ -1,0 +1,13 @@
+site_name: Teal
+#site_url: https://example.com/foo/
+repo_url: https://github.com/rueedlinger/teal
+edit_uri: blob/main/docs/
+repo_name: GitHub
+nav:
+  - 'index.md'
+  - 'getting_started.md'
+  - 'user_guide.md'
+  - 'developer_guide.md'
+theme:
+  name: material
+  #name: readthedocs

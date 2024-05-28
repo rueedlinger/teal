@@ -4,63 +4,33 @@
 developer looking to automate PDF processing or integrate PDF functionalities into your existing workflow, Teal provides
 a seamless and efficient solution.
 
-## Understanding Different Types of PDFs
-
-**Digitally Created PDFs:**
-
-- Created using software like Microsoft Word or Excel, or via the "print" function within applications.
-- Contains text and images with electronic character designation.
-- Text and images can be easily edited, searched, and manipulated.
-
-**Image-only PDFs:**
-
-- Generated from scanned hard copy documents or images.
-- Content is locked in a snapshot-like image without a text layer.
-- Not searchable or editable without OCR (Optical Character Recognition).
-
-**Searchable PDFs:**
-
-- Result from applying OCR to scanned or image-based documents.
-- Have a text layer added underneath the image layer, making them fully searchable.
-- Text can be selected, copied, and marked up like in original documents.
-
-## Key Features
-
-- Digitize documents to searchable or archivable PDF (PDF/A).
-- Extract metadata, text, and tables as structured data.
-- Convert different document types to PDF.
-- Convert PDFs to PDF/A.
-- Check PDF/A compliance.
-
 ## Getting Started
+
+### Running Teal in App Mode
 
 Here's a quick example of how easy it is to work with Teal:
 
-To begin using Teal, check out our detailed documentation which covers installation, usage examples, and comprehensive
-guides on all API features.
+```bash
+docker run --rm -it -p 8000:8000 --name teal ghcr.io/rueedlinger/teal:latest
+```
 
-## Deployment
+Next you can use the api with the openapi ui.
+
+- http://127.0.0.1:8000/docs
+
+### Running Teal in Test Mode
+
+Teal is packed with unit and integration tests. These tests can be run and verified with teh following command.
+
+```bash
+docker run --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:latest
+```
+
+## Documentation
 
 tbd
 
-## API
 
-- tbd
-
-## Libraries Used in Teal
-
-**Teal** uses other open-source libraries and provides this functionality through convenient APIs.
-
-| Feature                                           | Library                 |
-|---------------------------------------------------|-------------------------|
-| Extract text from PDFs                            | pypdfium2               |
-| Extract text from scanned PDFs (OCR)              | pytesseract             |
-| Extract tables from PDFs                          | camelot                 |
-| Convert PDF to PDF/A (with OCR when no text)      | ocrmypdf                |
-| Convert Office documents to PDF                   | libreoffice             |
-| PDF/A validation                                  | veraPDF                 |
-| Extract meta data from PDF                        | **not yet implemented** |
-| Process documents from a remote repository (HTTP) | **not yet implemented** |
 
 
 

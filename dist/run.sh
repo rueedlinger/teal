@@ -16,6 +16,8 @@ if [ "$TEAL_TEST_MODE" = true ] ; then
   #pytest --no-header -v --disable-warnings --log-cli-level debug
   echo "shutting container down..."
   exit
+else
+  echo "running in app mode"
 fi
 
 
@@ -41,10 +43,7 @@ else
   echo "env TEAL_IP_BIND is set to '$TEAL_IP_BIND'"
 fi
 
-
-
+echo "see API doc http://$TEAL_IP_BIND:$TEAL_PORT/docs"
 gunicorn teal.api:app --workers "$TEAL_WORKERS" \
     --worker-class uvicorn.workers.UvicornWorker --bind "$TEAL_IP_BIND":"$TEAL_PORT" \
     --access-logfile="-" --error-logfile="-"
-
-

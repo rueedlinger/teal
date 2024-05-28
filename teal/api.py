@@ -88,7 +88,7 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
 if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_VALIDATE"):
 
     @app.post("/pdfa/validate", response_model=PdfAReport, tags=["pdfa"])
-    async def convert_pdf_to_pdfa_with_ocr(
+    async def validate_pdfa(
         file: UploadFile,
     ) -> Any:
         logger.debug(f"extract table from pdf file='{file.filename}'")
@@ -96,7 +96,7 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_VALIDATE"):
         return pdf.validate_pdf(data=await file.read(), filename=file.filename)
 
 
-if is_feature_enabled("TEA_FEATURE_CONVERT_LIBREOFFICE"):
+if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
 
     @app.post("/libreoffice/convert", response_class=FileResponse, tags=["libreoffice"])
     async def convert_libreoffice_docs_to_pdf(
