@@ -14,12 +14,11 @@ jobs:
           COMPOSE_INTERACTIVE_NO_CLI: 1
         run: |
           docker-compose up --build -d
-          docker-compose exec teal pytest
       #- name: Check running containers
       #  run: docker-compose ps -a
       #- name: Check logs
       #  run: docker-compose logs teal
-      #- name: Test with pytest
-      #  env:
-      #    COMPOSE_INTERACTIVE_NO_CLI: 1
-      #  run: docker-compose exec teal pytest
+      - name: Test with pytest
+        #env:
+        #  COMPOSE_INTERACTIVE_NO_CLI: 1
+        run: docker-compose exec teal pytest
