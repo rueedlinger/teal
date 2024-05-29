@@ -112,12 +112,14 @@ curl -X 'POST' \
 
 ### Convert Libreoffice Documents to PDF
 
+Convert a Libreoffice document to PDF.
+
 ```bash
 curl -X 'POST' \
   'http://127.0.0.1:8000/libreoffice/convert' \
   -H 'accept: */*' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'file=@file.pdf;type=application/pdf'
+  -F 'file=@file.docx;type=application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 ```
 
 ## Running Teal in Test Mode
