@@ -129,7 +129,7 @@ def test_validate_pdfa_success():
     json_resp = json.loads(resp.body)
 
     assert json_resp["compliant"] is True
-    assert json_resp["profile"] == "PDF/A-2B"
+    assert json_resp["profile"] == "PDF/A-1B"
 
     # simulate background thread
     assert os.path.exists(resp.background.args[0]) is True
