@@ -14,7 +14,13 @@ from teal.core import (
     get_tesseract_languages,
 )
 from teal.libreoffice import LibreOfficeAdapter
-from teal.model import TextExtract, TableExtract, PdfAReport, PdfAProfile
+from teal.model import (
+    TextExtract,
+    TableExtract,
+    PdfAReport,
+    PdfAProfile,
+    LibreOfficePdfProfile,
+)
 from teal.pdf import PdfDataExtractor
 from teal.pdfa import PdfAValidator, PdfAConverter
 
@@ -140,11 +146,12 @@ if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
     @app.post("/libreoffice/convert", response_class=FileResponse, tags=["libreoffice"])
     async def convert_libreoffice_docs_to_pdf(
         file: UploadFile,
+        pdf_version: LibreOfficePdfProfile = Query(LibreOfficePdfProfile.PDF17),
     ) -> Any:
         logger.debug(f"libreoffice convert file='{file.filename}' to pdf")
         libreoffice = LibreOfficeAdapter()
         return libreoffice.convert_to_pdf(
-            data=await file.read(), filename=file.filename
+            data=await file.read(), filename=file.filename, pdf_profile=pdf_version
         )
 
 

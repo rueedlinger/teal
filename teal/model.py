@@ -31,3 +31,15 @@ class PdfAProfile(str, Enum):
     PDFA1 = "pdfa-1"
     PDFA2 = "pdfa-2"
     PDFA3 = "pdfa-3"
+
+
+class LibreOfficePdfProfile(str, Enum):
+    PDFA1 = "pdfa-1"
+    PDFA2 = "pdfa-2"
+    PDFA3 = "pdfa-3"
+    PDF15 = "pdf-1.5"
+    PDF16 = "pdf-1.6"
+    PDF17 = "pdf-1.7"
+
+    def to_libreoffice_pdf_version(self):
+        return self.value.replace("pdf-", "").replace("pdfa-", "")
