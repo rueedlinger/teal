@@ -23,7 +23,6 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     apt-get install -y tesseract-ocr && \
     apt-get install -y $TESSERACT_LANGUAGES && \
     apt-get install -y poppler-utils && \
-    apt-get install -y ocrmypdf && \
     apt-get install -y ghostscript python3-tk && \
     apt-get install -y libgl1 && \
     apt-get install -y ocrmypdf && \
@@ -52,6 +51,7 @@ ENV PATH="${PATH}:/usr/local/verapdf"
 
 USER $USERNAME
 ENV TEAL_VERSION="$VERSION"
+ENV TESSERACT_TESSDATA_PATH="/usr/share/tesseract-ocr/5/tessdata"
 # Runs "/usr/bin/dumb-init -- /my/script --with --args"
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 CMD ["/usr/src/app/run.sh"]

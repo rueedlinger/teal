@@ -5,6 +5,7 @@ from starlette.responses import FileResponse, JSONResponse
 
 import teal.pdf as pdf
 import teal.pdfa as pdfa
+from teal.model import PdfAProfile
 from tests import load_file
 
 
@@ -32,30 +33,37 @@ def test_not_supported_types():
     }
 
 
-def test_convert_pdf_from_digital_pdf():
-    converter = pdfa.PdfAConverter()
-    out = converter.convert_pdfa(
-        load_file("data/digital_pdf/normal_document.pdf"), "test.pdf"
-    )
-    assert type(out) is FileResponse
-    assert out.filename == "test.pdf"
-    assert out.media_type == "application/pdf"
-    pdfa_file = load_file(out.path)
+def test_convert_pdfa1_from_digital_pdf():
+    resp = _convert_to_pdfa(PdfAProfile.PDFA1)
 
-    # simulate background thread
-    assert os.path.exists(out.path) is True
-    out.background.func(out.background.args[0])
-    assert os.path.exists(out.path) is False
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 200
+    json_resp = json.loads(resp.body)
 
-    # test if OCR worked
-    extractor = pdf.PdfDataExtractor()
-    txt_extracts = extractor.extract_text(pdfa_file, "test.pdf")
+    assert json_resp["compliant"] is True
+    assert json_resp["profile"] == "PDF/A-1B"
 
-    assert len(txt_extracts) == 2
-    assert txt_extracts[0].page == 1
-    assert len(txt_extracts[0].text) > 2000
-    assert txt_extracts[1].page == 2
-    assert len(txt_extracts[1].text) > 2000
+
+def test_convert_pdfa2_from_digital_pdf():
+    resp = _convert_to_pdfa(PdfAProfile.PDFA2)
+
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 200
+    json_resp = json.loads(resp.body)
+
+    assert json_resp["compliant"] is True
+    assert json_resp["profile"] == "PDF/A-2B"
+
+
+def test_convert_pdfa3_from_digital_pdf():
+    resp = _convert_to_pdfa(PdfAProfile.PDFA3)
+
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 200
+    json_resp = json.loads(resp.body)
+
+    assert json_resp["compliant"] is True
+    assert json_resp["profile"] == "PDF/A-3B"
 
 
 def test_convert_pdf_from_scanned_pdf():
@@ -80,6 +88,16 @@ def test_convert_pdf_from_scanned_pdf():
     assert len(txt_extracts[0].text) > 2000
     assert txt_extracts[1].page == 2
     assert len(txt_extracts[1].text) > 2000
+
+    validator = pdfa.PdfAValidator()
+    resp = validator.validate_pdf(pdfa_file, filename="test.pdf")
+
+    assert type(resp) is JSONResponse
+    assert resp.status_code == 200
+    json_resp = json.loads(resp.body)
+
+    assert json_resp["compliant"] is True
+    assert json_resp["profile"] == "PDF/A-1B"
 
 
 def test_convert_pdf_from_scanned_pdf_with_table():
@@ -129,7 +147,7 @@ def test_validate_pdfa_success():
     json_resp = json.loads(resp.body)
 
     assert json_resp["compliant"] is True
-    assert json_resp["profile"] == "PDF/A-2B"
+    assert json_resp["profile"] == "PDF/A-1B"
 
     # simulate background thread
     assert os.path.exists(resp.background.args[0]) is True
@@ -149,3 +167,32 @@ def test_validate_pdfa_failed():
 
     assert json_resp["compliant"] is False
     assert json_resp["profile"] == "PDF/A-1B"
+
+
+def _convert_to_pdfa(pdfa_profile: PdfAProfile) -> JSONResponse:
+    converter = pdfa.PdfAConverter()
+    out = converter.convert_pdfa(
+        load_file("data/digital_pdf/normal_document.pdf"),
+        "test.pdf",
+        langs=[],
+        pdfa=pdfa_profile,
+    )
+    assert type(out) is FileResponse
+    assert out.filename == "test.pdf"
+    assert out.media_type == "application/pdf"
+    pdfa_file = load_file(out.path)
+    # simulate background thread
+    assert os.path.exists(out.path) is True
+    out.background.func(out.background.args[0])
+    assert os.path.exists(out.path) is False
+    # test if OCR worked
+    extractor = pdf.PdfDataExtractor()
+    txt_extracts = extractor.extract_text(pdfa_file, "test.pdf")
+    assert len(txt_extracts) == 2
+    assert txt_extracts[0].page == 1
+    assert len(txt_extracts[0].text) > 2000
+    assert txt_extracts[1].page == 2
+    assert len(txt_extracts[1].text) > 2000
+    validator = pdfa.PdfAValidator()
+    resp = validator.validate_pdf(pdfa_file, filename="test.pdf")
+    return resp

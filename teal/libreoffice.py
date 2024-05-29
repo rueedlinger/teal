@@ -7,6 +7,7 @@ from starlette.background import BackgroundTask
 from starlette.responses import FileResponse, JSONResponse
 
 from teal.core import create_json_err_response, cleanup_tmp_dir
+from teal.model import LibreOfficePdfProfile
 
 _logger = logging.getLogger("teal.libreoffice")
 
@@ -146,7 +147,12 @@ class LibreOfficeAdapter:
             ".xml",
         ]
 
-    def convert_to_pdf(self, data, filename) -> FileResponse | JSONResponse:
+    def convert_to_pdf(
+        self,
+        data: bytes,
+        filename: str,
+        pdf_profile: LibreOfficePdfProfile = None,
+    ) -> FileResponse | JSONResponse:
 
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
@@ -167,7 +173,24 @@ class LibreOfficeAdapter:
             tmp_file_in.write(data)
 
         _logger.debug(f"expecting out pdf {tmp_file_in_path}")
-        cmd_convert_pdf = f'{self.libreoffice_cmd} --headless --convert-to pdf --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
+        # 1: PDF/A-1b
+        # 2: PDF/A-2b
+        # 3: PDF/A-3b
+        # 15: PDF 1.5
+        # 16: PDF 1.6
+        # 17: PDF 1.7 (same as default = 0)
+        # https://help.libreoffice.org/latest/en-US/text/shared/guide/pdf_params.html
+        if pdf_profile is None:
+            pdf_version = "1.7"
+        else:
+            pdf_version = pdf_profile.to_libreoffice_pdf_version()
+        pdf_param = (
+            'pdf:draw_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"'
+            + pdf_version
+            + '"}}'
+        )
+        cmd_convert_pdf = f'{self.libreoffice_cmd} --headless --convert-to \'{pdf_param}\' --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
+        # cmd_convert_pdf = f'{self.libreoffice_cmd} --headless --convert-to pdf --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(

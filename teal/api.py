@@ -3,7 +3,7 @@ import os
 from typing import Any, List
 
 import yaml
-from fastapi import FastAPI, UploadFile, Request
+from fastapi import FastAPI, UploadFile, Request, Query
 from fastapi.openapi.utils import get_openapi
 from starlette.responses import FileResponse
 
@@ -11,33 +11,61 @@ from teal.core import (
     create_json_err_response_from_exception,
     is_feature_enabled,
     get_version,
+    get_tesseract_languages,
 )
 from teal.libreoffice import LibreOfficeAdapter
-from teal.model import TextExtract, TableExtract, PdfAReport
+from teal.model import (
+    TextExtract,
+    TableExtract,
+    PdfAReport,
+    PdfAProfile,
+    LibreOfficePdfProfile,
+)
 from teal.pdf import PdfDataExtractor
 from teal.pdfa import PdfAValidator, PdfAConverter
 
 app = FastAPI()
-
-log_conf_file = "log_conf.yaml"
+logger = logging.getLogger("teal.api")
 if "TEAL_LOG_CONF" in os.environ:
     log_conf_file = os.environ["TEAL_LOG_CONF"]
-
-print(f"using TEAL_LOG_CONF {log_conf_file}")
-
-if os.path.exists(log_conf_file):
     with open(log_conf_file, "rt") as f:
         config = yaml.safe_load(f.read())
         logging.config.dictConfig(config)
+        logger.info(f"logging config loaded from {log_conf_file}")
 else:
-    logging.basicConfig(
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-        level=logging.WARNING,
+    logging.config.dictConfig(
+        {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "formatters": {
+                "simple": {
+                    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                    "datefmt": "%Y-%m-%d %H:%M:%S",
+                }
+            },
+            "handlers": {
+                "console": {
+                    "class": "logging.StreamHandler",
+                    "formatter": "simple",
+                    "stream": "ext://sys.stdout",
+                },
+            },
+            "loggers": {
+                "teal": {"level": "INFO", "handlers": ["console"], "propagate": False},
+                "uvicorn": {
+                    "level": "INFO",
+                    "handlers": ["console"],
+                    "propagate": False,
+                },
+            },
+            "root": {"handlers": ["console"], "level": "WARN"},
+        }
     )
+    logger.info(f"logging config file not set using default")
+
 
 # get root logger
-logger = logging.getLogger("teal.api")
+logger.info(f"installed tesseract languages: {get_tesseract_languages()}")
 
 
 @app.exception_handler(Exception)
@@ -46,6 +74,7 @@ async def unicorn_exception_handler(request: Request, ex: Exception):
 
 
 if is_feature_enabled("TEA_FEATURE_PDF_TEXT"):
+    logger.info("feature PDF text is enabled")
 
     @app.post("/pdf/text", response_model=List[TextExtract], tags=["pdf"])
     async def extract_text_from_pdf(
@@ -57,39 +86,50 @@ if is_feature_enabled("TEA_FEATURE_PDF_TEXT"):
 
 
 if is_feature_enabled("TEA_FEATURE_PDF_OCR"):
+    logger.info("feature PDF ocr is enabled")
 
     @app.post("/pdf/ocr", response_model=List[TextExtract], tags=["pdf"])
     async def extract_text_with_ocr_from_pdf(
-        file: UploadFile,
+        file: UploadFile, languages: List[str] = Query([])
     ) -> Any:
         logger.debug(f"extract text with ocr from pdf file='{file.filename}'")
         pdf = PdfDataExtractor()
-        return pdf.extract_text_with_ocr(data=await file.read(), filename=file.filename)
+        return pdf.extract_text_with_ocr(
+            data=await file.read(), filename=file.filename, langs=languages
+        )
 
 
 if is_feature_enabled("TEA_FEATURE_PDF_TABLE"):
+    logger.info("feature PDF table is enabled")
 
     @app.post("/pdf/table", response_model=List[TableExtract], tags=["pdf"])
-    async def extract_table_from_pdf(
-        file: UploadFile,
-    ) -> Any:
+    async def extract_table_from_pdf(file: UploadFile) -> Any:
         logger.debug(f"extract table from pdf file='{file.filename}'")
         pdf = PdfDataExtractor()
         return pdf.extract_table(data=await file.read(), filename=file.filename)
 
 
 if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
+    logger.info("feature PDF/A convert is enabled")
 
     @app.post("/pdfa/convert", response_class=FileResponse, tags=["pdfa"])
     async def convert_pdf_to_pdfa_with_ocr(
         file: UploadFile,
+        languages: List[str] = Query([]),
+        pdfa: PdfAProfile = Query(PdfAProfile.PDFA1),
     ) -> Any:
-        logger.debug(f"extract table from pdf file='{file.filename}'")
+        logger.debug(
+            f"extract table from pdf file='{file.filename}', languages='{languages}, pdfa='{pdfa}'"
+        )
+        logger.info(languages)
         pdf = PdfAConverter()
-        return pdf.convert_pdfa(data=await file.read(), filename=file.filename)
+        return pdf.convert_pdfa(
+            data=await file.read(), filename=file.filename, langs=languages, pdfa=pdfa
+        )
 
 
 if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_VALIDATE"):
+    logger.info("feature PDF/A validate is enabled")
 
     @app.post("/pdfa/validate", response_model=PdfAReport, tags=["pdfa"])
     async def validate_pdfa(
@@ -101,15 +141,17 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_VALIDATE"):
 
 
 if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
+    logger.info("feature libreoffice convert is enabled")
 
     @app.post("/libreoffice/convert", response_class=FileResponse, tags=["libreoffice"])
     async def convert_libreoffice_docs_to_pdf(
         file: UploadFile,
+        pdf_version: LibreOfficePdfProfile = Query(LibreOfficePdfProfile.PDF17),
     ) -> Any:
         logger.debug(f"libreoffice convert file='{file.filename}' to pdf")
         libreoffice = LibreOfficeAdapter()
         return libreoffice.convert_to_pdf(
-            data=await file.read(), filename=file.filename
+            data=await file.read(), filename=file.filename, pdf_profile=pdf_version
         )
 
 

@@ -30,3 +30,19 @@ def test_feature_flag():
 
     os.environ["foo_flag"] = "False"
     assert core.is_feature_enabled("foo_flag") is False
+
+
+def test_tesseract_languages():
+    assert len(core.get_tesseract_languages()) > 0
+
+
+def test_make_tesseract_lang_param():
+    assert core.make_tesseract_lang_param([]) is None
+
+    assert core.make_tesseract_lang_param([""]) is None
+
+    assert core.make_tesseract_lang_param(["eng"]) == "eng"
+
+    assert core.make_tesseract_lang_param(["eng", "deu"]) == "eng+deu"
+
+    assert core.make_tesseract_lang_param(["eng", "deu", "fra"]) == "eng+deu+fra"

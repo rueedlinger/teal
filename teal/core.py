@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import shutil
 
 from starlette.background import BackgroundTask
@@ -63,3 +64,28 @@ def cleanup_tmp_dir(tmp_dir: str):
         _logger.warning(
             f"will not delete '{tmp_dir}', tmp dir must start with '{teal_tmp_dir_prefix}'"
         )
+
+
+def get_tesseract_languages() -> list[str]:
+    path = "/usr/share/tesseract-ocr/5/tessdata"
+    if "TESSERACT_TESSDATA_PATH" in os.environ:
+        path = os.environ["TESSERACT_TESSDATA_PATH"]
+
+    if os.path.exists(path):
+        languages = [
+            f.replace(".traineddata", "")
+            for f in os.listdir(path)
+            if re.match(r"[a-zA-Z_]+.*\.traineddata", f)
+        ]
+        return languages
+    else:
+        _logger.warning(f"not tesseract languages found in path {path}")
+        return []
+
+
+def make_tesseract_lang_param(langs: list[str]) -> str | None:
+    if len(langs) == 0:
+        return None
+    if len(langs) == 1 and langs[0] == "":
+        return None
+    return "+".join(langs)
