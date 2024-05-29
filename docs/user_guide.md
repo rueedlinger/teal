@@ -2,9 +2,35 @@
 
 ## Running Teal
 
+Here's a quick example of how easy it is to work with Teal directly with docker
+
 ```bash
-docker run --rm -it -p 8000:8000 -e TEAL_WORKERS=1 --name teal ghcr.io/rueedlinger/teal:latest
+docker run --rm -it -p 8000:8000 -e TEAL_WORKERS=1 --name teal ghcr.io/rueedlinger/teal:main
 ```
+
+or start Teak inside docker compose.
+
+```yaml
+services:
+  teal:
+    image: ghcr.io/rueedlinger/teal:main
+    ports:
+      - 8000:8000
+    environment:
+      #TEAL_LOG_CONF: "log_conf.yaml"
+      TEAL_WORKERS: 1
+      TEAL_PORT: 8000
+      TEAL_IP_BIND: 0.0.0.0
+```
+
+## OpenAPI Documentation
+
+Explore the comprehensive OpenAPI documentation for the API at the following links:
+
+- http://localhost:8000/docs
+- http://localhost:8000/openapi.json
+
+These resources provide detailed information about the endpoints, request parameters, and response formats.
 
 ## Configuration
 

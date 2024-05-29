@@ -46,8 +46,8 @@ def is_feature_enabled(feature_flag) -> bool:
 
 
 def get_version() -> str:
-    if "VERSION" in os.environ:
-        return os.environ["VERSION"]
+    if "TEAL_VERSION" in os.environ:
+        return os.environ["TEAL_VERSION"]
     return "unknown"
 
 

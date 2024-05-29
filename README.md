@@ -28,7 +28,7 @@ docker run --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/ruee
 
 ## Documentation
 
-tbd
+see https://rueedlinger.github.io/teal/
 
 
 
