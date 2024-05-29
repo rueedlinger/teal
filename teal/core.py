@@ -45,6 +45,12 @@ def is_feature_enabled(feature_flag) -> bool:
         return os.environ[feature_flag].lower() == "true"
 
 
+def get_version() -> str:
+    if "VERSION" in os.environ:
+        return os.environ["VERSION"]
+    return "unknown"
+
+
 def cleanup_tmp_dir(tmp_dir: str):
     teal_tmp_dir_prefix = "/tmp/teal-"
     if tmp_dir.startswith(teal_tmp_dir_prefix):
