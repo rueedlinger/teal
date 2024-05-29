@@ -2,8 +2,25 @@
 
 ## Running Teal
 
+Here's a quick example of how easy it is to work with Teal directly with docker
+
 ```bash
-docker run --rm -it -p 8000:8000 -e TEAL_WORKERS=1 --name teal ghcr.io/rueedlinger/teal:latest
+docker run --rm -it -p 8000:8000 -e TEAL_WORKERS=1 --name teal ghcr.io/rueedlinger/teal:main
+```
+
+or start Teak inside docker compose.
+
+```yaml
+services:
+  teal:
+    image: ghcr.io/rueedlinger/teal:main
+    ports:
+      - 8000:8000
+    environment:
+      #TEAL_LOG_CONF: "log_conf.yaml"
+      TEAL_WORKERS: 1
+      TEAL_PORT: 8000
+      TEAL_IP_BIND: 0.0.0.0
 ```
 
 ## Configuration
