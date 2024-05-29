@@ -23,6 +23,15 @@ services:
       TEAL_IP_BIND: 0.0.0.0
 ```
 
+## OpenAPI Documentation
+
+Explore the comprehensive OpenAPI documentation for the API at the following links:
+
+- http://localhost:8000/docs
+- http://localhost:8000/openapi.json
+
+These resources provide detailed information about the endpoints, request parameters, and response formats.
+
 ## Configuration
 
 ### Environment Variables
