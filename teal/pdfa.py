@@ -8,8 +8,13 @@ from fastapi.encoders import jsonable_encoder
 from starlette.background import BackgroundTask
 from starlette.responses import JSONResponse, FileResponse
 
-from teal.core import create_json_err_response, create_json_response, cleanup_tmp_dir
-from teal.model import PdfAReport
+from teal.core import (
+    create_json_err_response,
+    create_json_response,
+    cleanup_tmp_dir,
+    make_tesseract_lang_param,
+)
+from teal.model import PdfAReport, PdfAProfile
 
 _logger = logging.getLogger("teal.pdfa")
 
@@ -19,7 +24,15 @@ class PdfAConverter:
         self.ocrmypdf_cmd = ocrmypdf_cmd
         self.supported_file_extensions = [".pdf"]
 
-    def convert_pdfa(self, data, filename) -> FileResponse | JSONResponse:
+    def convert_pdfa(
+        self,
+        data: bytes,
+        filename: str,
+        langs: list[str] = [],
+        pdfa: PdfAProfile = PdfAProfile.PDFA1,
+        first_page=None,
+        last_page=None,
+    ) -> FileResponse | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
@@ -45,8 +58,14 @@ class PdfAConverter:
         # have text. The page will be copied to the output. This may be useful for documents that contain
         # both “born digital” and scanned content, or to use OCRmyPDF to normalize and convert to PDF/A
         # regardless of their contents.
+        languages = make_tesseract_lang_param(langs)
+        if languages is None:
+            languages = "eng"
 
-        cmd_convert_pdf = f'{self.ocrmypdf_cmd} --skip-text --output-type pdfa "{tmp_file_in_path}" "{tmp_file_out_path}"'
+        if pdfa is None:
+            pdfa = PdfAProfile.PDFA1
+
+        cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --skip-text --output-type {pdfa.value} "{tmp_file_in_path}" "{tmp_file_out_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(
@@ -86,7 +105,7 @@ class PdfAValidator:
         self.verapdf_cmd = verapdf_cmd
         self.supported_file_extensions = [".pdf"]
 
-    def validate_pdf(self, data, filename, profile="0") -> JSONResponse:
+    def validate_pdf(self, data: bytes, filename: str, profile="0") -> JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(

@@ -146,7 +146,7 @@ class LibreOfficeAdapter:
             ".xml",
         ]
 
-    def convert_to_pdf(self, data, filename) -> FileResponse | JSONResponse:
+    def convert_to_pdf(self, data: bytes, filename: str) -> FileResponse | JSONResponse:
 
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:

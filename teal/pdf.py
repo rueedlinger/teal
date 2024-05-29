@@ -9,7 +9,7 @@ import pytesseract
 from pdf2image import convert_from_bytes
 from starlette.responses import JSONResponse
 
-from teal.core import create_json_err_response
+from teal.core import create_json_err_response, make_tesseract_lang_param
 from teal.model import TextExtract, TableExtract
 
 _logger = logging.getLogger("teal.pdf")
@@ -19,7 +19,13 @@ class PdfDataExtractor:
     def __init__(self):
         self.supported_file_extensions = [".pdf"]
 
-    def extract_text(self, data, filename) -> list[TextExtract] | JSONResponse:
+    def extract_text(
+        self,
+        data: bytes,
+        filename: str,
+        first_page=None,
+        last_page=None,
+    ) -> list[TextExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
@@ -39,7 +45,12 @@ class PdfDataExtractor:
         return extracts
 
     def extract_text_with_ocr(
-        self, data, filename, lang=None, first_page=None, last_page=None
+        self,
+        data: bytes,
+        filename: str,
+        langs: list[str] = [],
+        first_page=None,
+        last_page=None,
     ) -> list[TextExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
@@ -53,11 +64,20 @@ class PdfDataExtractor:
 
         for i, page in enumerate(images):
             # multi lang eg. eng+chi_tra
-            text = pytesseract.image_to_string(page, lang=lang)
+            languages = make_tesseract_lang_param(langs)
+            if languages is None:
+                languages = "eng"
+            text = pytesseract.image_to_string(page, lang=languages)
             extracts.append(TextExtract.model_validate({"text": text, "page": i + 1}))
         return extracts
 
-    def extract_table(self, data, filename) -> list[TableExtract] | JSONResponse:
+    def extract_table(
+        self,
+        data: bytes,
+        filename: str,
+        first_page=None,
+        last_page=None,
+    ) -> list[TableExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(

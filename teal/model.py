@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List
 
 from pydantic import BaseModel
@@ -24,3 +25,9 @@ class PdfAReport(BaseModel):
     statement: str
     compliant: bool
     details: dict
+
+
+class PdfAProfile(str, Enum):
+    PDFA1 = "pdfa-1"
+    PDFA2 = "pdfa-2"
+    PDFA3 = "pdfa-3"
