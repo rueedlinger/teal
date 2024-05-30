@@ -11,5 +11,6 @@ camelot-py[base]
 opencv-python
 pytest
 pytest-cov
+locust
 sphinx
 black
