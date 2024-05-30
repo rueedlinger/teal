@@ -198,7 +198,7 @@ class LibreOfficeAdapter:
             shell=True,
             capture_output=True,
             text=True,
-            env={"HOME": "/tmp"},
+            env={"HOME": tmp_dir},
         )
 
         converted_file_out = os.path.join(tmp_dir, "out", "tmp.pdf")

@@ -8,7 +8,7 @@ Here's a quick example of how easy it is to work with Teal directly with docker
 docker run --rm -it -p 8000:8000 -e TEAL_WORKERS=1 --name teal ghcr.io/rueedlinger/teal:main
 ```
 
-or start Teak inside docker compose.
+or start Teal inside docker compose.
 
 ```yaml
 services:
@@ -19,6 +19,7 @@ services:
     environment:
       #TEAL_LOG_CONF: "log_conf.yaml"
       TEAL_WORKERS: 1
+      #TEAL_WORKERS_TIMEOUT: 90
       TEAL_PORT: 8000
       TEAL_IP_BIND: 0.0.0.0
 ```
@@ -36,12 +37,13 @@ These resources provide detailed information about the endpoints, request parame
 
 ### Environment Variables
 
-| ENV           | Default       | Description                     |
-|---------------|---------------|---------------------------------|
-| TEAL_LOG_CONF | log_conf.yaml | The python logging conf (yaml)  |
-| TEAL_WORKERS  | 1             | The number of worker processes. |
-| TEAL_PORT     | 8000          | Bind socket to this port        |
-| TEAL_IP_BIND  | 0.0.0.0       | Bind socket to this host.       |
+| ENV                  | Default       | Description                     |
+|----------------------|---------------|---------------------------------|
+| TEAL_LOG_CONF        | log_conf.yaml | The python logging conf (yaml). |
+| TEAL_WORKERS         | 10            | The number of worker processes. |
+| TEAL_WORKERS_TIMEOUT | 120           | Worker timeout in seconds.      |
+| TEAL_PORT            | 8000          | Bind socket to this port        |
+| TEAL_IP_BIND         | 0.0.0.0       | Bind socket to this host.       |
 
 ### Logging
 

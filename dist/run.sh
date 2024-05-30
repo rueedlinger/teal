@@ -20,7 +20,7 @@ fi
 
 
 if [ -z ${TEAL_WORKERS+x} ]; then
-  TEAL_WORKERS=1
+  TEAL_WORKERS=10
   echo "env TEAL_WORKERS is unset, will set to $TEAL_WORKERS"
 
 else
@@ -41,7 +41,15 @@ else
   echo "env TEAL_IP_BIND is set to '$TEAL_IP_BIND'"
 fi
 
+if [ -z ${TEAL_WORKERS_TIMEOUT+x} ]; then
+  TEAL_WORKERS_TIMEOUT=120
+  echo "env TEAL_WORKERS_TIMEOUT is unset, will set to $TEAL_WORKERS_TIMEOUT"
+
+else
+    echo "env TEAL_WORKERS_TIMEOUT is set to '$TEAL_WORKERS_TIMEOUT'"
+fi
+
 echo "see API doc http://$TEAL_IP_BIND:$TEAL_PORT/docs"
 gunicorn teal.api:app --workers "$TEAL_WORKERS" \
     --worker-class uvicorn.workers.UvicornWorker --bind "$TEAL_IP_BIND":"$TEAL_PORT" \
-    --access-logfile="-" --error-logfile="-"
+    --timeout $TEAL_WORKERS_TIMEOUT --access-logfile="-" --error-logfile="-"
