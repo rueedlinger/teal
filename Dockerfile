@@ -9,7 +9,7 @@ ARG TESSERACT_LANGUAGES="tesseract-ocr-deu tesseract-ocr-fra tesseract-ocr-ita t
 
 LABEL org.opencontainers.image.title="teal" \
       org.opencontainers.image.description="A convenient REST API for working with PDF's." \
-      org.opencontainers.image.documentation="https://rueedlinger.github.io/teal" \
+      org.opencontainers.image.documentation="https://teal.yax.ch/" \
       org.opencontainers.image.source="https://github.com/rueedlinger/teal"
 
 WORKDIR /usr/src/app
