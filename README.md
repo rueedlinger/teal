@@ -38,7 +38,7 @@ You can now start the load test from the locust webui (http://0.0.0.0:8089/).
 
 ## Documentation
 
-see https://rueedlinger.github.io/teal/
+see https://teal.yax.ch/
 
 
 
