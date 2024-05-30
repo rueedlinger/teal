@@ -10,7 +10,7 @@ Teal has two modes:
 Here's a quick example of how easy it is to work with Teal:
 
 ```bash
-docker run --rm -it -p 8000:8000 --name teal ghcr.io/rueedlinger/teal:main
+docker run --pull=always --rm -it -p 8000:8000 --name teal ghcr.io/rueedlinger/teal:main
 ```
 
 Next you can use the api with the openapi ui.

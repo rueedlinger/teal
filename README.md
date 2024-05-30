@@ -26,6 +26,16 @@ Teal is packed with unit and integration tests. These tests can be run and verif
 docker run --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:main
 ```
 
+### Starting Teal with Locust (Load Testing)
+
+The following command will start the locust webui inside the docker container.
+
+```bash
+docker run --rm -it -p 8089:8089 -p 8000:8000 -e TEAL_START_LOCUST=true --name teal ghcr.io/rueedlinger/teal:main
+```
+
+You can now start the load test from the locust webui (http://0.0.0.0:8089/).
+
 ## Documentation
 
 see https://rueedlinger.github.io/teal/
