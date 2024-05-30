@@ -12,4 +12,4 @@ services:
       # TEAL_WORKERS_TIMEOUT: 90
       TEAL_PORT: 8000
       # TEAL_IP_BIND: 0.0.0.0
-      TEAL_START_LOCUST: true
+      # TEAL_START_LOCUST: 'true'
