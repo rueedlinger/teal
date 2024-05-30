@@ -56,6 +56,7 @@ def test_convert_to_pdf_16_with_version_from_docx():
     assert json_resp["profile"] == "PDF/A-1B"
 
 
+"""
 def test_convert_to_pdf_17_with_version_from_docx():
     resp = _convert_to_pdf_version(LibreOfficePdfProfile.PDF17)
 
@@ -65,6 +66,7 @@ def test_convert_to_pdf_17_with_version_from_docx():
 
     assert json_resp["compliant"] is False
     assert json_resp["profile"] == "PDF/A-1B"
+"""
 
 
 def test_convert_to_pdfa1_with_version_from_docx():

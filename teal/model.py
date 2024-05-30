@@ -39,7 +39,7 @@ class LibreOfficePdfProfile(str, Enum):
     PDFA3 = "pdfa-3"
     PDF15 = "pdf-1.5"
     PDF16 = "pdf-1.6"
-    PDF17 = "pdf-1.7"
+    # PDF17 = "pdf-1.7"
 
     def to_libreoffice_pdf_version(self):
         if "pdfa-" in self.value:
