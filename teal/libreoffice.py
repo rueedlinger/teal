@@ -185,6 +185,7 @@ class LibreOfficeAdapter:
         # 15: PDF 1.5
         # 16: PDF 1.6
         # 17: PDF 1.7 (same as default = 0)
+        # current docker image (LibreOffice 7.4.7.2 40(Build:2)) does not supports  PDF 1.7
         # https://help.libreoffice.org/latest/en-US/text/shared/guide/pdf_params.html
         if pdf_profile is None:
             pdf_version = "0"
