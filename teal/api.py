@@ -121,7 +121,6 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
         logger.debug(
             f"extract table from pdf file='{file.filename}', languages='{languages}, pdfa='{pdfa}'"
         )
-        logger.info(languages)
         pdf = PdfAConverter()
         return pdf.convert_pdfa(
             data=await file.read(), filename=file.filename, langs=languages, pdfa=pdfa

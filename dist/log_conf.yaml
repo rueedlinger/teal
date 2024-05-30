@@ -20,7 +20,7 @@ handlers:
 
 loggers:
   teal:
-    level: DEBUG
+    level: INFO
     handlers: [ console ]
     propagate: no
   uvicorn.error:

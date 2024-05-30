@@ -87,7 +87,7 @@ To build and run the container, use the following command
 docker compose up --build
 ```
 
-## Testing
+## Unit/Integration Testing
 
 To run the pytest inside the docker container just pass the env `TEAL_TEST_MODE=true`. When you want to pass
 arguments to pytest you can use the env `TEAL_PYTEST_ARGS`.
@@ -95,3 +95,24 @@ arguments to pytest you can use the env `TEAL_PYTEST_ARGS`.
 ```bash
 docker compose run --build --name teal_pytest --rm -e TEAL_TEST_MODE=true teal
 ```
+
+### Load Testing
+
+```bash
+locust --host http://localhost:8000 --users 5 -t 10m --autostart -f tests/locustfile.py
+```
+
+you can see the result with the locust webui (http://0.0.0.0:8089/).
+
+The following is load test run with 5 users for 10 minutes (10 workers, worker timeout 120 seconds)
+on mac book pro (2023, Apple M2 Max, 64GB Mem)
+
+| Type | Name                 | # Requests | # Fails | Median (ms) | 95%ile (ms) | 99%ile (ms) | Average (ms) | Min (ms) | Max (ms) | Average size (bytes) | Current RPS | Current Failures/s |
+|------|----------------------|------------|---------|-------------|-------------|-------------|--------------|----------|----------|----------------------|-------------|--------------------|
+| POST | /libreoffice/convert | 370        | 0       | 620         | 750         | 940         | 628.05       | 514      | 1197     | 59527.49             | 0.5         | 0                  |
+| POST | /pdf/ocr             | 326        | 0       | 6100        | 8100        | 9400        | 6198.9       | 4101     | 10376    | 5009                 | 0.8         | 0                  |
+| POST | /pdf/table           | 342        | 0       | 590         | 690         | 730         | 607.71       | 553      | 808      | 154                  | 0.5         | 0                  |
+| POST | /pdf/text            | 336        | 0       | 9           | 18          | 22          | 9.87         | 6        | 84       | 5169                 | 1           | 0                  |
+| POST | /pdfa/convert        | 335        | 0       | 360         | 440         | 480         | 367.51       | 316      | 812      | 51695                | 0.6         | 0                  |
+| POST | /pdfa/validate       | 346        | 0       | 1100        | 1300        | 1400        | 1145.63      | 864      | 1543     | 214                  | 0.4         | 0                  |
+|      | Aggregated           | 2055       | 0       | 600         | 6600        | 7900        | 1452.01      | 6        | 10376    | 20846.44             | 3.8         | 0                  |

@@ -7,7 +7,8 @@ services:
       - 8000:8000
     environment:
       TEAL_LOG_CONF: "log_conf.yaml"
-      TEAL_WORKERS: 1
+      # TEAL_WORKERS: 1
+      #TEAL_WORKERS_TIMEOUT: 90
       TEAL_PORT: 8000
       #TEAL_IP_BIND: 0.0.0.0
 

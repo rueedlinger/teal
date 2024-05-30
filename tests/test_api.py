@@ -29,7 +29,7 @@ def test_pdf_ocr():
 def test_pdf_table():
     client = TestClient(api.app)
     with open(get_path("data/digital_pdf/simple_tables.pdf"), "rb") as f:
-        response = client.post(url="/pdf/ocr", files={"file": f})
+        response = client.post(url="/pdf/table", files={"file": f})
         assert response.status_code == 200
         assert len(response.json()) >= 1
 
