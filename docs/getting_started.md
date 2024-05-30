@@ -28,7 +28,9 @@ docker run --pull=always --rm -it -p 8089:8089 -p 8000:8000 -e TEAL_START_LOCUST
 
 You can now start the load test from the locust webui (http://0.0.0.0:8089/).
 
-### Extract Text From a PDF
+### Teal REST API Endpoint
+
+#### Extract Text From a PDF
 
 This will extract the text from a digital pdf.
 
@@ -40,7 +42,7 @@ curl -X 'POST' \
   -F 'file=@file.pdf;type=application/pdf'
 ```
 
-### Extract Text With OCR From a PDF
+#### Extract Text With OCR From a PDF
 
 Extract text from a image only pdf with default languages (eng).
 
@@ -63,7 +65,7 @@ curl -X 'POST' \
   -F 'file=@file.pdf;type=application/pdf'
 ```
 
-### Extract Table From a PPF
+#### Extract Table From a PPF
 
 Extract tables as json from a digital pdf.
 
@@ -75,7 +77,7 @@ curl -X 'POST' \
   -F 'file=@file.pdf;type=application/pdf'
 ```
 
-### Convert PDF To PDF/A With OCR
+#### Convert PDF To PDF/A With OCR
 
 Convert a PDF to PDF/A. If the PDF is a scanned image, OCR is used with default languages eng. The languages correspond
 to the tesseract languages codes.
@@ -109,7 +111,7 @@ curl -X 'POST' \
   -F 'file=@file.pdf;type=application/pdf'
 ```
 
-### Validate PDF/A
+#### Validate PDF/A
 
 Validate an PDF against the PDF/A standard.
 
@@ -121,7 +123,7 @@ curl -X 'POST' \
   -F 'file=@file.pdf;type=application/pdf'
 ```
 
-### Convert Libreoffice Documents to PDF
+#### Convert Libreoffice Documents to PDF
 
 Convert a Libreoffice document to PDF.
 
