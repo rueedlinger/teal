@@ -96,16 +96,34 @@ arguments to pytest you can use the env `TEAL_PYTEST_ARGS`.
 docker compose run --build --name teal_pytest --rm -e TEAL_TEST_MODE=true teal
 ```
 
-### Load Testing
+## Load Testing
+
+You can run the load test locally or inside docker.
+
+### Locally
+
+The following command will start the load test with locust.
 
 ```bash
 locust --host http://localhost:8000 --users 5 -t 10m --autostart -f tests/locustfile.py
 ```
 
-you can see the result with the locust webui (http://0.0.0.0:8089/).
+You can see the result with the locust webui (http://0.0.0.0:8089/).
+
+### Inside Docker
+
+The following command will start the locust webui inside the docker container.
+
+```bash
+docker compose run --build --rm -p 8089:8089 -p 8000:8000 -e TEAL_START_LOCUST=true teal
+```
+
+You can now start the load test from the locust webui (http://0.0.0.0:8089/).
+
+### Result
 
 The following is load test run with 5 users for 10 minutes (10 workers, worker timeout 120 seconds)
-on mac book pro (2023, Apple M2 Max, 64GB Mem)
+on a mac book pro (2023, Apple M2 Max, 64GB Mem) witch docker settings memory limit 16GB and CPU limit 12.
 
 | Type | Name                 | # Requests | # Fails | Median (ms) | 95%ile (ms) | 99%ile (ms) | Average (ms) | Min (ms) | Max (ms) | Average size (bytes) | Current RPS | Current Failures/s |
 |------|----------------------|------------|---------|-------------|-------------|-------------|--------------|----------|----------|----------------------|-------------|--------------------|
@@ -116,3 +134,4 @@ on mac book pro (2023, Apple M2 Max, 64GB Mem)
 | POST | /pdfa/convert        | 335        | 0       | 360         | 440         | 480         | 367.51       | 316      | 812      | 51695                | 0.6         | 0                  |
 | POST | /pdfa/validate       | 346        | 0       | 1100        | 1300        | 1400        | 1145.63      | 864      | 1543     | 214                  | 0.4         | 0                  |
 |      | Aggregated           | 2055       | 0       | 600         | 6600        | 7900        | 1452.01      | 6        | 10376    | 20846.44             | 3.8         | 0                  |
+

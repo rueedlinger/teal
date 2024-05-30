@@ -49,6 +49,12 @@ else
     echo "env TEAL_WORKERS_TIMEOUT is set to '$TEAL_WORKERS_TIMEOUT'"
 fi
 
+if [ "$TEAL_START_LOCUST" = true ] ; then
+  echo "env $TEAL_START_LOCUST ist set to '$TEAL_START_LOCUST'"
+  echo "starting in locust"
+  locust --host http://localhost:$TEAL_PORT --web-port 8089 -f tests/locustfile.py &
+fi
+
 echo "see API doc http://$TEAL_IP_BIND:$TEAL_PORT/docs"
 gunicorn teal.api:app --workers "$TEAL_WORKERS" \
     --worker-class uvicorn.workers.UvicornWorker --bind "$TEAL_IP_BIND":"$TEAL_PORT" \

@@ -5,18 +5,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8000:8000
+      - 8089:8089
     environment:
       TEAL_LOG_CONF: "log_conf.yaml"
       # TEAL_WORKERS: 1
-      #TEAL_WORKERS_TIMEOUT: 90
+      # TEAL_WORKERS_TIMEOUT: 90
       TEAL_PORT: 8000
-      #TEAL_IP_BIND: 0.0.0.0
-
-  #gotenberg:
-  #  image: gotenberg/gotenberg:8
-  #  ports:
-  #    - 3000:3000
-  #tika:
-  #  image: tika/2.9.2.0-full
-  #  ports:
-  #    - 9998:9998
+      # TEAL_IP_BIND: 0.0.0.0
+      # TEAL_START_LOCUST: 'true'
