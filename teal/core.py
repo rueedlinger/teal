@@ -89,3 +89,33 @@ def make_tesseract_lang_param(langs: list[str]) -> str | None:
     if len(langs) == 1 and langs[0] == "":
         return None
     return "+".join(langs)
+
+
+def parse_page_ranges(range_string):
+    if range_string is None:
+        return None
+
+    result = []
+    elements = range_string.split(",")
+
+    for element in elements:
+        if "-" in element:
+            try:
+                start, end = map(int, element.split("-"))
+                result.extend(range(start, end + 1))
+            except ValueError as e:
+                _logger.warning(f"ignoring invalid range input {element}")
+        else:
+            try:
+                result.append(int(element))
+            except ValueError as e:
+                _logger.warning(f"ignoring invalid input {element}")
+
+    if len(result) == 0:
+        return None
+
+    return sorted(set(result))
+
+
+def to_page_range(ranges: list[int]) -> str:
+    return ",".join([str(e) for e in ranges])

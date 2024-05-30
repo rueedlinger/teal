@@ -42,4 +42,9 @@ class LibreOfficePdfProfile(str, Enum):
     PDF17 = "pdf-1.7"
 
     def to_libreoffice_pdf_version(self):
-        return self.value.replace("pdf-", "").replace("pdfa-", "")
+        if "pdfa-" in self.value:
+            return self.value.replace("pdfa-", "")
+        elif "pdf-" in self.value:
+            return self.value.replace("pdf-", "").replace(".", "")
+        else:
+            return "0"

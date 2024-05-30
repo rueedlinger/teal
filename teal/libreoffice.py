@@ -6,7 +6,12 @@ import tempfile
 from starlette.background import BackgroundTask
 from starlette.responses import FileResponse, JSONResponse
 
-from teal.core import create_json_err_response, cleanup_tmp_dir
+from teal.core import (
+    create_json_err_response,
+    cleanup_tmp_dir,
+    parse_page_ranges,
+    to_page_range,
+)
 from teal.model import LibreOfficePdfProfile
 
 _logger = logging.getLogger("teal.libreoffice")
@@ -152,6 +157,7 @@ class LibreOfficeAdapter:
         data: bytes,
         filename: str,
         pdf_profile: LibreOfficePdfProfile = None,
+        page_ranges: str = None,
     ) -> FileResponse | JSONResponse:
 
         file_ext = os.path.splitext(filename)[1]
@@ -181,14 +187,26 @@ class LibreOfficeAdapter:
         # 17: PDF 1.7 (same as default = 0)
         # https://help.libreoffice.org/latest/en-US/text/shared/guide/pdf_params.html
         if pdf_profile is None:
-            pdf_version = "1.7"
+            pdf_version = "0"
         else:
             pdf_version = pdf_profile.to_libreoffice_pdf_version()
-        pdf_param = (
-            'pdf:draw_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"'
-            + pdf_version
-            + '"}}'
-        )
+
+        pages = parse_page_ranges(page_ranges)
+        if pages is None:
+            pdf_param = (
+                'pdf:draw_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"'
+                + pdf_version
+                + '"}}'
+            )
+        else:
+            pdf_param = (
+                'pdf:draw_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"'
+                + pdf_version
+                + '"},"PageRange":{"type":"string","value":"'
+                + to_page_range(pages)
+                + '"}}'
+            )
+
         cmd_convert_pdf = f'{self.libreoffice_cmd} --headless --convert-to \'{pdf_param}\' --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
         # cmd_convert_pdf = f'{self.libreoffice_cmd} --headless --convert-to pdf --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
 

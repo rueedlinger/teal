@@ -79,10 +79,13 @@ if is_feature_enabled("TEA_FEATURE_PDF_TEXT"):
     @app.post("/pdf/text", response_model=List[TextExtract], tags=["pdf"])
     async def extract_text_from_pdf(
         file: UploadFile,
+        pages: str = Query(None),
     ) -> Any:
         logger.debug(f"extract text from pdf file='{file.filename}'")
         pdf = PdfDataExtractor()
-        return pdf.extract_text(data=await file.read(), filename=file.filename)
+        return pdf.extract_text(
+            data=await file.read(), filename=file.filename, page_ranges=pages
+        )
 
 
 if is_feature_enabled("TEA_FEATURE_PDF_OCR"):
@@ -90,12 +93,17 @@ if is_feature_enabled("TEA_FEATURE_PDF_OCR"):
 
     @app.post("/pdf/ocr", response_model=List[TextExtract], tags=["pdf"])
     async def extract_text_with_ocr_from_pdf(
-        file: UploadFile, languages: List[str] = Query([])
+        file: UploadFile,
+        languages: List[str] = Query([]),
+        pages: str = Query(None),
     ) -> Any:
         logger.debug(f"extract text with ocr from pdf file='{file.filename}'")
         pdf = PdfDataExtractor()
         return pdf.extract_text_with_ocr(
-            data=await file.read(), filename=file.filename, langs=languages
+            data=await file.read(),
+            filename=file.filename,
+            langs=languages,
+            page_ranges=pages,
         )
 
 
@@ -103,10 +111,15 @@ if is_feature_enabled("TEA_FEATURE_PDF_TABLE"):
     logger.info("feature PDF table is enabled")
 
     @app.post("/pdf/table", response_model=List[TableExtract], tags=["pdf"])
-    async def extract_table_from_pdf(file: UploadFile) -> Any:
+    async def extract_table_from_pdf(
+        file: UploadFile,
+        pages: str = Query(None),
+    ) -> Any:
         logger.debug(f"extract table from pdf file='{file.filename}'")
         pdf = PdfDataExtractor()
-        return pdf.extract_table(data=await file.read(), filename=file.filename)
+        return pdf.extract_table(
+            data=await file.read(), filename=file.filename, page_ranges=pages
+        )
 
 
 if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
@@ -117,13 +130,18 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
         file: UploadFile,
         languages: List[str] = Query([]),
         pdfa: PdfAProfile = Query(PdfAProfile.PDFA1),
+        pages: str = Query(None),
     ) -> Any:
         logger.debug(
             f"extract table from pdf file='{file.filename}', languages='{languages}, pdfa='{pdfa}'"
         )
         pdf = PdfAConverter()
         return pdf.convert_pdfa(
-            data=await file.read(), filename=file.filename, langs=languages, pdfa=pdfa
+            data=await file.read(),
+            filename=file.filename,
+            langs=languages,
+            pdfa=pdfa,
+            page_ranges=pages,
         )
 
 
@@ -145,12 +163,16 @@ if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
     @app.post("/libreoffice/convert", response_class=FileResponse, tags=["libreoffice"])
     async def convert_libreoffice_docs_to_pdf(
         file: UploadFile,
-        pdf_version: LibreOfficePdfProfile = Query(LibreOfficePdfProfile.PDF17),
+        pdfa: LibreOfficePdfProfile = Query(None),
+        pages: str = Query(None),
     ) -> Any:
         logger.debug(f"libreoffice convert file='{file.filename}' to pdf")
         libreoffice = LibreOfficeAdapter()
         return libreoffice.convert_to_pdf(
-            data=await file.read(), filename=file.filename, pdf_profile=pdf_version
+            data=await file.read(),
+            filename=file.filename,
+            pdf_profile=pdfa,
+            page_ranges=pages,
         )
 
 

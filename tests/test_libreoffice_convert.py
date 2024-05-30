@@ -41,8 +41,8 @@ def test_convert_to_pdf_15_with_version_from_docx():
     assert resp.status_code == 200
     json_resp = json.loads(resp.body)
 
-    assert json_resp["compliant"] is True
-    assert json_resp["profile"] == "PDF/A-1A"
+    assert json_resp["compliant"] is False
+    assert json_resp["profile"] == "PDF/A-1B"
 
 
 def test_convert_to_pdf_16_with_version_from_docx():
@@ -52,8 +52,8 @@ def test_convert_to_pdf_16_with_version_from_docx():
     assert resp.status_code == 200
     json_resp = json.loads(resp.body)
 
-    assert json_resp["compliant"] is True
-    assert json_resp["profile"] == "PDF/A-1A"
+    assert json_resp["compliant"] is False
+    assert json_resp["profile"] == "PDF/A-1B"
 
 
 def test_convert_to_pdf_17_with_version_from_docx():
@@ -63,8 +63,8 @@ def test_convert_to_pdf_17_with_version_from_docx():
     assert resp.status_code == 200
     json_resp = json.loads(resp.body)
 
-    assert json_resp["compliant"] is True
-    assert json_resp["profile"] == "PDF/A-1A"
+    assert json_resp["compliant"] is False
+    assert json_resp["profile"] == "PDF/A-1B"
 
 
 def test_convert_to_pdfa1_with_version_from_docx():
