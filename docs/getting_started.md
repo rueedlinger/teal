@@ -2,7 +2,7 @@
 
 Teal has two modes:
 
-- **app mode** will run the teal app.
+- **app mode** will run the teal app. In app mode you can also start up the Locust webui.
 - **test mode** will run the tests and print the result to stdout.
 
 ## Running Teal in App Mode
@@ -16,6 +16,17 @@ docker run --pull=always --rm -it -p 8000:8000 --name teal ghcr.io/rueedlinger/t
 Next you can use the api with the openapi ui.
 
 - http://localhost:8000/docs
+
+### Starting Teal with Locust (Load Testing)
+
+Teal also includes Locust load tests, you just need to set the environment variable `TEAL_START_LOCUST=true`.
+The following command will start the Locust web UI inside the Docker container.
+
+```bash
+docker run --pull=always --rm -it -p 8089:8089 -p 8000:8000 -e TEAL_START_LOCUST=true --name teal ghcr.io/rueedlinger/teal:main
+```
+
+You can now start the load test from the locust webui (http://0.0.0.0:8089/).
 
 ### Extract Text From a PDF
 
@@ -124,8 +135,9 @@ curl -X 'POST' \
 
 ## Running Teal in Test Mode
 
-Teal is packed with unit and integration tests. These tests can be run and verified with teh following command.
+Teal is packed with unit and integration tests, you just need to set the environment varaible `TEAL_TEST_MODE=true`.
+These tests can be run and verified with teh following command.
 
 ```bash
-docker run --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:main
+docker run --pull=always --rm -it -p 8000:8000 -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:main
 ```
