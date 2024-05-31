@@ -20,6 +20,7 @@ from teal.model import (
     PdfAReport,
     PdfAProfile,
     LibreOfficePdfProfile,
+    HealthCheck,
 )
 from teal.pdf import PdfDataExtractor
 from teal.pdfa import PdfAValidator, PdfAConverter
@@ -76,7 +77,12 @@ async def unicorn_exception_handler(request: Request, ex: Exception):
 if is_feature_enabled("TEA_FEATURE_PDF_TEXT"):
     logger.info("feature PDF text is enabled")
 
-    @app.post("/pdf/text", response_model=List[TextExtract], tags=["pdf"])
+    @app.post(
+        "/pdf/text",
+        summary="Extract text from a PDF",
+        response_model=List[TextExtract],
+        tags=["pdf"],
+    )
     async def extract_text_from_pdf(
         file: UploadFile,
         pages: str = Query(None),
@@ -91,7 +97,12 @@ if is_feature_enabled("TEA_FEATURE_PDF_TEXT"):
 if is_feature_enabled("TEA_FEATURE_PDF_OCR"):
     logger.info("feature PDF ocr is enabled")
 
-    @app.post("/pdf/ocr", response_model=List[TextExtract], tags=["pdf"])
+    @app.post(
+        "/pdf/ocr",
+        summary="Extract text with OCR from a PDF",
+        response_model=List[TextExtract],
+        tags=["pdf"],
+    )
     async def extract_text_with_ocr_from_pdf(
         file: UploadFile,
         languages: List[str] = Query([]),
@@ -110,7 +121,12 @@ if is_feature_enabled("TEA_FEATURE_PDF_OCR"):
 if is_feature_enabled("TEA_FEATURE_PDF_TABLE"):
     logger.info("feature PDF table is enabled")
 
-    @app.post("/pdf/table", response_model=List[TableExtract], tags=["pdf"])
+    @app.post(
+        "/pdf/table",
+        summary="Extract tables from a PDF",
+        response_model=List[TableExtract],
+        tags=["pdf"],
+    )
     async def extract_table_from_pdf(
         file: UploadFile,
         pages: str = Query(None),
@@ -125,7 +141,12 @@ if is_feature_enabled("TEA_FEATURE_PDF_TABLE"):
 if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
     logger.info("feature PDF/A convert is enabled")
 
-    @app.post("/pdfa/convert", response_class=FileResponse, tags=["pdfa"])
+    @app.post(
+        "/pdfa/convert",
+        summary="Convert PDF documents to PDF/A",
+        response_class=FileResponse,
+        tags=["pdfa"],
+    )
     async def convert_pdf_to_pdfa_with_ocr(
         file: UploadFile,
         languages: List[str] = Query([]),
@@ -148,7 +169,12 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
 if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_VALIDATE"):
     logger.info("feature PDF/A validate is enabled")
 
-    @app.post("/pdfa/validate", response_model=PdfAReport, tags=["pdfa"])
+    @app.post(
+        "/pdfa/validate",
+        summary="Validate PDF documents for PDF/A compliance",
+        response_model=PdfAReport,
+        tags=["pdfa"],
+    )
     async def validate_pdfa(
         file: UploadFile,
     ) -> Any:
@@ -160,7 +186,12 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_VALIDATE"):
 if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
     logger.info("feature libreoffice convert is enabled")
 
-    @app.post("/libreoffice/convert", response_class=FileResponse, tags=["libreoffice"])
+    @app.post(
+        "/libreoffice/convert",
+        summary="Convert LibreOffice documents to PDF or PDF/A",
+        response_class=FileResponse,
+        tags=["libreoffice"],
+    )
     async def convert_libreoffice_docs_to_pdf(
         file: UploadFile,
         pdfa: LibreOfficePdfProfile = Query(None),
@@ -176,19 +207,29 @@ if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
         )
 
 
+@app.get(
+    "/health",
+    tags=["healthcheck"],
+    summary="Perform a Health Check",
+    response_model=HealthCheck,
+)
+def get_health() -> HealthCheck:
+    return HealthCheck(status="OK")
+
+
 def custom_openapi():
     tags_metadata = [
         {
             "name": "pdf",
-            "description": "Extract text, OCR or tables from PDFs",
+            "description": "Extract text, perform OCR, or extract tables from PDFs.",
         },
         {
             "name": "pdfa",
-            "description": "Convert PDFs to PDF/A.",
+            "description": "Convert PDF to PDF/A and validate PDF/A compliance.",
         },
         {
             "name": "libreoffice",
-            "description": "Convert documents to PDF.",
+            "description": "Convert LibreOffice documents to PDF.",
         },
     ]
 

@@ -89,49 +89,73 @@ docker compose up --build
 
 ## Unit/Integration Testing
 
-To run the pytest inside the docker container just pass the env `TEAL_TEST_MODE=true`. When you want to pass
-arguments to pytest you can use the env `TEAL_PYTEST_ARGS`.
+To run pytest inside the Docker container, set the environment variable `TEAL_TEST_MODE=true`. If you need to pass
+arguments to pytest, you can use the `TEAL_PYTEST_ARGS` environment variable.
+
+To run pytest without additional arguments, use the following command:
 
 ```bash
-docker compose run --build --name teal_pytest --rm -e TEAL_TEST_MODE=true teal
+docker compose run --build --name teal_pytest \
+  --rm -e TEAL_TEST_MODE=true teal
+```
+
+If you need to pass arguments to pytest, set the `TEAL_PYTEST_ARGS` environment variable. For example, to run tests in
+verbose mode, you can use:
+
+```bash
+docker compose run --build --name teal_pytest \
+  --rm -e TEAL_TEST_MODE=true -e TEAL_PYTEST_ARGS="-v" teal
 ```
 
 ## Load Testing
 
-You can run the load test locally or inside docker.
+You can run the load test locally or inside a Docker container.
 
 ### Locally
 
-The following command will start the load test with locust.
+The following command will start the load test with Locust. Note that the application must be running on port 8000 when
+you start the load test.
 
 ```bash
-locust --host http://localhost:8000 --users 5 -t 10m --autostart -f tests/locustfile.py
+locust --host http://localhost:8000 --users 5 -t 10m \
+  --autostart -f tests/locustfile.py
 ```
 
-You can see the result with the locust webui (http://0.0.0.0:8089/).
+You can view the results with the Locust web UI at http://0.0.0.0:8089/.
 
 ### Inside Docker
 
-The following command will start the locust webui inside the docker container.
+The following command will start the Locust web UI inside the Docker container:
 
 ```bash
-docker compose run --build --rm -p 8089:8089 -p 8000:8000 -e TEAL_START_LOCUST=true teal
+docker compose run --build --rm -p 8089:8089 -p 8000:8000 \
+  -e TEAL_START_LOCUST=true teal
 ```
 
-You can now start the load test from the locust webui (http://0.0.0.0:8089/).
+The -e `TEAL_START_LOCUST=true` environment variable signals the container to start Locust.
+
+You can now start the load test from the Locust web UI, accessible at http://0.0.0.0:8089/. To begin, navigate to this
+URL in your web browser. From the interface, you can configure various test parameters such as the number of users,
+spawn rate, and duration of the test. Once your settings are in place, click the "Start" button to initiate the load
+test. As the test runs, you can monitor real-time performance metrics and view detailed statistics on response times,
+failure rates, and other key indicators. This will help you assess the performance and stability of your application
+under load.
 
 ### Result
 
-The following is load test run with 5 users for 10 minutes (10 workers, worker timeout 120 seconds)
-on a mac book pro (2023, Apple M2 Max, 64GB Mem) witch docker settings memory limit 16GB and CPU limit 12.
+The following load test was conducted with 5 users for a duration of 5 minutes. The test configuration included 10
+workers, each with a timeout of 120 seconds. The test was performed on a MacBook Pro (2023 model, Apple M2 Max, 64GB
+RAM). Docker settings were configured with a memory limit of 16GB and a CPU limit of 12 cores. Please note that the
+results obtained from this test may vary based on differences in hardware and software configurations in your setup.
 
-| Type | Name                 | # Requests | # Fails | Median (ms) | 95%ile (ms) | 99%ile (ms) | Average (ms) | Min (ms) | Max (ms) | Average size (bytes) | Current RPS | Current Failures/s |
-|------|----------------------|------------|---------|-------------|-------------|-------------|--------------|----------|----------|----------------------|-------------|--------------------|
-| POST | /libreoffice/convert | 370        | 0       | 620         | 750         | 940         | 628.05       | 514      | 1197     | 59527.49             | 0.5         | 0                  |
-| POST | /pdf/ocr             | 326        | 0       | 6100        | 8100        | 9400        | 6198.9       | 4101     | 10376    | 5009                 | 0.8         | 0                  |
-| POST | /pdf/table           | 342        | 0       | 590         | 690         | 730         | 607.71       | 553      | 808      | 154                  | 0.5         | 0                  |
-| POST | /pdf/text            | 336        | 0       | 9           | 18          | 22          | 9.87         | 6        | 84       | 5169                 | 1           | 0                  |
-| POST | /pdfa/convert        | 335        | 0       | 360         | 440         | 480         | 367.51       | 316      | 812      | 51695                | 0.6         | 0                  |
-| POST | /pdfa/validate       | 346        | 0       | 1100        | 1300        | 1400        | 1145.63      | 864      | 1543     | 214                  | 0.4         | 0                  |
-|      | Aggregated           | 2055       | 0       | 600         | 6600        | 7900        | 1452.01      | 6        | 10376    | 20846.44             | 3.8         | 0                  |
+| Type           | Name                 | # Requests | # Fails | Median (ms) | 95%ile (ms) | 99%ile (ms) | Average (ms) | Min (ms) | Max (ms) | Average size (bytes) | Current RPS | Current Failures/s |
+|----------------|----------------------|------------|---------|-------------|-------------|-------------|--------------|----------|----------|----------------------|-------------|--------------------|
+| POST           | /libreoffice/convert | 168        | 0       | 580         | 700         | 1000        | 593.29       | 533      | 1051     | 31682                | 0.5         | 0                  |
+| POST           | /pdf/ocr             | 168        | 0       | 6000        | 7100        | 8200        | 6000.91      | 3950     | 8268     | 5009                 | 0.6         | 0                  |
+| POST           | /pdf/table           | 168        | 0       | 580         | 650         | 690         | 586.76       | 557      | 723      | 154                  | 0.5         | 0                  |
+| POST           | /pdf/text            | 168        | 0       | 6           | 8           | 10          | 6.03         | 5        | 12       | 5169                 | 0.5         | 0                  |
+| POST           | /pdfa/convert        | 168        | 0       | 360         | 440         | 480         | 361.63       | 318      | 534      | 51695                | 0.5         | 0                  |
+| POST           | /pdfa/validate       | 166        | 0       | 1200        | 1400        | 1400        | 1188.84      | 925      | 1451     | 214                  | 0.7         | 0                  |
+| **Aggregated** |                      | 1006       | 0       | 580         | 6200        | 7000        | 1456.77      | 5        | 8268     | 15684.53             | 3.3         | 0                  |
+
 
