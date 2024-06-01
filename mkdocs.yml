@@ -6,6 +6,7 @@ repo_name: GitHub
 nav:
   - 'index.md'
   - 'getting_started.md'
+  - 'releases.md'
   - 'user_guide.md'
   - 'developer_guide.md'
 theme:

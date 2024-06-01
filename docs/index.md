@@ -4,6 +4,16 @@
 developer looking to automate PDF processing or integrate PDF functionalities into your existing workflow, Teal provides
 a seamless and efficient solution.
 
+For the source code, see [https://github.com/rueedlinger/teal](https://github.com/rueedlinger/teal).
+
+## Key Features
+
+- Digitize documents to searchable PDF or archivable PDF/A.
+- Extract metadata, text, and tables as structured data.
+- Convert different document types to PDF.
+- Convert PDFs to PDF/A.
+- Check PDF/A compliance.
+
 ## Understanding Different Types of PDFs
 
 **Digitally Created PDFs:**
@@ -24,25 +34,55 @@ a seamless and efficient solution.
 - Have a text layer added underneath the image layer, making them fully searchable.
 - Text can be selected, copied, and marked up like in original documents.
 
-## Key Features
-
-- Digitize documents to searchable or archivable PDF (PDF/A).
-- Extract metadata, text, and tables as structured data.
-- Convert different document types to PDF.
-- Convert PDFs to PDF/A.
-- Check PDF/A compliance.
-
-## Libraries Used in Teal
+## Libraries and Binaries Used in Teal
 
 **Teal** uses other open-source libraries and provides this functionality through convenient APIs.
 
-| Feature                                           | Library                 |
-|---------------------------------------------------|-------------------------|
-| Extract text from PDFs                            | pypdfium2               |
-| Extract text from scanned PDFs (OCR)              | pytesseract             |
-| Extract tables from PDFs                          | camelot                 |
-| Convert PDF to PDF/A (with OCR when no text)      | ocrmypdf                |
-| Convert Office documents to PDF                   | libreoffice             |
-| PDF/A validation                                  | veraPDF                 |
-| Extract meta data from PDF                        | **not yet implemented** |
-| Process documents from a remote repository (HTTP) | **not yet implemented** |
+**Docker Base Image**
+
+Currently `python:3.12` is used as Docker base image.
+
+**Python Libraries:**
+
+The following python packages are defiend in the `requirements.in`file.
+
+```text
+fastapi
+python-multipart
+uvicorn
+gunicorn
+pyyaml
+pypdfium2
+pytesseract
+pdf2image
+camelot-py
+# needed by camelot-py
+ghostscript
+# needed by camelot-py
+opencv-python
+pytest
+pytest-cov
+locust
+black
+```
+
+You can generate the full list of dependencies with `pip-compile` (
+see [pip-compile](https://pip-tools.readthedocs.io/en/stable/)).
+
+**Binaries:**
+
+The following binaries (debian packages) are needed:
+
+- tesseract-ocr
+- tesseract-ocr-eng (and additional required languages)
+- poppler-utils
+- ocrmypdf
+- ghostscript
+- python3-tk
+- libgl1
+- libreoffice
+- default-jre-headless
+- libreoffice-java-common
+- jodconverter
+
+For more details have a look at the Docker file.

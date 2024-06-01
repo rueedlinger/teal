@@ -1,9 +1,9 @@
 import os
 
-from locust import HttpUser, task
+from locust import task, FastHttpUser
 
 
-class TealApiRequest(HttpUser):
+class TealApiRequest(FastHttpUser):
     @task
     def run_all_requests_in_order(self):
         # pdf

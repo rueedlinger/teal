@@ -5,7 +5,8 @@
 Here's a quick example of how easy it is to work with Teal directly with docker
 
 ```bash
-docker run --rm -it -p 8000:8000 -e TEAL_WORKERS=1 --name teal ghcr.io/rueedlinger/teal:main
+docker run --pull=always --rm -it -p 8000:8000 -e TEAL_WORKERS=1 \
+  --name teal ghcr.io/rueedlinger/teal:main
 ```
 
 or start Teal inside docker compose.
@@ -15,21 +16,23 @@ services:
   teal:
     image: ghcr.io/rueedlinger/teal:main
     ports:
-      - 8000:8000
+      - 8000:8000 # Rest API port 
+      - 8089:8089 # Locust web ui port
     environment:
-      #TEAL_LOG_CONF: "log_conf.yaml"
-      TEAL_WORKERS: 1
-      #TEAL_WORKERS_TIMEOUT: 90
+      TEAL_LOG_CONF: "log_conf.yaml"
+      # TEAL_WORKERS: 1
+      # TEAL_WORKERS_TIMEOUT: 90
       TEAL_PORT: 8000
-      TEAL_IP_BIND: 0.0.0.0
+      # TEAL_IP_BIND: 0.0.0.0
+      # TEAL_START_LOCUST: 'true'
 ```
 
 ## OpenAPI Documentation
 
 Explore the comprehensive OpenAPI documentation for the API at the following links:
 
-- http://localhost:8000/docs
-- http://localhost:8000/openapi.json
+- [http://localhost:8000/docs](http://localhost:8000/docs)
+- [http://localhost:8000/openapi.json](http://localhost:8000/openapi.json)
 
 These resources provide detailed information about the endpoints, request parameters, and response formats.
 
@@ -37,13 +40,14 @@ These resources provide detailed information about the endpoints, request parame
 
 ### Environment Variables
 
-| ENV                  | Default       | Description                     |
-|----------------------|---------------|---------------------------------|
-| TEAL_LOG_CONF        | log_conf.yaml | The python logging conf (yaml). |
-| TEAL_WORKERS         | 10            | The number of worker processes. |
-| TEAL_WORKERS_TIMEOUT | 120           | Worker timeout in seconds.      |
-| TEAL_PORT            | 8000          | Bind socket to this port        |
-| TEAL_IP_BIND         | 0.0.0.0       | Bind socket to this host.       |
+| ENV                  | Default       | Description                                                                                 |
+|----------------------|---------------|---------------------------------------------------------------------------------------------|
+| TEAL_LOG_CONF        | log_conf.yaml | The python logging conf yaml file.                                                          |
+| TEAL_WORKERS         | 10            | The number of worker processes.                                                             |
+| TEAL_WORKERS_TIMEOUT | 120           | Worker timeout in seconds.                                                                  |
+| TEAL_PORT            | 8000          | Bind socket to this port                                                                    |
+| TEAL_IP_BIND         | 0.0.0.0       | Bind socket to this host.                                                                   |
+| TEAL_START_LOCUST    | false         | When set to to `true`, the locust will be started. The web ui can be accessed on port 8089. |
 
 ### Logging
 
