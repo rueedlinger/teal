@@ -7,7 +7,7 @@ from teal import api
 from tests import get_path
 
 
-def test_libreoffice_convert_default():
+def test_libreoffice_convert_docx_default():
     client = TestClient(api.app, raise_server_exceptions=False)
     with open(get_path("data/doc/normal_document.docx"), "rb") as f:
         response = client.post(url="/libreoffice/convert", files={"file": f})
@@ -18,6 +18,32 @@ def test_libreoffice_convert_default():
                 response = client.post(url="/pdf/text", files={"file": pdf_file})
                 assert response.status_code == 200
                 assert len(response.json()) == 3
+
+
+def test_libreoffice_convert_txt_default():
+    client = TestClient(api.app, raise_server_exceptions=False)
+    with open(get_path("data/doc/normal_text.txt"), "rb") as f:
+        response = client.post(url="/libreoffice/convert", files={"file": f})
+        assert response.status_code == 200
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
+            tmp.write(response.content)
+            with open(tmp.name, "rb") as pdf_file:
+                response = client.post(url="/pdf/text", files={"file": pdf_file})
+                assert response.status_code == 200
+                assert len(response.json()) == 1
+
+
+def test_libreoffice_convert_pdf_default():
+    client = TestClient(api.app, raise_server_exceptions=False)
+    with open(get_path("data/digital_pdf/normal_document.pdf"), "rb") as f:
+        response = client.post(url="/libreoffice/convert", files={"file": f})
+        assert response.status_code == 200
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
+            tmp.write(response.content)
+            with open(tmp.name, "rb") as pdf_file:
+                response = client.post(url="/pdf/text", files={"file": pdf_file})
+                assert response.status_code == 200
+                assert len(response.json()) == 2
 
 
 def test_libreoffice_convert_with_selection():
