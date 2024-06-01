@@ -1,3 +1,5 @@
+import tempfile
+
 from starlette.testclient import TestClient
 
 from teal import api
@@ -18,6 +20,22 @@ def test_pdf_table_extract_from_single_table():
             {"0": "A2", "1": "B22", "2": "C222"},
             {"0": "A3", "1": "B33", "2": "C333"},
         ]
+
+
+def test_pdf_table_extract_from_scanned_document():
+    client = TestClient(api.app, raise_server_exceptions=False)
+    with open(get_path("data/ocr/scanned_document_with_table.pdf"), "rb") as f:
+        response = client.post(url="/pdfa/convert", files={"file": f})
+        assert response.status_code == 200
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
+            tmp.write(response.content)
+            with open(tmp.name, "rb") as pdf_file:
+                response = client.post(url="/pdf/table", files={"file": pdf_file})
+                assert response.status_code == 200
+                assert len(response.json()) == 1
+                assert response.json()[0]["page"] == 1
+                assert response.json()[0]["index"] == 0
+                assert len(response.json()[0]["table"]) == 4
 
 
 def test_pdf_table_extract_from_multiple_tables():
