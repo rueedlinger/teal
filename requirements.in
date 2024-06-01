@@ -1,0 +1,17 @@
+fastapi
+python-multipart
+uvicorn
+gunicorn
+pyyaml
+pypdfium2
+pytesseract
+pdf2image
+camelot-py
+# needed by camelot-py
+ghostscript
+# needed by camelot-py
+opencv-python
+pytest
+pytest-cov
+locust
+black
