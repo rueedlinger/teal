@@ -160,6 +160,8 @@ pygments==2.18.0
     # via rich
 pypdf==4.2.0
     # via camelot-py
+pypdf2==3.0.1
+    # via -r requirements.in
 pypdfium2==4.30.0
     # via -r requirements.in
 pytesseract==0.3.10

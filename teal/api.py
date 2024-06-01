@@ -194,7 +194,7 @@ if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
     )
     async def convert_libreoffice_docs_to_pdf(
         file: UploadFile,
-        pdfa: LibreOfficePdfProfile = Query(None),
+        profile: LibreOfficePdfProfile = Query(None),
         pages: str = Query(None),
     ) -> Any:
         logger.debug(f"libreoffice convert file='{file.filename}' to pdf")
@@ -202,7 +202,7 @@ if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
         return libreoffice.convert_to_pdf(
             data=await file.read(),
             filename=file.filename,
-            pdf_profile=pdfa,
+            pdf_profile=profile,
             page_ranges=pages,
         )
 

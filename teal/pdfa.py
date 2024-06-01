@@ -1,9 +1,11 @@
+import io
 import json
 import logging
 import os
 import subprocess
 import tempfile
 
+from PyPDF2 import PdfReader, PdfWriter
 from fastapi.encoders import jsonable_encoder
 from starlette.background import BackgroundTask
 from starlette.responses import JSONResponse, FileResponse
@@ -14,7 +16,6 @@ from teal.core import (
     cleanup_tmp_dir,
     make_tesseract_lang_param,
     parse_page_ranges,
-    to_page_range,
 )
 from teal.model import PdfAReport, PdfAProfile
 
@@ -48,9 +49,22 @@ class PdfAConverter:
         tmp_file_in_path = os.path.join(tmp_dir, "in-tmp.pdf")
         tmp_file_out_path = os.path.join(tmp_dir, "out-tmp.pdf")
 
-        with open(tmp_file_in_path, "wb") as tmp_file_in:
-            _logger.debug(f"writing file {filename} to {tmp_file_in_path}")
-            tmp_file_in.write(data)
+        pages = parse_page_ranges(page_ranges)
+        if pages is None:
+            with open(tmp_file_in_path, "wb") as tmp_file_in:
+                _logger.debug(f"writing file {filename} to {tmp_file_in_path}")
+                tmp_file_in.write(data)
+        else:
+            _logger.debug(
+                f"writing pages {pages} from {filename} to {tmp_file_in_path}"
+            )
+            infile = PdfReader(io.BytesIO(data), strict=False)
+            output = PdfWriter()
+            for i in pages:
+                p = infile.pages[i - 1]
+                output.add_page(p)
+            with open(tmp_file_in_path, "wb") as tmp_file_in:
+                output.write(tmp_file_in)
 
         # see https://ocrmypdf.readthedocs.io/en/latest/advanced.html
         # -l eng+fra
@@ -66,11 +80,7 @@ class PdfAConverter:
         if pdfa is None:
             pdfa = PdfAProfile.PDFA1
 
-        pages = parse_page_ranges(page_ranges)
-        if pages is None:
-            cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --skip-text --output-type {pdfa.value} "{tmp_file_in_path}" "{tmp_file_out_path}"'
-        else:
-            cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --pages {to_page_range(pages)} --skip-text --output-type {pdfa.value} "{tmp_file_in_path}" "{tmp_file_out_path}"'
+        cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --skip-text --output-type {pdfa.value} "{tmp_file_in_path}" "{tmp_file_out_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(
