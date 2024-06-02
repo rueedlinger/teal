@@ -104,18 +104,18 @@ class PdfDataExtractor:
             pages = parse_page_ranges(page_ranges)
 
             for p in range(len(tables)):
-                page_no = p + 1
-                if pages is None or page_no in pages:
-                    with tempfile.NamedTemporaryFile(suffix=".json") as tmp_json_file:
-                        tables[p].to_json(tmp_json_file.name)
-                        report = tables[p].parsing_report
+                with tempfile.NamedTemporaryFile(suffix=".json") as tmp_json_file:
+                    tables[p].to_json(tmp_json_file.name)
+                    report = tables[p].parsing_report
+                    page_no = report["page"]
+                    if pages is None or page_no in pages:
                         _logger.debug(f"parsing tables report {report}")
                         f = open(tmp_json_file.name)
                         table_json = json.load(f)
                         extracts.append(
                             TableExtract.model_validate(
                                 {
-                                    "page": report["page"],
+                                    "page": page_no,
                                     "index": report["order"] - 1,
                                     "table": table_json,
                                 }

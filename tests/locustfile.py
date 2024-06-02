@@ -1,37 +1,46 @@
 import os
 
-from locust import HttpUser, task
+from locust import task, FastHttpUser, tag
 
 
-class TealApiRequest(HttpUser):
+class TealApiRequest(FastHttpUser):
+
+    DOC_LOAD_TEST = "data/digital_pdf/loadtest.pdf"
+
+    @tag("libreoffice_convert")
     @task
     def libreoffice_convert(self):
-        with open(get_path("data/doc/normal_document.docx"), "rb") as f:
+        with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
             response = self.client.post("/libreoffice/convert", files={"file": f})
 
+    @tag("pdfa_validate")
     @task
     def pdfa_validate(self):
-        with open(get_path("data/pdfa/pdfa_2b.pdf"), "rb") as f:
+        with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
             response = self.client.post("/pdfa/validate", files={"file": f})
 
+    @tag("pdfa_convert")
     @task
     def pdfa_convert(self):
-        with open(get_path("data/digital_pdf/normal_document.pdf"), "rb") as f:
+        with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
             response = self.client.post("/pdfa/convert", files={"file": f})
 
+    @tag("pdf_text")
     @task
     def pdf_text(self):
-        with open(get_path("data/digital_pdf/normal_document.pdf"), "rb") as f:
+        with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
             response = self.client.post("/pdf/text", files={"file": f})
 
+    @tag("pdf_ocr")
     @task
     def pdf_ocr(self):
-        with open(get_path("data/ocr/scanned_document.pdf"), "rb") as f:
+        with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
             response = self.client.post("/pdf/ocr", files={"file": f})
 
+    @tag("pdf_table")
     @task
-    def pdf_tabel(self):
-        with open(get_path("data/digital_pdf/simple_tables.pdf"), "rb") as f:
+    def pdf_table(self):
+        with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
             response = self.client.post("/pdf/table", files={"file": f})
 
 

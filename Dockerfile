@@ -29,7 +29,6 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     apt-get --no-install-recommends install -y libreoffice && \
     apt-get install -y default-jre-headless libreoffice-java-common jodconverter
 
-# verapdf
 COPY dist/auto-install.xml /tmp
 RUN wget -O /tmp/verapdf-installer.zip https://software.verapdf.org/releases/verapdf-installer.zip && \
     unzip -d /tmp /tmp/verapdf-installer.zip && \

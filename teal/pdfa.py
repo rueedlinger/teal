@@ -1,9 +1,11 @@
+import io
 import json
 import logging
 import os
 import subprocess
 import tempfile
 
+from PyPDF2 import PdfReader, PdfWriter
 from fastapi.encoders import jsonable_encoder
 from starlette.background import BackgroundTask
 from starlette.responses import JSONResponse, FileResponse
@@ -14,9 +16,8 @@ from teal.core import (
     cleanup_tmp_dir,
     make_tesseract_lang_param,
     parse_page_ranges,
-    to_page_range,
 )
-from teal.model import PdfAReport, PdfAProfile
+from teal.model import PdfAReport, OcrPdfAProfile, ValidatePdfProfile
 
 _logger = logging.getLogger("teal.pdfa")
 
@@ -31,7 +32,7 @@ class PdfAConverter:
         data: bytes,
         filename: str,
         langs: list[str] = [],
-        pdfa: PdfAProfile = PdfAProfile.PDFA1,
+        pdfa: OcrPdfAProfile = None,
         page_ranges: str = None,
     ) -> FileResponse | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
@@ -48,29 +49,31 @@ class PdfAConverter:
         tmp_file_in_path = os.path.join(tmp_dir, "in-tmp.pdf")
         tmp_file_out_path = os.path.join(tmp_dir, "out-tmp.pdf")
 
-        with open(tmp_file_in_path, "wb") as tmp_file_in:
-            _logger.debug(f"writing file {filename} to {tmp_file_in_path}")
-            tmp_file_in.write(data)
+        pages = parse_page_ranges(page_ranges)
+        if pages is None:
+            with open(tmp_file_in_path, "wb") as tmp_file_in:
+                _logger.debug(f"writing file {filename} to {tmp_file_in_path}")
+                tmp_file_in.write(data)
+        else:
+            _logger.debug(
+                f"writing pages {pages} from {filename} to {tmp_file_in_path}"
+            )
+            infile = PdfReader(io.BytesIO(data), strict=False)
+            output = PdfWriter()
+            for i in pages:
+                p = infile.pages[i - 1]
+                output.add_page(p)
+            with open(tmp_file_in_path, "wb") as tmp_file_in:
+                output.write(tmp_file_in)
 
-        # see https://ocrmypdf.readthedocs.io/en/latest/advanced.html
-        # -l eng+fra
-        # --output-type {pdfa,pdf,pdfa-1,pdfa-2,pdfa-3,non
-        # --skip-text then no image processing or OCR will be performed on pages that already
-        # have text. The page will be copied to the output. This may be useful for documents that contain
-        # both “born digital” and scanned content, or to use OCRmyPDF to normalize and convert to PDF/A
-        # regardless of their contents.
         languages = make_tesseract_lang_param(langs)
         if languages is None:
             languages = "eng"
 
         if pdfa is None:
-            pdfa = PdfAProfile.PDFA1
+            pdfa = OcrPdfAProfile.PDFA_1B
 
-        pages = parse_page_ranges(page_ranges)
-        if pages is None:
-            cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --skip-text --output-type {pdfa.value} "{tmp_file_in_path}" "{tmp_file_out_path}"'
-        else:
-            cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --pages {to_page_range(pages)} --skip-text --output-type {pdfa.value} "{tmp_file_in_path}" "{tmp_file_out_path}"'
+        cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --skip-text --output-type {pdfa.to_ocrmypdf_profile()} "{tmp_file_in_path}" "{tmp_file_out_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(
@@ -110,7 +113,9 @@ class PdfAValidator:
         self.verapdf_cmd = verapdf_cmd
         self.supported_file_extensions = [".pdf"]
 
-    def validate_pdf(self, data: bytes, filename: str, profile="0") -> JSONResponse:
+    def validate_pdf(
+        self, data: bytes, filename: str, profile: ValidatePdfProfile
+    ) -> JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
@@ -130,9 +135,12 @@ class PdfAValidator:
             tmp_file_in.write(data)
 
         if profile is None:
-            profile = "0"
+            # Letting veraPDF control the profile choice
+            profile_value = "0"
+        else:
+            profile_value = profile.value
 
-        cmd_convert_pdf = f'{self.verapdf_cmd} -f {profile} --format json "{tmp_file_in_path}" > "{tmp_file_out_path}"'
+        cmd_convert_pdf = f'{self.verapdf_cmd} -f {profile_value} --format json "{tmp_file_in_path}" > "{tmp_file_out_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(
@@ -147,11 +155,20 @@ class PdfAValidator:
         if result.returncode == 0 or result.returncode == 1:
 
             with open(tmp_file_out_path) as tmp_json:
-                report = json.load(tmp_json)
-                out = report["report"]["jobs"][0]["validationResult"]
-                out["profile"] = report["report"]["jobs"][0]["validationResult"][
-                    "profileName"
-                ].split(" ")[0]
+                out = {
+                    "profile": "NONE",
+                    "statement": f"non of the profiles matched {[e.value for e in ValidatePdfProfile]}",
+                    "compliant": False,
+                }
+
+                if profile is None and result.returncode == 1:
+                    pass
+                else:
+                    report = json.load(tmp_json)
+                    out = report["report"]["jobs"][0]["validationResult"]
+                    out["profile"] = report["report"]["jobs"][0]["validationResult"][
+                        "profileName"
+                    ].split(" ")[0]
                 return create_json_response(
                     content=jsonable_encoder(PdfAReport.model_validate(out)),
                     background=BackgroundTask(cleanup_tmp_dir, tmp_dir),

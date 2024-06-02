@@ -2,7 +2,7 @@
 
 ## Python
 
-### Install Python 3.12.0 using pyenv
+### Install Python 3.12.0 Using pyenv
 
 This command will download and install Python version 3.12.0. Pyenv is a popular tool for managing multiple versions of
 Python on a single system.
@@ -11,7 +11,7 @@ Python on a single system.
 pyenv install 3.12.0
 ```
 
-### Create a virtual environment named 'teal'
+### Create a Virtual Environment Named 'teal'
 
 This command will create a virtual environment using the Python version 3.12.0 that was just installed. Virtual
 environments are useful for managing project-specific dependencies.
@@ -20,7 +20,7 @@ environments are useful for managing project-specific dependencies.
 pyenv virtualenv 3.12.0 teal
 ```
 
-### Activate the virtual environment 'teal'
+### Activate the Virtual Environment 'teal'
 
 Activating the virtual environment ensures that any Python commands run will use the packages and interpreter from the '
 teal' environment.
@@ -29,14 +29,29 @@ teal' environment.
 pyenv activate teal
 ```
 
-### Install dependencies from requirements.txt
+### Install Dependencies from requirements.txt
 
 This command will install all the necessary packages listed in the requirements.txt file. This file typically contains a
 list of all the Python packages required for the project.
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.in
 ```
+
+### Update Dependencies
+
+To update the dependencies, first modify the `requirements.in` file with the desired package versions or additions.
+Then, run the following command to generate an updated requirements.txt file:
+
+```bash
+pip-compile --output-file=requirements.txt
+```
+
+This will ensure that the requirements.txt file is synchronized with the changes made in requirements.in.
+
+> *Note:* *pip-compile* is a tool from the pip-tools package. If you don't have it installed, you can add it using pip
+> install pip-tools. For more information, visit
+> the [pip-tools documentation](https://pip-tools.readthedocs.io/en/stable/).
 
 ### Install Binaries
 
@@ -89,49 +104,73 @@ docker compose up --build
 
 ## Unit/Integration Testing
 
-To run the pytest inside the docker container just pass the env `TEAL_TEST_MODE=true`. When you want to pass
-arguments to pytest you can use the env `TEAL_PYTEST_ARGS`.
+To run pytest inside the Docker container, set the environment variable `TEAL_TEST_MODE=true`. If you need to pass
+arguments to pytest, you can use the `TEAL_PYTEST_ARGS` environment variable.
+
+To run pytest without additional arguments, use the following command:
 
 ```bash
-docker compose run --build --name teal_pytest --rm -e TEAL_TEST_MODE=true teal
+docker compose run --build --name teal_pytest \
+  --rm -e TEAL_TEST_MODE=true teal
+```
+
+If you need to pass arguments to pytest, set the `TEAL_PYTEST_ARGS` environment variable. For example, to run tests in
+verbose mode, you can use:
+
+```bash
+docker compose run --build --name teal_pytest \
+  --rm -e TEAL_TEST_MODE=true -e TEAL_PYTEST_ARGS="-v" teal
 ```
 
 ## Load Testing
 
-You can run the load test locally or inside docker.
+You can run the load test locally or inside a Docker container.
 
 ### Locally
 
-The following command will start the load test with locust.
+The following command will start the load test with Locust. Note that the application must be running on port 8000 when
+you start the load test.
 
 ```bash
-locust --host http://localhost:8000 --users 5 -t 10m --autostart -f tests/locustfile.py
+locust --host http://localhost:8000 --users 5 -t 10m \
+  --autostart -f tests/locustfile.py
 ```
 
-You can see the result with the locust webui (http://0.0.0.0:8089/).
+You can view the results with the Locust web UI at http://0.0.0.0:8089/.
 
 ### Inside Docker
 
-The following command will start the locust webui inside the docker container.
+The following command will start the Locust web UI inside the Docker container:
 
 ```bash
-docker compose run --build --rm -p 8089:8089 -p 8000:8000 -e TEAL_START_LOCUST=true teal
+docker compose run --build --rm -p 8089:8089 -p 8000:8000 \
+  -e TEAL_START_LOCUST=true teal
 ```
 
-You can now start the load test from the locust webui (http://0.0.0.0:8089/).
+The -e `TEAL_START_LOCUST=true` environment variable signals the container to start Locust.
+
+You can now start the load test from the Locust web UI, accessible at http://0.0.0.0:8089/. To begin, navigate to this
+URL in your web browser. From the interface, you can configure various test parameters such as the number of users,
+spawn rate, and duration of the test. Once your settings are in place, click the "Start" button to initiate the load
+test. As the test runs, you can monitor real-time performance metrics and view detailed statistics on response times,
+failure rates, and other key indicators. This will help you assess the performance and stability of your application
+under load.
 
 ### Result
 
-The following is load test run with 5 users for 10 minutes (10 workers, worker timeout 120 seconds)
-on a mac book pro (2023, Apple M2 Max, 64GB Mem) witch docker settings memory limit 16GB and CPU limit 12.
+The test was performed on a MacBook Pro (2023 model, Apple M2 Max, 64GB
+RAM). Docker settings were configured with a memory limit of 16GB and a CPU limit of 12 cores. Please note that the
+results obtained from this test may vary based on differences in hardware and software configurations in your setup.
 
-| Type | Name                 | # Requests | # Fails | Median (ms) | 95%ile (ms) | 99%ile (ms) | Average (ms) | Min (ms) | Max (ms) | Average size (bytes) | Current RPS | Current Failures/s |
-|------|----------------------|------------|---------|-------------|-------------|-------------|--------------|----------|----------|----------------------|-------------|--------------------|
-| POST | /libreoffice/convert | 370        | 0       | 620         | 750         | 940         | 628.05       | 514      | 1197     | 59527.49             | 0.5         | 0                  |
-| POST | /pdf/ocr             | 326        | 0       | 6100        | 8100        | 9400        | 6198.9       | 4101     | 10376    | 5009                 | 0.8         | 0                  |
-| POST | /pdf/table           | 342        | 0       | 590         | 690         | 730         | 607.71       | 553      | 808      | 154                  | 0.5         | 0                  |
-| POST | /pdf/text            | 336        | 0       | 9           | 18          | 22          | 9.87         | 6        | 84       | 5169                 | 1           | 0                  |
-| POST | /pdfa/convert        | 335        | 0       | 360         | 440         | 480         | 367.51       | 316      | 812      | 51695                | 0.6         | 0                  |
-| POST | /pdfa/validate       | 346        | 0       | 1100        | 1300        | 1400        | 1145.63      | 864      | 1543     | 214                  | 0.4         | 0                  |
-|      | Aggregated           | 2055       | 0       | 600         | 6600        | 7900        | 1452.01      | 6        | 10376    | 20846.44             | 3.8         | 0                  |
+The following load test was conducted with 5 user for a duration of 10 minutes. The test configuration included 1
+worker with a timeout of 120 seconds. The PDF document used for all test has a size of 17 KB (16'873 bytes, one page).
 
+| Type           | Name                 | # Requests | # Fails | Median (ms) | 95%ile (ms) | 99%ile (ms) | Average (ms) | Min (ms) | Max (ms)  | Average size (bytes) | Current RPS | Current Failures/s |
+|----------------|----------------------|------------|---------|-------------|-------------|-------------|--------------|----------|-----------|----------------------|-------------|--------------------|
+| POST           | /libreoffice/convert | 191        | 0       | 4600        | 8800        | 10000       | 4766.63      | 500      | 12394     | 21297                | 0.2         | 0                  |
+| POST           | /pdf/ocr             | 209        | 0       | 1400        | 2600        | 2800        | 1509.29      | 684      | 3499      | 635                  | 0.5         | 0                  |
+| POST           | /pdf/table           | 212        | 0       | 1300        | 2400        | 2600        | 1370.22      | 558      | 2955      | 2                    | 0.1         | 0                  |
+| POST           | /pdf/text            | 223        | 0       | 780         | 2000        | 2300        | 783.64       | 2        | 2740      | 654                  | 0.4         | 0                  |
+| POST           | /pdfa/convert        | 197        | 0       | 4600        | 9300        | 11000       | 4845.74      | 305      | 11176     | 21436                | 0.2         | 0                  |
+| POST           | /pdfa/validate       | 213        | 0       | 1500        | 2500        | 3000        | 1522.62      | 767      | 3499      | 171                  | 0.5         | 0                  |
+| **Aggregated** |                      | **1245**   | **0**   | **1600**    | **6900**    | **9500**    | **2385.57**  | **2**    | **12394** | **6912.47**          | **1.9**     | **0**              |

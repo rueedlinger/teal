@@ -6,8 +6,25 @@ repo_name: GitHub
 nav:
   - 'index.md'
   - 'getting_started.md'
+  - 'releases.md'
   - 'user_guide.md'
   - 'developer_guide.md'
 theme:
   name: material
   #name: readthedocs
+  features:
+    - announce.dismiss
+    #- content.action.edit
+    #- content.action.view
+    - content.code.annotate
+    - content.code.copy
+
+markdown_extensions:
+  #- tables
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

@@ -4,6 +4,14 @@
 developer looking to automate PDF processing or integrate PDF functionalities into your existing workflow, Teal provides
 a seamless and efficient solution.
 
+## Key Features
+
+- Digitize documents to searchable PDF or archivable PDF/A.
+- Extract metadata, text, and tables as structured data.
+- Convert different document types to PDF.
+- Convert PDFs to PDF/A.
+- Check PDF/A compliance.
+
 ## Getting Started
 
 ### Running Teal in App Mode
