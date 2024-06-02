@@ -18,9 +18,10 @@ from teal.model import (
     TextExtract,
     TableExtract,
     PdfAReport,
-    PdfAProfile,
+    OcrPdfAProfile,
     LibreOfficePdfProfile,
     HealthCheck,
+    ValidatePdfProfile,
 )
 from teal.pdf import PdfDataExtractor
 from teal.pdfa import PdfAValidator, PdfAConverter
@@ -150,7 +151,7 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
     async def convert_pdf_to_pdfa_with_ocr(
         file: UploadFile,
         languages: List[str] = Query([]),
-        pdfa: PdfAProfile = Query(PdfAProfile.PDFA1),
+        pdfa: OcrPdfAProfile = Query(OcrPdfAProfile.PDFA_1B),
         pages: str = Query(None),
     ) -> Any:
         logger.debug(
@@ -177,10 +178,13 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_VALIDATE"):
     )
     async def validate_pdfa(
         file: UploadFile,
+        profile: ValidatePdfProfile = Query(None),
     ) -> Any:
         logger.debug(f"extract table from pdf file='{file.filename}'")
         pdf = PdfAValidator()
-        return pdf.validate_pdf(data=await file.read(), filename=file.filename)
+        return pdf.validate_pdf(
+            data=await file.read(), filename=file.filename, profile=profile
+        )
 
 
 if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):

@@ -17,7 +17,7 @@ from teal.core import (
     make_tesseract_lang_param,
     parse_page_ranges,
 )
-from teal.model import PdfAReport, PdfAProfile
+from teal.model import PdfAReport, OcrPdfAProfile, ValidatePdfProfile
 
 _logger = logging.getLogger("teal.pdfa")
 
@@ -32,7 +32,7 @@ class PdfAConverter:
         data: bytes,
         filename: str,
         langs: list[str] = [],
-        pdfa: PdfAProfile = PdfAProfile.PDFA1,
+        pdfa: OcrPdfAProfile = None,
         page_ranges: str = None,
     ) -> FileResponse | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
@@ -78,9 +78,9 @@ class PdfAConverter:
             languages = "eng"
 
         if pdfa is None:
-            pdfa = PdfAProfile.PDFA1
+            pdfa = OcrPdfAProfile.PDFA1
 
-        cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --skip-text --output-type {pdfa.value} "{tmp_file_in_path}" "{tmp_file_out_path}"'
+        cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --skip-text --output-type {pdfa.to_ocrmypdf_profile()} "{tmp_file_in_path}" "{tmp_file_out_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(
@@ -120,7 +120,9 @@ class PdfAValidator:
         self.verapdf_cmd = verapdf_cmd
         self.supported_file_extensions = [".pdf"]
 
-    def validate_pdf(self, data: bytes, filename: str, profile="0") -> JSONResponse:
+    def validate_pdf(
+        self, data: bytes, filename: str, profile: ValidatePdfProfile
+    ) -> JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
@@ -140,9 +142,12 @@ class PdfAValidator:
             tmp_file_in.write(data)
 
         if profile is None:
-            profile = "0"
+            # Letting veraPDF control the profile choice
+            profile_value = "0"
+        else:
+            profile_value = profile.value
 
-        cmd_convert_pdf = f'{self.verapdf_cmd} -f {profile} --format json "{tmp_file_in_path}" > "{tmp_file_out_path}"'
+        cmd_convert_pdf = f'{self.verapdf_cmd} -f {profile_value} --format json "{tmp_file_in_path}" > "{tmp_file_out_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(

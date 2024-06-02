@@ -76,7 +76,7 @@ def test_libreoffice_convert_pdfa1():
     client = TestClient(api.app, raise_server_exceptions=False)
     with open(get_path("data/doc/normal_document.docx"), "rb") as f:
         response = client.post(
-            url="/libreoffice/convert?profile=pdfa-1", files={"file": f}
+            url="/libreoffice/convert?profile=pdfa-1a", files={"file": f}
         )
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
@@ -92,7 +92,7 @@ def test_libreoffice_convert_pdfa2():
     client = TestClient(api.app, raise_server_exceptions=False)
     with open(get_path("data/doc/normal_document.docx"), "rb") as f:
         response = client.post(
-            url="/libreoffice/convert?profile=pdfa-2", files={"file": f}
+            url="/libreoffice/convert?profile=pdfa-2b", files={"file": f}
         )
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
@@ -108,7 +108,7 @@ def test_libreoffice_convert_pdfa3():
     client = TestClient(api.app, raise_server_exceptions=False)
     with open(get_path("data/doc/normal_document.docx"), "rb") as f:
         response = client.post(
-            url="/libreoffice/convert?profile=pdfa-3", files={"file": f}
+            url="/libreoffice/convert?profile=pdfa-3b", files={"file": f}
         )
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
