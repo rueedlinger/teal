@@ -23,8 +23,9 @@ from teal.model import (
     LibreOfficePdfProfile,
     HealthCheck,
     ValidatePdfProfile,
+    PdfMetaDataReport,
 )
-from teal.pdf import PdfDataExtractor
+from teal.pdf import PdfDataExtractor, PdfMetaDataExtractor
 from teal.pdfa import PdfAValidator, PdfAConverter
 
 app = FastAPI()
@@ -140,6 +141,23 @@ if is_feature_enabled("TEAL_FEATURE_PDF_TABLE"):
         return pdf.extract_table(
             data=await file.read(), filename=file.filename, page_ranges=pages
         )
+
+
+if is_feature_enabled("TEAL_FEATURE_PDF_META"):
+    logger.info("feature PDF meta data is enabled")
+
+    @app.post(
+        "/pdf/meta",
+        summary="Extract meata data from a PDF",
+        response_model=PdfMetaDataReport,
+        tags=["pdf"],
+    )
+    async def extract_text_from_pdf(
+        file: UploadFile,
+    ) -> Any:
+        logger.debug(f"extract meta data from pdf file='{file.filename}'")
+        pdf = PdfMetaDataExtractor()
+        return pdf.extract_meta_data(data=await file.read(), filename=file.filename)
 
 
 if is_feature_enabled("TEAL_FEATURE_PDFA_CONVERT"):

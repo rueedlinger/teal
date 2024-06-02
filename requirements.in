@@ -13,6 +13,7 @@ ghostscript
 # needed by camelot-py
 opencv-python
 PyPDF2
+pikepdf
 pytest
 pytest-cov
 locust
