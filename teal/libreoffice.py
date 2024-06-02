@@ -179,15 +179,9 @@ class LibreOfficeAdapter:
             tmp_file_in.write(data)
 
         _logger.debug(f"expecting out pdf {tmp_file_in_path}")
-        # 1: PDF/A-1b
-        # 2: PDF/A-2b
-        # 3: PDF/A-3b
-        # 15: PDF 1.5
-        # 16: PDF 1.6
-        # 17: PDF 1.7 (same as default = 0)
-        # current docker image (LibreOffice 7.4.7.2 40(Build:2)) does not supports  PDF 1.7
-        # https://help.libreoffice.org/latest/en-US/text/shared/guide/pdf_params.html
+
         if pdf_profile is None:
+            # use default pdf version from libreoffice
             pdf_version = "0"
         else:
             pdf_version = pdf_profile.to_libreoffice_pdf_version()
@@ -209,7 +203,6 @@ class LibreOfficeAdapter:
             )
 
         cmd_convert_pdf = f'{self.libreoffice_cmd} --headless --convert-to \'{pdf_param}\' --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
-        # cmd_convert_pdf = f'{self.libreoffice_cmd} --headless --convert-to pdf --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(

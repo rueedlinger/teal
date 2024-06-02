@@ -5,6 +5,7 @@ from typing import Any, List
 import yaml
 from fastapi import FastAPI, UploadFile, Request, Query
 from fastapi.openapi.utils import get_openapi
+from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.responses import FileResponse
 
 from teal.core import (
@@ -75,7 +76,7 @@ async def unicorn_exception_handler(request: Request, ex: Exception):
     return create_json_err_response_from_exception(ex)
 
 
-if is_feature_enabled("TEA_FEATURE_PDF_TEXT"):
+if is_feature_enabled("TEAL_FEATURE_PDF_TEXT"):
     logger.info("feature PDF text is enabled")
 
     @app.post(
@@ -88,14 +89,14 @@ if is_feature_enabled("TEA_FEATURE_PDF_TEXT"):
         file: UploadFile,
         pages: str = Query(None),
     ) -> Any:
-        logger.debug(f"extract text from pdf file='{file.filename}'")
+        logger.debug(f"extract text from pdf file='{file.filename}', pages='{pages}'")
         pdf = PdfDataExtractor()
         return pdf.extract_text(
             data=await file.read(), filename=file.filename, page_ranges=pages
         )
 
 
-if is_feature_enabled("TEA_FEATURE_PDF_OCR"):
+if is_feature_enabled("TEAL_FEATURE_PDF_OCR"):
     logger.info("feature PDF ocr is enabled")
 
     @app.post(
@@ -109,7 +110,9 @@ if is_feature_enabled("TEA_FEATURE_PDF_OCR"):
         languages: List[str] = Query([]),
         pages: str = Query(None),
     ) -> Any:
-        logger.debug(f"extract text with ocr from pdf file='{file.filename}'")
+        logger.debug(
+            f"extract text with ocr from pdf file='{file.filename}', languages='{languages}', pages='{pages}'"
+        )
         pdf = PdfDataExtractor()
         return pdf.extract_text_with_ocr(
             data=await file.read(),
@@ -119,7 +122,7 @@ if is_feature_enabled("TEA_FEATURE_PDF_OCR"):
         )
 
 
-if is_feature_enabled("TEA_FEATURE_PDF_TABLE"):
+if is_feature_enabled("TEAL_FEATURE_PDF_TABLE"):
     logger.info("feature PDF table is enabled")
 
     @app.post(
@@ -132,14 +135,14 @@ if is_feature_enabled("TEA_FEATURE_PDF_TABLE"):
         file: UploadFile,
         pages: str = Query(None),
     ) -> Any:
-        logger.debug(f"extract table from pdf file='{file.filename}'")
+        logger.debug(f"extract table from pdf file='{file.filename}', pages='{pages}'")
         pdf = PdfDataExtractor()
         return pdf.extract_table(
             data=await file.read(), filename=file.filename, page_ranges=pages
         )
 
 
-if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
+if is_feature_enabled("TEAL_FEATURE_PDFA_CONVERT"):
     logger.info("feature PDF/A convert is enabled")
 
     @app.post(
@@ -155,7 +158,7 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
         pages: str = Query(None),
     ) -> Any:
         logger.debug(
-            f"extract table from pdf file='{file.filename}', languages='{languages}, pdfa='{pdfa}'"
+            f"extract table from pdf file='{file.filename}', languages='{languages}, pdfa='{pdfa}', pages='{pages}'"
         )
         pdf = PdfAConverter()
         return pdf.convert_pdfa(
@@ -167,7 +170,7 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_CONVERT"):
         )
 
 
-if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_VALIDATE"):
+if is_feature_enabled("TEAL_FEATURE_PDFA_VALIDATE"):
     logger.info("feature PDF/A validate is enabled")
 
     @app.post(
@@ -180,14 +183,16 @@ if is_feature_enabled("TEA_FEATURE_CONVERT_PDFA_VALIDATE"):
         file: UploadFile,
         profile: ValidatePdfProfile = Query(None),
     ) -> Any:
-        logger.debug(f"extract table from pdf file='{file.filename}'")
+        logger.debug(
+            f"extract table from pdf file='{file.filename}', profile='{profile}'"
+        )
         pdf = PdfAValidator()
         return pdf.validate_pdf(
             data=await file.read(), filename=file.filename, profile=profile
         )
 
 
-if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
+if is_feature_enabled("TEAL_FEATURE_LIBREOFFICE_CONVERT"):
     logger.info("feature libreoffice convert is enabled")
 
     @app.post(
@@ -201,7 +206,9 @@ if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
         profile: LibreOfficePdfProfile = Query(None),
         pages: str = Query(None),
     ) -> Any:
-        logger.debug(f"libreoffice convert file='{file.filename}' to pdf")
+        logger.debug(
+            f"libreoffice convert to pdf file='{file.filename}', profile={profile}, pages='{pages}'"
+        )
         libreoffice = LibreOfficeAdapter()
         return libreoffice.convert_to_pdf(
             data=await file.read(),
@@ -211,14 +218,16 @@ if is_feature_enabled("TEA_FEATURE_LIBREOFFICE_CONVERT"):
         )
 
 
-@app.get(
-    "/health",
-    tags=["healthcheck"],
-    summary="Perform a Health Check",
-    response_model=HealthCheck,
-)
-def get_health() -> HealthCheck:
-    return HealthCheck(status="OK")
+if is_feature_enabled("TEAL_FEATURE_APP_HEALTH"):
+
+    @app.get(
+        "/app/health",
+        tags=["appinfo"],
+        summary="Health Check",
+        response_model=HealthCheck,
+    )
+    def get_health() -> HealthCheck:
+        return HealthCheck(status="OK")
 
 
 def custom_openapi():
@@ -234,6 +243,10 @@ def custom_openapi():
         {
             "name": "libreoffice",
             "description": "Convert LibreOffice documents to PDF.",
+        },
+        {
+            "name": "appinfo",
+            "description": "Application information.",
         },
     ]
 
@@ -255,3 +268,7 @@ def custom_openapi():
 
 
 app.openapi = custom_openapi
+if is_feature_enabled("TEAL_FEATURE_APP_METRICS"):
+    Instrumentator().instrument(app).expose(
+        app, endpoint="/app/metrics", tags=["appinfo"]
+    )

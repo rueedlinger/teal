@@ -95,5 +95,16 @@ root:
 
 ### Feature Flags
 
-You can disable different features in Teal with the env `TEA_FEATURE_<PATH>`. For example to disable the libreoffice
-endpoint path (`/libreoffice/convert`) you can set `TEA_FEATURE_LIBREOFFICE_CONVERT=false`.
+You can disable different features in Teal with the env `TEAL_FEATURE_<PATH>`. For example to disable the libreoffice
+endpoint path (`/libreoffice/convert`) you can set `TEAL_FEATURE_LIBREOFFICE_CONVERT=false`.
+
+Currently there are the following feature flags:
+
+- TEAL_FEATURE_PDF_TEXT
+- TEAL_FEATURE_PDF_OCR
+- TEAL_FEATURE_PDF_TABLE
+- TEAL_FEATURE_PDFA_CONVERT
+- TEAL_FEATURE_PDFA_VALIDATE
+- TEAL_FEATURE_LIBREOFFICE_CONVERT
+- TEAL_FEATURE_HEALTH
+- TEAL_FEATURE_METRICS
