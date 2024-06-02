@@ -274,6 +274,6 @@ if is_feature_enabled("TEAL_FEATURE_APP_METRICS"):
         excluded_handlers=["/app/*", "/docs/*", "/openapi.json"]
     )
     instrumentator.instrument(app).expose(
-        app, endpoint="/app/metrics", include_in_schema=True
+        app, endpoint="/app/metrics", include_in_schema=True, tags=["appinfo"]
     )
     instrumentator.add(metrics.requests())
