@@ -5,7 +5,7 @@ from typing import Any, List
 import yaml
 from fastapi import FastAPI, UploadFile, Request, Query
 from fastapi.openapi.utils import get_openapi
-from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_fastapi_instrumentator import Instrumentator, metrics
 from starlette.responses import FileResponse
 
 from teal.core import (
@@ -268,7 +268,10 @@ def custom_openapi():
 
 
 app.openapi = custom_openapi
+
 if is_feature_enabled("TEAL_FEATURE_APP_METRICS"):
-    Instrumentator().instrument(app).expose(
-        app, endpoint="/app/metrics", tags=["appinfo"]
+    instrumentator = Instrumentator(excluded_handlers=["/app/*", "/docs/*"])
+    instrumentator.instrument(app).expose(
+        app, endpoint="/app/metrics", include_in_schema=True
     )
+    instrumentator.add(metrics.requests())

@@ -20,7 +20,7 @@ fi
 
 
 if [ -z ${TEAL_WORKERS+x} ]; then
-  TEAL_WORKERS=10
+  TEAL_WORKERS=2
   echo "env TEAL_WORKERS is unset, will set to $TEAL_WORKERS"
 
 else
@@ -51,8 +51,14 @@ fi
 
 if [ "$TEAL_START_LOCUST" = true ] ; then
   echo "env $TEAL_START_LOCUST ist set to '$TEAL_START_LOCUST'"
+
   echo "starting in locust"
-  locust --host http://localhost:$TEAL_PORT --web-port 8089 -f tests/locustfile.py &
+  if [ -z ${TEAL_LOCUST_PORT+x} ]; then
+    locust --host http://localhost:$TEAL_PORT --web-port 8089 -f tests/locustfile.py &
+  else
+    locust --host http://localhost:$TEAL_PORT --web-port $TEAL_LOCUST_PORT -f tests/locustfile.py &
+  fi
+
 fi
 
 echo "see API doc http://$TEAL_IP_BIND:$TEAL_PORT/docs"
