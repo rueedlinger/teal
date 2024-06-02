@@ -165,12 +165,12 @@ results obtained from this test may vary based on differences in hardware and so
 The following load test was conducted with 5 user for a duration of 10 minutes. The test configuration included 1
 worker with a timeout of 120 seconds. The PDF document used for all test has a size of 17 KB (16'873 bytes, one page).
 
-| Type           | Name                 | # Requests | # Fails  | Median (ms) | 95%ile (ms) | 99%ile (ms) | Average (ms) | Min (ms)  | Max (ms)    | Average size (bytes) | Current RPS | Current Failures/s |
-|----------------|----------------------|------------|----------|-------------|-------------|-------------|--------------|-----------|-------------|----------------------|-------------|--------------------|
-| POST           | /libreoffice/convert | 191        | 0        | 4600        | 8800        | 10000       | 4766.63      | 500       | 12394       | 21297                | 0.2         | 0                  |
-| POST           | /pdf/ocr             | 209        | 0        | 1400        | 2600        | 2800        | 1509.29      | 684       | 3499        | 635                  | 0.5         | 0                  |
-| POST           | /pdf/table           | 212        | 0        | 1300        | 2400        | 2600        | 1370.22      | 558       | 2955        | 2                    | 0.1         | 0                  |
-| POST           | /pdf/text            | 223        | 0        | 780         | 2000        | 2300        | 783.64       | 2         | 2740        | 654                  | 0.4         | 0                  |
-| POST           | /pdfa/convert        | 197        | 0        | 4600        | 9300        | 11000       | 4845.74      | 305       | 11176       | 21436                | 0.2         | 0                  |
-| POST           | /pdfa/validate       | 213        | 0        | 1500        | 2500        | 3000        | 1522.62      | 767       | 3499        | 171                  | 0.5         | 0                  |
-| **Aggregated** | **1245**             | **0**      | **1600** | **6900**    | **9500**    | **2385.57** | **2**        | **12394** | **6912.47** | **1.9**              | **0**       |
+| Type           | Name                 | # Requests | # Fails | Median (ms) | 95%ile (ms) | 99%ile (ms) | Average (ms) | Min (ms) | Max (ms)  | Average size (bytes) | Current RPS | Current Failures/s |
+|----------------|----------------------|------------|---------|-------------|-------------|-------------|--------------|----------|-----------|----------------------|-------------|--------------------|
+| POST           | /libreoffice/convert | 191        | 0       | 4600        | 8800        | 10000       | 4766.63      | 500      | 12394     | 21297                | 0.2         | 0                  |
+| POST           | /pdf/ocr             | 209        | 0       | 1400        | 2600        | 2800        | 1509.29      | 684      | 3499      | 635                  | 0.5         | 0                  |
+| POST           | /pdf/table           | 212        | 0       | 1300        | 2400        | 2600        | 1370.22      | 558      | 2955      | 2                    | 0.1         | 0                  |
+| POST           | /pdf/text            | 223        | 0       | 780         | 2000        | 2300        | 783.64       | 2        | 2740      | 654                  | 0.4         | 0                  |
+| POST           | /pdfa/convert        | 197        | 0       | 4600        | 9300        | 11000       | 4845.74      | 305      | 11176     | 21436                | 0.2         | 0                  |
+| POST           | /pdfa/validate       | 213        | 0       | 1500        | 2500        | 3000        | 1522.62      | 767      | 3499      | 171                  | 0.5         | 0                  |
+| **Aggregated** |                      | **1245**   | **0**   | **1600**    | **6900**    | **9500**    | **2385.57**  | **2**    | **12394** | **6912.47**          | **1.9**     | **0**              |

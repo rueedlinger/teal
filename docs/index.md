@@ -48,6 +48,7 @@ The following python packages are defiend in the `requirements.in`file.
 
 ```text
 fastapi
+prometheus-fastapi-instrumentator
 python-multipart
 uvicorn
 gunicorn
@@ -60,6 +61,7 @@ camelot-py
 ghostscript
 # needed by camelot-py
 opencv-python
+PyPDF2
 pytest
 pytest-cov
 locust
