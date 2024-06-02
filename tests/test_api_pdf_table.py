@@ -8,7 +8,7 @@ from tests import get_path
 
 def test_pdf_table_extract_from_single_table():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/digital_pdf/simple_tables.pdf"), "rb") as f:
+    with open(get_path("data/digital_pdf/document_with_one_table.pdf"), "rb") as f:
         response = client.post(url="/pdf/table", files={"file": f})
         assert response.status_code == 200
         assert len(response.json()) == 1
@@ -40,7 +40,9 @@ def test_pdf_table_extract_from_scanned_document():
 
 def test_pdf_table_extract_from_multiple_tables():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/digital_pdf/multiple_tables.pdf"), "rb") as f:
+    with open(
+        get_path("data/digital_pdf/document_with_multiple_tables.pdf"), "rb"
+    ) as f:
         response = client.post(url="/pdf/table", files={"file": f})
         assert response.status_code == 200
         assert len(response.json()) == 3
@@ -77,7 +79,9 @@ def test_pdf_table_extract_from_multiple_tables():
 
 def test_pdf_table_extract_with_selection():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/digital_pdf/multiple_tables.pdf"), "rb") as f:
+    with open(
+        get_path("data/digital_pdf/document_with_multiple_tables.pdf"), "rb"
+    ) as f:
         response = client.post(url="/pdf/table?pages=2", files={"file": f})
         assert response.status_code == 200
         assert len(response.json()) == 1
@@ -94,7 +98,9 @@ def test_pdf_table_extract_with_selection():
 
 def test_pdf_table_extract_with_page_range():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/digital_pdf/multiple_tables.pdf"), "rb") as f:
+    with open(
+        get_path("data/digital_pdf/document_with_multiple_tables.pdf"), "rb"
+    ) as f:
         response = client.post(url="/pdf/table?pages=1-2", files={"file": f})
         assert response.status_code == 200
         assert len(response.json()) == 3
@@ -102,7 +108,9 @@ def test_pdf_table_extract_with_page_range():
 
 def test_pdf_table_extract_with_selection_and_page_range():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/digital_pdf/multiple_tables.pdf"), "rb") as f:
+    with open(
+        get_path("data/digital_pdf/document_with_multiple_tables.pdf"), "rb"
+    ) as f:
         response = client.post(url="/pdf/table?pages=1-1,2", files={"file": f})
         assert response.status_code == 200
         assert len(response.json()) == 3
@@ -118,9 +126,9 @@ def test_pdf_table_extract_no_tables():
 
 def test_pdf_extract_text_with_wrong_file_ending():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/doc/normal_document.docx"), "rb") as f:
+    with open(get_path("data/doc/word_document.docx"), "rb") as f:
         response = client.post(url="/pdf/table", files={"file": f})
         assert response.status_code == 400
         assert response.json() == {
-            "message": "file extension '.docx' is not supported (normal_document.docx)."
+            "message": "file extension '.docx' is not supported (word_document.docx)."
         }

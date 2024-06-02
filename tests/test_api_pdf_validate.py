@@ -16,7 +16,7 @@ def test_pdfa_validate_compliant_pdfa():
 
 def test_pdfa_validate_non_compliant_pdfa():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/digital_pdf/normal_document.pdf"), "rb") as f:
+    with open(get_path("data/digital_pdf/document_two_pages.pdf"), "rb") as f:
         response = client.post(url="/pdfa/validate", files={"file": f})
         assert response.status_code == 200
         assert response.json()["compliant"] is False
@@ -25,17 +25,17 @@ def test_pdfa_validate_non_compliant_pdfa():
 
 def test_pdfa_validate_wrong_file_type():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/doc/normal_document.docx"), "rb") as f:
+    with open(get_path("data/doc/word_document.docx"), "rb") as f:
         response = client.post(url="/pdfa/validate", files={"file": f})
         assert response.status_code == 400
         assert response.json() == {
-            "message": "file extension '.docx' is not supported (normal_document.docx)."
+            "message": "file extension '.docx' is not supported (word_document.docx)."
         }
 
 
 def test_pdfa_validate_non_compliant_all_profiles():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/digital_pdf/normal_document.pdf"), "rb") as f:
+    with open(get_path("data/digital_pdf/document_two_pages.pdf"), "rb") as f:
         for p in ValidatePdfProfile:
             response = client.post(
                 url=f"/pdfa/validate?profile={p.value}", files={"file": f}

@@ -9,7 +9,7 @@ from tests import get_path
 
 def test_libreoffice_convert_docx_default():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/doc/normal_document.docx"), "rb") as f:
+    with open(get_path("data/doc/word_document.docx"), "rb") as f:
         response = client.post(url="/libreoffice/convert", files={"file": f})
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
@@ -22,7 +22,7 @@ def test_libreoffice_convert_docx_default():
 
 def test_libreoffice_convert_txt_default():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/doc/normal_text.txt"), "rb") as f:
+    with open(get_path("data/doc/text_document.txt"), "rb") as f:
         response = client.post(url="/libreoffice/convert", files={"file": f})
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
@@ -35,7 +35,7 @@ def test_libreoffice_convert_txt_default():
 
 def test_libreoffice_convert_pdf_default():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/digital_pdf/normal_document.pdf"), "rb") as f:
+    with open(get_path("data/digital_pdf/document_two_pages.pdf"), "rb") as f:
         response = client.post(url="/libreoffice/convert", files={"file": f})
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
@@ -48,7 +48,7 @@ def test_libreoffice_convert_pdf_default():
 
 def test_libreoffice_convert_with_selection():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/doc/normal_document.docx"), "rb") as f:
+    with open(get_path("data/doc/word_document.docx"), "rb") as f:
         response = client.post(url="/libreoffice/convert?pages=1", files={"file": f})
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
@@ -61,7 +61,7 @@ def test_libreoffice_convert_with_selection():
 
 def test_libreoffice_convert_with_page_range():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/doc/normal_document.docx"), "rb") as f:
+    with open(get_path("data/doc/word_document.docx"), "rb") as f:
         response = client.post(url="/libreoffice/convert?pages=2-3", files={"file": f})
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
@@ -74,7 +74,7 @@ def test_libreoffice_convert_with_page_range():
 
 def test_libreoffice_convert_pdfa1():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/doc/normal_document.docx"), "rb") as f:
+    with open(get_path("data/doc/word_document.docx"), "rb") as f:
         response = client.post(
             url="/libreoffice/convert?profile=pdfa-1a", files={"file": f}
         )
@@ -90,7 +90,7 @@ def test_libreoffice_convert_pdfa1():
 
 def test_libreoffice_convert_pdfa2():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/doc/normal_document.docx"), "rb") as f:
+    with open(get_path("data/doc/word_document.docx"), "rb") as f:
         response = client.post(
             url="/libreoffice/convert?profile=pdfa-2b", files={"file": f}
         )
@@ -106,7 +106,7 @@ def test_libreoffice_convert_pdfa2():
 
 def test_libreoffice_convert_pdfa3():
     client = TestClient(api.app, raise_server_exceptions=False)
-    with open(get_path("data/doc/normal_document.docx"), "rb") as f:
+    with open(get_path("data/doc/word_document.docx"), "rb") as f:
         response = client.post(
             url="/libreoffice/convert?profile=pdfa-3b", files={"file": f}
         )

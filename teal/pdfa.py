@@ -66,19 +66,12 @@ class PdfAConverter:
             with open(tmp_file_in_path, "wb") as tmp_file_in:
                 output.write(tmp_file_in)
 
-        # see https://ocrmypdf.readthedocs.io/en/latest/advanced.html
-        # -l eng+fra
-        # --output-type {pdfa,pdf,pdfa-1,pdfa-2,pdfa-3,non
-        # --skip-text then no image processing or OCR will be performed on pages that already
-        # have text. The page will be copied to the output. This may be useful for documents that contain
-        # both “born digital” and scanned content, or to use OCRmyPDF to normalize and convert to PDF/A
-        # regardless of their contents.
         languages = make_tesseract_lang_param(langs)
         if languages is None:
             languages = "eng"
 
         if pdfa is None:
-            pdfa = OcrPdfAProfile.PDFA1
+            pdfa = OcrPdfAProfile.PDFA_1B
 
         cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --skip-text --output-type {pdfa.to_ocrmypdf_profile()} "{tmp_file_in_path}" "{tmp_file_out_path}"'
 
