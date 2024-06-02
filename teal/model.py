@@ -29,7 +29,7 @@ class PdfAReport(BaseModel):
     profile: str
     statement: str
     compliant: bool
-    details: dict
+    details: dict = {}
 
 
 class OcrPdfAProfile(str, Enum):

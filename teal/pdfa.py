@@ -162,11 +162,20 @@ class PdfAValidator:
         if result.returncode == 0 or result.returncode == 1:
 
             with open(tmp_file_out_path) as tmp_json:
-                report = json.load(tmp_json)
-                out = report["report"]["jobs"][0]["validationResult"]
-                out["profile"] = report["report"]["jobs"][0]["validationResult"][
-                    "profileName"
-                ].split(" ")[0]
+                out = {
+                    "profile": "NONE",
+                    "statement": f"non of the profiles matched {[e.value for e in ValidatePdfProfile]}",
+                    "compliant": False,
+                }
+
+                if profile is None and result.returncode == 1:
+                    pass
+                else:
+                    report = json.load(tmp_json)
+                    out = report["report"]["jobs"][0]["validationResult"]
+                    out["profile"] = report["report"]["jobs"][0]["validationResult"][
+                        "profileName"
+                    ].split(" ")[0]
                 return create_json_response(
                     content=jsonable_encoder(PdfAReport.model_validate(out)),
                     background=BackgroundTask(cleanup_tmp_dir, tmp_dir),

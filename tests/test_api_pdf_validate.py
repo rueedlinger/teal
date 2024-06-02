@@ -20,7 +20,7 @@ def test_pdfa_validate_non_compliant_pdfa():
         response = client.post(url="/pdfa/validate", files={"file": f})
         assert response.status_code == 200
         assert response.json()["compliant"] is False
-        assert response.json()["profile"] == "PDF/A-1B"
+        assert response.json()["profile"] == "NONE"
 
 
 def test_pdfa_validate_wrong_file_type():
