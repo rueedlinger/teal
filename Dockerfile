@@ -51,8 +51,6 @@ ENV PATH="${PATH}:/usr/local/verapdf"
 USER $USERNAME
 ENV TEAL_VERSION="$VERSION"
 ENV TESSERACT_TESSDATA_PATH="/usr/share/tesseract-ocr/5/tessdata"
-ENV PROMETHEUS_MULTIPROC_DIR="/tmp/prometheus"
-RUN mkdir $PROMETHEUS_MULTIPROC_DIR
 # Runs "/usr/bin/dumb-init -- /my/script --with --args"
 ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 CMD ["/usr/src/app/run.sh"]

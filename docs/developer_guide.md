@@ -162,15 +162,15 @@ The test was performed on a MacBook Pro (2023 model, Apple M2 Max, 64GB
 RAM). Docker settings were configured with a memory limit of 16GB and a CPU limit of 12 cores. Please note that the
 results obtained from this test may vary based on differences in hardware and software configurations in your setup.
 
-The following load test was conducted with 5 user for a duration of 10 minutes. The test configuration included 10
-workers with a timeout of 120 seconds.
+The following load test was conducted with 5 user for a duration of 10 minutes. The test configuration included 1
+worker with a timeout of 120 seconds. The PDF document used for all test has a size of 17 KB (16'873 bytes, one page).
 
-| Type | Name                 | # Requests | # Fails | Median (ms) | 95%ile (ms) | 99%ile (ms) | Average (ms) | Min (ms) | Max (ms) | Average size (bytes) | Current RPS | Current Failures/s |
-|------|----------------------|------------|---------|-------------|-------------|-------------|--------------|----------|----------|----------------------|-------------|--------------------|
-| POST | /libreoffice/convert | 192        | 0       | 560         | 630         | 690         | 571.5        | 521      | 700      | 31682                | 0.4         | 0                  |
-| POST | /pdf/ocr             | 192        | 0       | 13000       | 14000       | 15000       | 12721.04     | 10353    | 15380    | 10321                | 0.5         | 0                  |
-| POST | /pdf/table           | 192        | 0       | 580         | 600         | 610         | 576.22       | 552      | 624      | 154                  | 0.4         | 0                  |
-| POST | /pdf/text            | 192        | 0       | 5           | 7           | 9           | 4.86         | 4        | 9        | 5169                 | 0.4         | 0                  |
-| POST | /pdfa/convert        | 192        | 0       | 340         | 400         | 420         | 349.69       | 315      | 447      | 51695                | 0.4         | 0                  |
-| POST | /pdfa/validate       | 192        | 0       | 1100        | 1300        | 1400        | 1133.78      | 905      | 1448     | 214                  | 0.4         | 0                  |
-|      | Aggregated           | 1152       | 0       | 570         | 13000       | 14000       | 2559.51      | 4        | 15380    | 16539.17             | 2.5         | 0                  |
+| Type           | Name                 | # Requests | # Fails  | Median (ms) | 95%ile (ms) | 99%ile (ms) | Average (ms) | Min (ms)  | Max (ms)    | Average size (bytes) | Current RPS | Current Failures/s |
+|----------------|----------------------|------------|----------|-------------|-------------|-------------|--------------|-----------|-------------|----------------------|-------------|--------------------|
+| POST           | /libreoffice/convert | 191        | 0        | 4600        | 8800        | 10000       | 4766.63      | 500       | 12394       | 21297                | 0.2         | 0                  |
+| POST           | /pdf/ocr             | 209        | 0        | 1400        | 2600        | 2800        | 1509.29      | 684       | 3499        | 635                  | 0.5         | 0                  |
+| POST           | /pdf/table           | 212        | 0        | 1300        | 2400        | 2600        | 1370.22      | 558       | 2955        | 2                    | 0.1         | 0                  |
+| POST           | /pdf/text            | 223        | 0        | 780         | 2000        | 2300        | 783.64       | 2         | 2740        | 654                  | 0.4         | 0                  |
+| POST           | /pdfa/convert        | 197        | 0        | 4600        | 9300        | 11000       | 4845.74      | 305       | 11176       | 21436                | 0.2         | 0                  |
+| POST           | /pdfa/validate       | 213        | 0        | 1500        | 2500        | 3000        | 1522.62      | 767       | 3499        | 171                  | 0.5         | 0                  |
+| **Aggregated** | **1245**             | **0**      | **1600** | **6900**    | **9500**    | **2385.57** | **2**        | **12394** | **6912.47** | **1.9**              | **0**       |

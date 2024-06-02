@@ -270,7 +270,9 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 if is_feature_enabled("TEAL_FEATURE_APP_METRICS"):
-    instrumentator = Instrumentator(excluded_handlers=["/app/*", "/docs/*"])
+    instrumentator = Instrumentator(
+        excluded_handlers=["/app/*", "/docs/*", "/openapi.json"]
+    )
     instrumentator.instrument(app).expose(
         app, endpoint="/app/metrics", include_in_schema=True
     )

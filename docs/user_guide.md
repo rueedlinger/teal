@@ -43,7 +43,7 @@ These resources provide detailed information about the endpoints, request parame
 | ENV                  | Default       | Description                                                                                 |
 |----------------------|---------------|---------------------------------------------------------------------------------------------|
 | TEAL_LOG_CONF        | log_conf.yaml | The python logging conf yaml file.                                                          |
-| TEAL_WORKERS         | 10            | The number of worker processes.                                                             |
+| TEAL_WORKERS         | 1             | The number of worker processes. Number of recommended workers is 2 x number_of_cores + 1.   |
 | TEAL_WORKERS_TIMEOUT | 120           | Worker timeout in seconds.                                                                  |
 | TEAL_PORT            | 8000          | Bind socket to this port                                                                    |
 | TEAL_IP_BIND         | 0.0.0.0       | Bind socket to this host.                                                                   |

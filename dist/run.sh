@@ -20,11 +20,15 @@ fi
 
 
 if [ -z ${TEAL_WORKERS+x} ]; then
-  TEAL_WORKERS=2
+  TEAL_WORKERS=1
   echo "env TEAL_WORKERS is unset, will set to $TEAL_WORKERS"
-
 else
     echo "env TEAL_WORKERS is set to '$TEAL_WORKERS'"
+    if [ "$TEAL_WORKERS" -gt 1 ]; then
+      export PROMETHEUS_MULTIPROC_DIR="/tmp/prometheus"
+      echo "running in multi worker mode, creating PROMETHEUS_MULTIPROC_DIR $PROMETHEUS_MULTIPROC_DIR"
+      mkdir $PROMETHEUS_MULTIPROC_DIR
+    fi
 fi
 
 if [ -z ${TEAL_PORT+x} ]; then
