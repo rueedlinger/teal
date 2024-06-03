@@ -148,7 +148,7 @@ if is_feature_enabled("TEAL_FEATURE_PDF_META"):
 
     @app.post(
         "/pdf/meta",
-        summary="Extract meata data from a PDF",
+        summary="Extract metadata from a PDF",
         response_model=PdfMetaDataReport,
         tags=["pdf"],
     )

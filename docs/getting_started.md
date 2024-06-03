@@ -22,108 +22,171 @@ Next you can use the api with the openapi ui.
 
 #### Extract Text From a PDF
 
-This will extract the text from a digital pdf.
+This endpoint will extract the text from a digital PDF.
 
 ```bash
 curl -X 'POST' \
   'http://127.0.0.1:8000/pdf/text' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'file=@file.pdf;type=application/pdf'
+  -F 'file=@../tests/data/digital_pdf/loadtest.pdf;type=application/pdf'
+```
+
+The response might look like this:
+
+```json
+[
+  {
+    "page": 1,
+    "text": "Lorem ipsum"
+  }
+]
 ```
 
 #### Extract Text With OCR From a PDF
 
-Extract text from a image only pdf with default languages (eng).
+This endpoint extracts text from an image-only PDF or a digital PDF using the default language (English).
 
 ```bash
 curl -X 'POST' \
-  'http://127.0.0.1:8000/pdf/ocr' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'file=@file.pdf;type=application/pdf'
+  'http://127.0.0.1:8000/pdf/ocr?languages=eng' \
+  -F 'file=@../tests/data/ocr/scanned_document.pdf'
 ```
 
-Extract text from a image only pdf with multiple languages (eng, deu). The languages correspond to the tesseract
-languages codes.
+The extracted text from the PDF might look like the following response:
 
-```bash
-curl -X 'POST' \
-  'http://127.0.0.1:8000/pdf/ocr?languages=eng&languages=deu' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'file=@file.pdf;type=application/pdf'
+```json
+[
+  {
+    "page": 1,
+    "text": "Lorem ipsum"
+  }
+] 
 ```
 
-#### Extract Table From a PPF
+#### Extract Table From a PDF
 
-Extract tables as json from a digital pdf.
+This endpoint extracts tables as JSON from a digital PDF.
 
 ```bash
 curl -X 'POST' \
   'http://127.0.0.1:8000/pdf/table' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'file=@file.pdf;type=application/pdf'
+  -F 'file=@../tests/data/digital_pdf/document_with_one_table.pdf'
+```
+
+The response might look like this:
+
+```json
+[
+  {
+    "page": 1,
+    "index": 0,
+    "table": [
+      {
+        "0": "A",
+        "1": "B",
+        "2": "C"
+      },
+      {
+        "0": "A1",
+        "1": "B11",
+        "2": "C111"
+      },
+      {
+        "0": "A2",
+        "1": "B22",
+        "2": "C222"
+      },
+      {
+        "0": "A3",
+        "1": "B33",
+        "2": "C333"
+      }
+    ]
+  }
+]%
+```
+
+#### Extract Metadata From a PDF
+
+This endpoint extracts metadata from a PDF.
+
+```bash
+curl -X 'POST' \
+  'http://127.0.0.1:8000/pdf/meta' \
+  -F 'file=@../tests/data/digital_pdf/loadtest.pdf'
+```
+
+The extracted metadata from the PDF might look like the following response:
+
+```json
+{
+  "fileName": "loadtest.pdf",
+  "fileSize": 16873,
+  "pdfVersion": "1.3",
+  "pdfaClaim": null,
+  "pages": 1,
+  "docInfo": {
+    "/Author": "foo",
+    "/CreationDate": "D:20240602153930Z00'00'",
+    "/Creator": "Word",
+    "/ModDate": "D:20240602153930Z00'00'",
+    "/Producer": "macOS Version 14.5 (Build 23F79) Quartz PDFContext",
+    "/Title": "Document1"
+  },
+  "xmp": {}
+}
 ```
 
 #### Convert PDF To PDF/A With OCR
 
-Convert a PDF to PDF/A. If the PDF is a scanned image, OCR is used with default languages eng. The languages correspond
-to the tesseract languages codes.
+This endpoint converts a PDF to PDF/A. If the PDF is a scanned image, OCR is used with the default language (English).
+The languages correspond to the Tesseract language codes.
 
 ```bash
-curl -X 'POST' \
-  'http://127.0.0.1:8000/pdfa/convert' \
-  -H 'accept: */*' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'file=@file.pdf;type=application/pdf'
+curl -X 'POST' --output pdfa.pdf \
+  'http://127.0.0.1:8000/pdfa//convert?languages=enf&?pdfa=pdfa-3' \
+  -F 'file=@../tests/data/digital_pdf/loadtest.pdf'
 ```
 
-Convert a PDF to PDF/A. If the PDF is a scanned image, OCR is used with the languages eng and deu. The default is
-PDF/A-1.
-
-```bash
-curl -X 'POST' \
-  'http://127.0.0.1:8000/pdfa/convert?languages=eng&languages=deu' \
-  -H 'accept: */*' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'file=@file.pdf;type=application/pdf'
-```
-
-The following converts to PDF/A-3.
-
-```bash
-curl -X 'POST' \
-  'http://127.0.0.1:8000/pdfa/convert?pdfa=pdfa-3' \
-  -H 'accept: */*' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'file=@file.pdf;type=application/pdf'
-```
+The output is a PDF/A file.
 
 #### Validate PDF/A
 
-Validate an PDF against the PDF/A standard.
+This endpoint validates a PDF against the PDF/A standard.
 
 ```bash
 curl -X 'POST' \
   'http://127.0.0.1:8000/pdfa/validate' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'file=@file.pdf;type=application/pdf'
+  -F 'file=@../tests/data/pdfa/pdfa_2b.pdf'
 ```
 
-#### Convert Libreoffice Documents to PDF
+This will generate an output like this:
 
-Convert a Libreoffice document to PDF.
+```json
+{
+  "profile": "PDF/A-2B",
+  "statement": "PDF file is compliant with Validation Profile requirements.",
+  "compliant": true,
+  "details": {
+    "passedRules": 143,
+    "failedRules": 0,
+    "passedChecks": 400,
+    "failedChecks": 0,
+    "ruleSummaries": []
+  }
+}
+```
+
+#### Convert LibreOffice Documents to PDF
+
+This endpoint converts a LibreOffice document to PDF (version 1.6).
 
 ```bash
-curl -X 'POST' \
-  'http://127.0.0.1:8000/libreoffice/convert' \
-  -H 'accept: */*' \
-  -H 'Content-Type: multipart/form-data' \
-  -F 'file=@file.docx;type=application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+curl -X 'POST' --output pdf.pdf \
+  'http://127.0.0.1:8000/libreoffice/convert?profile=pdf-1.6' \
+  -F 'file=@../tests/data/doc/text_document.txt'
 ```
+
+The output is a PDF document.
 
 ### Starting Teal with Locust (Load Testing)
 
