@@ -23,6 +23,11 @@ def test_pdfa_convert_digital_pdf():
                 assert response.status_code == 200
                 assert len(response.json()) == 2
 
+                response = client.post(url="/pdf/meta", files={"file": pdfa_file})
+                assert response.status_code == 200
+                assert response.json()["pdfVersion"] == "1.4"
+                assert response.json()["pdfaClaim"] == "1B"
+
 
 def test_pdfa_convert_scanned_document_with_ocr():
     client = TestClient(api.app, raise_server_exceptions=False)
@@ -40,6 +45,11 @@ def test_pdfa_convert_scanned_document_with_ocr():
                 response = client.post(url="/pdf/text", files={"file": pdfa_file})
                 assert response.status_code == 200
                 assert len(response.json()) == 10
+
+                response = client.post(url="/pdf/meta", files={"file": pdfa_file})
+                assert response.status_code == 200
+                assert response.json()["pdfVersion"] == "1.4"
+                assert response.json()["pdfaClaim"] == "1B"
 
 
 def test_pdfa_convert_digital_pdf_with_lang():
@@ -159,6 +169,11 @@ def test_pdfa_convert_to_pdfa2():
                 assert response.json()["compliant"] is True
                 assert response.json()["profile"] == "PDF/A-2B"
 
+                response = client.post(url="/pdf/meta", files={"file": pdfa_file})
+                assert response.status_code == 200
+                assert response.json()["pdfVersion"] == "1.7"
+                assert response.json()["pdfaClaim"] == "2B"
+
 
 def test_pdfa_convert_to_pdfa3():
     client = TestClient(api.app, raise_server_exceptions=False)
@@ -172,6 +187,11 @@ def test_pdfa_convert_to_pdfa3():
                 assert response.status_code == 200
                 assert response.json()["compliant"] is True
                 assert response.json()["profile"] == "PDF/A-3B"
+
+                response = client.post(url="/pdf/meta", files={"file": pdfa_file})
+                assert response.status_code == 200
+                assert response.json()["pdfVersion"] == "1.6"
+                assert response.json()["pdfaClaim"] == "3B"
 
 
 def test_pdfa_convert_wrong_file_type():

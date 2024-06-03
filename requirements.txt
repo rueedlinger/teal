@@ -46,6 +46,8 @@ coverage[toml]==7.5.3
     # via pytest-cov
 cryptography==42.0.7
     # via pdfminer-six
+deprecated==1.2.14
+    # via pikepdf
 dnspython==2.6.1
     # via email-validator
 email-validator==2.1.1
@@ -103,6 +105,8 @@ jinja2==3.1.4
     #   flask
 locust==2.28.0
     # via -r requirements.in
+lxml==5.2.2
+    # via pikepdf
 markdown-it-py==3.0.0
     # via rich
 markupsafe==2.1.5
@@ -130,6 +134,7 @@ packaging==24.0
     # via
     #   black
     #   gunicorn
+    #   pikepdf
     #   pytesseract
     #   pytest
 pandas==2.2.2
@@ -140,9 +145,12 @@ pdf2image==1.17.0
     # via -r requirements.in
 pdfminer-six==20231228
     # via camelot-py
+pikepdf==9.0.0
+    # via -r requirements.in
 pillow==10.3.0
     # via
     #   pdf2image
+    #   pikepdf
     #   pytesseract
 platformdirs==4.2.2
     # via black
@@ -241,6 +249,8 @@ werkzeug==3.0.3
     #   flask
     #   flask-login
     #   locust
+wrapt==1.16.0
+    # via deprecated
 zope-event==5.0
     # via gevent
 zope-interface==6.4.post2

@@ -32,6 +32,16 @@ class PdfAReport(BaseModel):
     details: dict = {}
 
 
+class PdfMetaDataReport(BaseModel):
+    fileName: str
+    fileSize: int
+    pdfVersion: str
+    pdfaClaim: str | None
+    pages: int
+    docInfo: dict = {}
+    xmp: dict = {}
+
+
 class OcrPdfAProfile(str, Enum):
     PDFA_1B = "pdfa-1b"
     PDFA_2B = "pdfa-2b"

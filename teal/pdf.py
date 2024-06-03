@@ -1,9 +1,11 @@
+import io
 import json
 import logging
 import os
 import tempfile
 
 import camelot.io as camelot
+import pikepdf
 import pypdfium2 as pdfium
 import pytesseract
 from pdf2image import convert_from_bytes
@@ -14,7 +16,7 @@ from teal.core import (
     make_tesseract_lang_param,
     parse_page_ranges,
 )
-from teal.model import TextExtract, TableExtract
+from teal.model import TextExtract, TableExtract, PdfMetaDataReport
 
 _logger = logging.getLogger("teal.pdf")
 
@@ -124,3 +126,42 @@ class PdfDataExtractor:
                         f.close()
 
         return extracts
+
+
+class PdfMetaDataExtractor:
+    def __init__(self):
+        self.supported_file_extensions = [".pdf"]
+
+    def extract_meta_data(
+        self,
+        data: bytes,
+        filename: str,
+    ) -> PdfMetaDataReport | JSONResponse:
+        file_ext = os.path.splitext(filename)[1]
+        if file_ext not in self.supported_file_extensions:
+            return create_json_err_response(
+                400, f"file extension '{file_ext}' is not supported ({filename})."
+            )
+        meta_data = {}
+        pdf = pikepdf.open(io.BytesIO(data))
+        meta = pdf.open_metadata()
+        for m in meta:
+            meta_data[m] = meta.get(m)
+
+        doc_info = {}
+        for key, value in pdf.docinfo.items():
+            doc_info[key] = str(value)
+
+        return PdfMetaDataReport.model_validate(
+            {
+                "fileName": filename,
+                "fileSize": len(data),
+                "pdfVersion": pdf.pdf_version,
+                "pdfaClaim": (
+                    None if meta.pdfa_status == "" else str(meta.pdfa_status)
+                ),
+                "pages": len(pdf.pages),
+                "docInfo": doc_info,
+                "xmp": meta_data,
+            }
+        )
