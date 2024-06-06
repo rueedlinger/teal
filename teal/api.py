@@ -24,6 +24,7 @@ from teal.model import (
     HealthCheck,
     ValidatePdfProfile,
     PdfMetaDataReport,
+    OcrMode,
 )
 from teal.pdf import PdfDataExtractor, PdfMetaDataExtractor
 from teal.pdfa import PdfAValidator, PdfAConverter
@@ -173,10 +174,11 @@ if is_feature_enabled("TEAL_FEATURE_PDFA_CONVERT"):
         file: UploadFile,
         languages: List[str] = Query([]),
         pdfa: OcrPdfAProfile = Query(OcrPdfAProfile.PDFA_1B),
+        ocr: OcrMode = Query(OcrMode.SKIP_TEXT),
         pages: str = Query(None),
     ) -> Any:
         logger.debug(
-            f"extract table from pdf file='{file.filename}', languages='{languages}, pdfa='{pdfa}', pages='{pages}'"
+            f"extract table from pdf file='{file.filename}', languages='{languages}, pdfa='{pdfa}', ocr={ocr}, pages='{pages}'"
         )
         pdf = PdfAConverter()
         return pdf.convert_pdfa(
@@ -184,6 +186,7 @@ if is_feature_enabled("TEAL_FEATURE_PDFA_CONVERT"):
             filename=file.filename,
             langs=languages,
             pdfa=pdfa,
+            ocr_mode=ocr,
             page_ranges=pages,
         )
 
