@@ -151,7 +151,7 @@ class PdfMetaDataExtractor:
         doc_info = {}
         for key, value in pdf.docinfo.items():
             doc_info[key] = str(value)
-
+        pdf.close()
         return PdfMetaDataReport.model_validate(
             {
                 "fileName": filename,
