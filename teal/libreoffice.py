@@ -3,6 +3,7 @@ import os
 import subprocess
 import tempfile
 
+import pikepdf
 from starlette.background import BackgroundTask
 from starlette.responses import FileResponse, JSONResponse
 
@@ -187,6 +188,12 @@ class LibreOfficeAdapter:
             pdf_version = pdf_profile.to_libreoffice_pdf_version()
 
         pages = parse_page_ranges(page_ranges)
+        _logger.info(f"using pdf version {pdf_version}")
+
+        # fix:
+        # with pdf.open_metadata() as meta:
+
+        # https://help.libreoffice.org/latest/en-US/text/shared/guide/pdf_params.html?&DbPAR=SHARED&System=UNIX
         if pages is None:
             pdf_param = (
                 'pdf:draw_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"'
@@ -217,8 +224,17 @@ class LibreOfficeAdapter:
 
         if result.returncode == 0:
             if os.path.exists(converted_file_out):
+                # workaround: fix metadata PDF/A-1b error in libreoffice
+                # edit metadata (this will fix xmp/docinfo metadata creation time difference bug)
+                fixed_file = os.path.join(tmp_dir, "out", "fixed.pdf")
+                pdf = pikepdf.open(converted_file_out)
+                with pdf.open_metadata() as meta:
+                    meta["xmp:CreatorTool"] = "LibreOffice"
+                pdf.save(fixed_file)
+                pdf.close()
+
                 return FileResponse(
-                    converted_file_out,
+                    fixed_file,
                     media_type="application/pdf",
                     filename=f"{os.path.splitext(filename)[0]}.pdf",
                     background=BackgroundTask(cleanup_tmp_dir, tmp_dir),
