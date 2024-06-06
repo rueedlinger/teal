@@ -52,12 +52,12 @@ class OcrPdfAProfile(str, Enum):
 
 
 class LibreOfficePdfProfile(str, Enum):
-    PDFA_1a = "pdfa-1a"
+    PDFA_1B = "pdfa-1b"
     PDFA_2B = "pdfa-2b"
     PDFA_3B = "pdfa-3b"
     PDF_15 = "pdf-1.5"
     PDF_16 = "pdf-1.6"
-    # PDF17 = "pdf-1.7"
+    PDF17 = "pdf-1.7"
 
     def to_libreoffice_pdf_version(self):
         if "pdfa-" in self.value:

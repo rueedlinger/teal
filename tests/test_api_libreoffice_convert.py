@@ -21,7 +21,7 @@ def test_libreoffice_convert_docx_default():
 
                 response = client.post(url="/pdf/meta", files={"file": pdf_file})
                 assert response.status_code == 200
-                assert response.json()["pdfVersion"] == "1.6"
+                assert response.json()["pdfVersion"] == "1.7"
                 assert response.json()["pdfaClaim"] is None
 
 
@@ -65,6 +65,26 @@ def test_libreoffice_convert_docx_pdf16():
                 assert response.json()["pdfaClaim"] is None
 
 
+def test_libreoffice_convert_docx_pdf17():
+    client = TestClient(api.app, raise_server_exceptions=False)
+    with open(get_path("data/doc/word_document.docx"), "rb") as f:
+        response = client.post(
+            url="/libreoffice/convert?profile=pdf-1.7", files={"file": f}
+        )
+        assert response.status_code == 200
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
+            tmp.write(response.content)
+            with open(tmp.name, "rb") as pdf_file:
+                response = client.post(url="/pdf/text", files={"file": pdf_file})
+                assert response.status_code == 200
+                assert len(response.json()) == 3
+
+                response = client.post(url="/pdf/meta", files={"file": pdf_file})
+                assert response.status_code == 200
+                assert response.json()["pdfVersion"] == "1.7"
+                assert response.json()["pdfaClaim"] is None
+
+
 def test_libreoffice_convert_txt_default():
     client = TestClient(api.app, raise_server_exceptions=False)
     with open(get_path("data/doc/text_document.txt"), "rb") as f:
@@ -79,7 +99,7 @@ def test_libreoffice_convert_txt_default():
 
                 response = client.post(url="/pdf/meta", files={"file": pdf_file})
                 assert response.status_code == 200
-                assert response.json()["pdfVersion"] == "1.6"
+                assert response.json()["pdfVersion"] == "1.7"
                 assert response.json()["pdfaClaim"] is None
 
 
@@ -97,7 +117,7 @@ def test_libreoffice_convert_pdf_default():
 
                 response = client.post(url="/pdf/meta", files={"file": pdf_file})
                 assert response.status_code == 200
-                assert response.json()["pdfVersion"] == "1.6"
+                assert response.json()["pdfVersion"] == "1.7"
                 assert response.json()["pdfaClaim"] is None
 
 
@@ -131,7 +151,7 @@ def test_libreoffice_convert_pdfa1():
     client = TestClient(api.app, raise_server_exceptions=False)
     with open(get_path("data/doc/word_document.docx"), "rb") as f:
         response = client.post(
-            url="/libreoffice/convert?profile=pdfa-1a", files={"file": f}
+            url="/libreoffice/convert?profile=pdfa-1b", files={"file": f}
         )
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
@@ -140,12 +160,12 @@ def test_libreoffice_convert_pdfa1():
                 response = client.post(url="/pdfa/validate", files={"file": pdf_file})
                 assert response.status_code == 200
                 assert response.json()["compliant"] is True
-                assert response.json()["profile"] == "PDF/A-1A"
+                assert response.json()["profile"] == "PDF/A-1B"
 
                 response = client.post(url="/pdf/meta", files={"file": pdf_file})
                 assert response.status_code == 200
                 assert response.json()["pdfVersion"] == "1.4"
-                assert response.json()["pdfaClaim"] == "1A"
+                assert response.json()["pdfaClaim"] == "1B"
 
 
 def test_libreoffice_convert_pdfa2():
@@ -165,7 +185,7 @@ def test_libreoffice_convert_pdfa2():
 
                 response = client.post(url="/pdf/meta", files={"file": pdf_file})
                 assert response.status_code == 200
-                assert response.json()["pdfVersion"] == "1.6"
+                assert response.json()["pdfVersion"] == "1.7"
                 assert response.json()["pdfaClaim"] == "2B"
 
 
@@ -186,7 +206,7 @@ def test_libreoffice_convert_pdfa3():
 
                 response = client.post(url="/pdf/meta", files={"file": pdf_file})
                 assert response.status_code == 200
-                assert response.json()["pdfVersion"] == "1.6"
+                assert response.json()["pdfVersion"] == "1.7"
                 assert response.json()["pdfaClaim"] == "3B"
 
 

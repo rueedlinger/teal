@@ -19,6 +19,7 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
     wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64  &&\
     chmod +x /usr/local/bin/dumb-init && \
+    echo "deb http://deb.debian.org/debian bookworm-backports main" >> /etc/apt/sources.list && \
     apt-get update && \
     apt-get install -y tesseract-ocr && \
     apt-get install -y $TESSERACT_LANGUAGES && \
@@ -26,8 +27,10 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     apt-get install -y ghostscript python3-tk && \
     apt-get install -y libgl1 && \
     apt-get install -y ocrmypdf && \
-    apt-get --no-install-recommends install -y libreoffice && \
-    apt-get install -y default-jre-headless libreoffice-java-common jodconverter
+    apt-get --no-install-recommends install -y -t bookworm-backports libreoffice && \
+    apt-get install -y default-jre-headless && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 
 COPY dist/auto-install.xml /tmp
 RUN wget -O /tmp/verapdf-installer.zip https://software.verapdf.org/releases/verapdf-installer.zip && \
