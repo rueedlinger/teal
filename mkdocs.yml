@@ -8,6 +8,7 @@ nav:
   - 'getting_started.md'
   - 'releases.md'
   - 'user_guide.md'
+  - 'api.md'
   - 'developer_guide.md'
 theme:
   name: material
