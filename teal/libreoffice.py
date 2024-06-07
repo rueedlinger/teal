@@ -190,9 +190,6 @@ class LibreOfficeAdapter:
         pages = parse_page_ranges(page_ranges)
         _logger.info(f"using pdf version {pdf_version}")
 
-        # fix:
-        # with pdf.open_metadata() as meta:
-
         # https://help.libreoffice.org/latest/en-US/text/shared/guide/pdf_params.html?&DbPAR=SHARED&System=UNIX
         if pages is None:
             pdf_param = (

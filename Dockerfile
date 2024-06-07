@@ -28,7 +28,8 @@ RUN groupadd --gid $USER_GID $USERNAME &&\
     apt-get install -y libgl1 && \
     apt-get install -y ocrmypdf && \
     apt-get --no-install-recommends install -y -t bookworm-backports libreoffice && \
-    apt-get install -y default-jre-headless && \
+    apt-get install -y default-jre-headless  && \
+    apt-get install -y -t bookworm-backports libreoffice-java-common  && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
@@ -51,7 +52,7 @@ COPY tests ./tests
 
 ENV PATH="${PATH}:/usr/local/verapdf"
 
-USER $USERNAME
+#USER $USERNAME
 ENV TEAL_VERSION="$VERSION"
 ENV TESSERACT_TESSDATA_PATH="/usr/share/tesseract-ocr/5/tessdata"
 # Runs "/usr/bin/dumb-init -- /my/script --with --args"
