@@ -13,6 +13,7 @@ from teal.core import (
     is_feature_enabled,
     get_version,
     get_tesseract_languages,
+    get_app_info,
 )
 from teal.libreoffice import LibreOfficeAdapter
 from teal.model import (
@@ -25,6 +26,7 @@ from teal.model import (
     ValidatePdfProfile,
     PdfMetaDataReport,
     OcrMode,
+    AppInfo,
 )
 from teal.pdf import PdfDataExtractor, PdfMetaDataExtractor
 from teal.pdfa import PdfAValidator, PdfAConverter
@@ -243,12 +245,24 @@ if is_feature_enabled("TEAL_FEATURE_APP_HEALTH"):
 
     @app.get(
         "/app/health",
-        tags=["appinfo"],
+        tags=["app"],
         summary="Health Check",
         response_model=HealthCheck,
     )
     def get_health() -> HealthCheck:
         return HealthCheck(status="OK")
+
+
+if is_feature_enabled("TEAL_FEATURE_APP_INFO"):
+
+    @app.get(
+        "/app/info",
+        tags=["app"],
+        summary="Application information's",
+        response_model=AppInfo,
+    )
+    def get_health() -> AppInfo:
+        return get_app_info()
 
 
 def custom_openapi():
@@ -266,7 +280,7 @@ def custom_openapi():
             "description": "Convert LibreOffice documents to PDF.",
         },
         {
-            "name": "appinfo",
+            "name": "app",
             "description": "Application information.",
         },
     ]
@@ -295,6 +309,6 @@ if is_feature_enabled("TEAL_FEATURE_APP_METRICS"):
         excluded_handlers=["/app/*", "/docs/*", "/openapi.json"]
     )
     instrumentator.instrument(app).expose(
-        app, endpoint="/app/metrics", include_in_schema=True, tags=["appinfo"]
+        app, endpoint="/app/metrics", include_in_schema=True, tags=["app"]
     )
     instrumentator.add(metrics.requests())

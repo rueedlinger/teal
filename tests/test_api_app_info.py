@@ -26,3 +26,9 @@ def test_metrics():
     client = TestClient(api.app, raise_server_exceptions=False)
     response = client.get(url="/app/metrics")
     assert response.status_code == 200
+
+
+def test_info():
+    client = TestClient(api.app, raise_server_exceptions=False)
+    response = client.get(url="/app/info")
+    assert response.status_code == 200

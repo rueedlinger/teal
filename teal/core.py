@@ -3,8 +3,16 @@ import os
 import re
 import shutil
 
+import PyPDF2
+import camelot
+import fastapi
+import pikepdf
+import pypdfium2
+import pytesseract
 from starlette.background import BackgroundTask
 from starlette.responses import JSONResponse
+
+from teal.model import AppInfo
 
 # get root logger
 _logger = logging.getLogger("teal.core")
@@ -47,7 +55,7 @@ def is_feature_enabled(feature_flag) -> bool:
 
 
 def get_version() -> str:
-    if "TEAL_VERSION" in os.environ:
+    if "TEAL_VERSION" in os.environ and len(os.environ["TEAL_VERSION"]) > 1:
         return os.environ["TEAL_VERSION"]
     return "unknown"
 
@@ -68,8 +76,8 @@ def cleanup_tmp_dir(tmp_dir: str):
 
 def get_tesseract_languages() -> list[str]:
     path = "/usr/share/tesseract-ocr/5/tessdata"
-    if "TESSERACT_TESSDATA_PATH" in os.environ:
-        path = os.environ["TESSERACT_TESSDATA_PATH"]
+    if "TEAL_TESSERACT_TESSDATA_PATH" in os.environ:
+        path = os.environ["TEAL_TESSERACT_TESSDATA_PATH"]
 
     if os.path.exists(path):
         languages = [
@@ -81,6 +89,48 @@ def get_tesseract_languages() -> list[str]:
     else:
         _logger.warning(f"not tesseract languages found in path {path}")
         return []
+
+
+def get_app_info() -> AppInfo:
+
+    details = {}
+    for k in os.environ.keys():
+        if k.startswith("TEAL_"):
+            details[k.lower().replace("teal_", "")] = os.environ[k]
+
+    details["tesseract_languages"] = get_tesseract_languages()
+
+    try:
+        details["pike_version"] = pikepdf.__version__
+    except Exception as e:
+        details["pike_version"] = str(e)
+
+    try:
+        details["pytesseract_version"] = pytesseract.__version__
+    except Exception as e:
+        details["pytesseract_version"] = str(e)
+
+    try:
+        details["pypdf2_version"] = PyPDF2.__version__
+    except Exception as e:
+        details["pypdf2_version"] = str(e)
+
+    try:
+        details["pypdfium2_version"] = pypdfium2.V_PYPDFIUM2
+    except Exception as e:
+        details["pypdfium2_version"] = str(e)
+
+    try:
+        details["camelot_version"] = camelot.__version__
+    except Exception as e:
+        details["camelot_version"] = str(e)
+
+    try:
+        details["fastapi_version"] = fastapi.__version__
+    except Exception as e:
+        details["fastapi_version"] = str(e)
+
+    return AppInfo.model_validate({"version": get_version(), "details": details})
 
 
 def make_tesseract_lang_param(langs: list[str]) -> str | None:

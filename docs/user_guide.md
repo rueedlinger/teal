@@ -6,7 +6,7 @@ Here's a quick example of how easy it is to work with Teal directly with docker
 
 ```bash
 docker run --pull=always --rm -it -p 8000:8000 -e TEAL_WORKERS=1 \
-  --name teal ghcr.io/rueedlinger/teal:main
+  --name teal ghcr.io/rueedlinger/teal:latest
 ```
 
 or start Teal inside docker compose.
@@ -14,7 +14,7 @@ or start Teal inside docker compose.
 ```yaml
 services:
   teal:
-    image: ghcr.io/rueedlinger/teal:main
+    image: ghcr.io/rueedlinger/teal:latest
     ports:
       - 8000:8000 # Rest API port 
       - 8089:8089 # Locust web ui port
@@ -98,7 +98,7 @@ root:
 You can disable different features in Teal with the env `TEAL_FEATURE_<PATH>`. For example to disable the libreoffice
 endpoint path (`/libreoffice/convert`) you can set `TEAL_FEATURE_LIBREOFFICE_CONVERT=false`.
 
-Currently there are the following feature flags:
+Currently, there are the following feature flags:
 
 - TEAL_FEATURE_PDF_TEXT
 - TEAL_FEATURE_PDF_OCR
@@ -106,5 +106,6 @@ Currently there are the following feature flags:
 - TEAL_FEATURE_PDFA_CONVERT
 - TEAL_FEATURE_PDFA_VALIDATE
 - TEAL_FEATURE_LIBREOFFICE_CONVERT
-- TEAL_FEATURE_HEALTH
-- TEAL_FEATURE_METRICS
+- TEAL_FEATURE_APP_HEALTH
+- TEAL_FEATURE_APP_METRICS
+- TEAL_FEATURE_APP_INFO
