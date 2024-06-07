@@ -8,11 +8,11 @@ from starlette.background import BackgroundTask
 from starlette.responses import FileResponse, JSONResponse
 
 from teal.core import (
-    create_json_err_response,
     cleanup_tmp_dir,
     parse_page_ranges,
     to_page_range,
 )
+from teal.http import create_json_err_response
 from teal.model import LibreOfficePdfProfile
 
 _logger = logging.getLogger("teal.libreoffice")
@@ -157,8 +157,8 @@ class LibreOfficeAdapter:
         self,
         data: bytes,
         filename: str,
-        pdf_profile: LibreOfficePdfProfile = None,
-        page_ranges: str = None,
+        pdf_profile: LibreOfficePdfProfile,
+        page_ranges: str,
     ) -> FileResponse | JSONResponse:
 
         file_ext = os.path.splitext(filename)[1]

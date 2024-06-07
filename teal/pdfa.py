@@ -11,12 +11,11 @@ from starlette.background import BackgroundTask
 from starlette.responses import JSONResponse, FileResponse
 
 from teal.core import (
-    create_json_err_response,
-    create_json_response,
     cleanup_tmp_dir,
     make_tesseract_lang_param,
     parse_page_ranges,
 )
+from teal.http import create_json_err_response, create_json_response
 from teal.model import PdfAReport, OcrPdfAProfile, ValidatePdfProfile, OcrMode
 
 _logger = logging.getLogger("teal.pdfa")
@@ -31,10 +30,10 @@ class PdfAConverter:
         self,
         data: bytes,
         filename: str,
-        langs: list[str] = [],
-        pdfa: OcrPdfAProfile = None,
-        ocr_mode: OcrMode = OcrMode.SKIP_TEXT,
-        page_ranges: str = None,
+        langs: list[str],
+        pdfa_profile: OcrPdfAProfile,
+        ocr_mode: OcrMode,
+        page_ranges: str,
     ) -> FileResponse | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
@@ -71,13 +70,13 @@ class PdfAConverter:
         if languages is None:
             languages = "eng"
 
-        if pdfa is None:
-            pdfa = OcrPdfAProfile.PDFA_1B
+        if pdfa_profile is None:
+            pdfa_profile = OcrPdfAProfile.PDFA_1B
 
         if ocr_mode is None:
             ocr_mode = OcrMode.SKIP_TEXT
 
-        cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} {ocr_mode.to_parameter()} --output-type {pdfa.to_ocrmypdf_profile()} "{tmp_file_in_path}" "{tmp_file_out_path}"'
+        cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} {ocr_mode.to_parameter()} --output-type {pdfa_profile.to_ocrmypdf_profile()} "{tmp_file_in_path}" "{tmp_file_out_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(

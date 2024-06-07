@@ -32,3 +32,12 @@ def test_info():
     client = TestClient(api.app, raise_server_exceptions=False)
     response = client.get(url="/app/info")
     assert response.status_code == 200
+
+
+def test_not_supported_query_parameter():
+    client = TestClient(api.app, raise_server_exceptions=False)
+    response = client.get(url="/app/info?foo")
+    assert response.status_code == 400
+
+    response = client.get(url="/app/info?foo=bar")
+    assert response.status_code == 400

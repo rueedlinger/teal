@@ -143,7 +143,7 @@ The languages correspond to the Tesseract language codes.
 
 ```bash
 curl -X 'POST' --output pdfa.pdf \
-  'http://127.0.0.1:8000/pdfa//convert?languages=enf&?pdfa=pdfa-3' \
+  'http://127.0.0.1:8000/pdfa/convert?languages=eng&?profile=pdfa-3' \
   -F 'file=@../tests/data/digital_pdf/loadtest.pdf'
 ```
 

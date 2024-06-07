@@ -109,3 +109,17 @@ Currently, there are the following feature flags:
 - TEAL_FEATURE_APP_HEALTH
 - TEAL_FEATURE_APP_METRICS
 - TEAL_FEATURE_APP_INFO
+
+## Health & Monitoring
+
+Teal provides several key endpoints for monitoring and information purposes. Below is a summary of each
+endpoint:
+
+| Endpoint       | Description                                                                                                                                                        |
+|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `/app/health`  | This endpoint returns the health status of the application. It can be used to verify that the application is running properly and is capable of handling requests. |
+| `/app/metrics` | This endpoint provides Prometheus metrics for the application. It can be used for gathering performance data and monitoring the application's usage statistics.    |
+| `/app/info`    | This endpoint returns general information about the application, such as version number, build details, and other relevant metadata.                               |
+
+These endpoints are essential for maintaining the operational integrity and performance of the application, allowing for
+effective monitoring and troubleshooting.

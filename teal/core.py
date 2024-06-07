@@ -10,41 +10,10 @@ import fastapi
 import pikepdf
 import pypdfium2
 import pytesseract
-from starlette.background import BackgroundTask
-from starlette.responses import JSONResponse
 
 from teal.model import AppInfo
 
-# get root logger
 _logger = logging.getLogger("teal.core")
-
-
-def create_json_response(content, background: BackgroundTask = None):
-    return JSONResponse(content=content, background=background)
-
-
-def create_json_err_response_from_exception(
-    ex: Exception, background: BackgroundTask = None
-):
-    return JSONResponse(
-        status_code=500,
-        content={
-            "message": f"{ex}",
-        },
-        background=background,
-    )
-
-
-def create_json_err_response(
-    code: int, message: str, background: BackgroundTask = None
-):
-    return JSONResponse(
-        status_code=code,
-        content={
-            "message": message,
-        },
-        background=background,
-    )
 
 
 def is_feature_enabled(feature_flag) -> bool:
@@ -139,7 +108,9 @@ def get_app_info() -> AppInfo:
     return AppInfo.model_validate({"version": get_version(), "details": details})
 
 
-def make_tesseract_lang_param(langs: list[str]) -> str | None:
+def make_tesseract_lang_param(langs: list[str] | None) -> str | None:
+    if langs is None:
+        return None
     if len(langs) == 0:
         return None
     if len(langs) == 1 and langs[0] == "":
