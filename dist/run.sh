@@ -80,9 +80,10 @@ TEAL_VERAPDF_VERSION=$(verapdf --version | head -n 1)
 export TEAL_VERAPDF_VERSION
 
 # from poppler-utils
-TEAL_PDFTOPPM_VERSION=$(pdftoppm -v | head -n 1)
+TEAL_PDFTOPPM_VERSION=$(echo "$(pdftoppm -v 2>&1 >/dev/null)" | head -n 1)
 export TEAL_PDFTOPPM_VERSION
 
+# from poppler-utils
 TEAL_PDFTOCAIRO_VERSION=$(echo "$(pdftocairo -v 2>&1 >/dev/null)" | head -n 1)
 export TEAL_PDFTOCAIRO_VERSION
 

@@ -5,6 +5,7 @@ import shutil
 
 import PyPDF2
 import camelot
+import cv2
 import fastapi
 import pikepdf
 import pypdfium2
@@ -129,6 +130,11 @@ def get_app_info() -> AppInfo:
         details["fastapi_version"] = fastapi.__version__
     except Exception as e:
         details["fastapi_version"] = str(e)
+
+    try:
+        details["opencv_version"] = cv2.__version__
+    except Exception as e:
+        details["opencv_version"] = str(e)
 
     return AppInfo.model_validate({"version": get_version(), "details": details})
 
