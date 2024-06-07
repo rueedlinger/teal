@@ -17,7 +17,7 @@ from teal.core import (
     make_tesseract_lang_param,
     parse_page_ranges,
 )
-from teal.model import PdfAReport, OcrPdfAProfile, ValidatePdfProfile
+from teal.model import PdfAReport, OcrPdfAProfile, ValidatePdfProfile, OcrMode
 
 _logger = logging.getLogger("teal.pdfa")
 
@@ -33,6 +33,7 @@ class PdfAConverter:
         filename: str,
         langs: list[str] = [],
         pdfa: OcrPdfAProfile = None,
+        ocr_mode: OcrMode = OcrMode.SKIP_TEXT,
         page_ranges: str = None,
     ) -> FileResponse | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
@@ -73,7 +74,10 @@ class PdfAConverter:
         if pdfa is None:
             pdfa = OcrPdfAProfile.PDFA_1B
 
-        cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} --skip-text --output-type {pdfa.to_ocrmypdf_profile()} "{tmp_file_in_path}" "{tmp_file_out_path}"'
+        if ocr_mode is None:
+            ocr_mode = OcrMode.SKIP_TEXT
+
+        cmd_convert_pdf = f'{self.ocrmypdf_cmd} -l {languages} {ocr_mode.to_parameter()} --output-type {pdfa.to_ocrmypdf_profile()} "{tmp_file_in_path}" "{tmp_file_out_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         result = subprocess.run(

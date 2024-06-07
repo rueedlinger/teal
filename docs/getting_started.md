@@ -11,7 +11,7 @@ Here's a quick example of how easy it is to work with Teal:
 
 ```bash
 docker run --pull=always --rm -it -p 8000:8000 \
-  --name teal ghcr.io/rueedlinger/teal:main
+  --name teal ghcr.io/rueedlinger/teal:latest
 ```
 
 Next you can use the api with the openapi ui.
@@ -29,13 +29,13 @@ Next you can use the api with the openapi ui.
 
 **PDF/A Endpoint**:
 
-* Converts a PDF to PDF/A (PDF/A-1B, PDF/A-2B, or PDF/A-3B) with OCR.
+* Converts a PDF to PDF/A (PDF/A-1B, PDF/A-2B or PDF/A-3B) with OCR.
 * Validates a PDF against the PDF/A standard.
 
 **LibreOffice Endpoint**;
 
-* Converts a LibreOffice document to PDF (supported profiles: PDF 1.5, PDF 1.6,
-  PDF/A-1A, PDF/A-2B, or PDF/A-3B).
+* Converts a LibreOffice document to PDF (supported profiles: PDF 1.5, PDF 1.6, PDF 1.7,
+  PDF/A-1B, PDF/A-2B or PDF/A-3B).
 
 ### Extract Text From a PDF
 
@@ -212,7 +212,7 @@ These tests can be run and verified with teh following command.
 
 ```bash
 docker run --pull=always --rm -it -p 8000:8000 \
-  -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:main
+  -e TEAL_TEST_MODE=true --name teal ghcr.io/rueedlinger/teal:latest
 ```
 
 ## Starting Teal with Locust (Load Testing)
@@ -222,7 +222,7 @@ The following command will start the Locust web UI inside the Docker container.
 
 ```bash
 docker run --pull=always --rm -it -p 8089:8089 -p 8000:8000 \
-  -e TEAL_START_LOCUST=true --name teal ghcr.io/rueedlinger/teal:main
+  -e TEAL_START_LOCUST=true --name teal ghcr.io/rueedlinger/teal:latest
 ```
 
 You can now start the load test from the locust webui [http://localhost:8089/](http://localhost:8089/).

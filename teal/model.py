@@ -51,6 +51,15 @@ class OcrPdfAProfile(str, Enum):
         return self.value[:-1]
 
 
+class OcrMode(str, Enum):
+    SKIP_TEXT = "skip-text"
+    FORCE_OCR = "force-ocr"
+    REDO_OCR = "redo-ocr"
+
+    def to_parameter(self):
+        return f"--{self.value}"
+
+
 class LibreOfficePdfProfile(str, Enum):
     PDFA_1B = "pdfa-1b"
     PDFA_2B = "pdfa-2b"
