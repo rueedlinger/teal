@@ -69,14 +69,15 @@ The following binaries (debian packages) are needed:
 - ghostscript
 - python3-tk
 - libgl1
-- libreoffice
+- libreoffice (bookworm-backports)
+- libreoffice-java-common (bookworm-backports)
 - default-jre-headless
-- libreoffice-java-common
-- jodconverter
 
 The following binaries must be installed manually:
 
 - verapdf
+
+For more details have a look at the [Dockerfile](https://github.com/rueedlinger/teal/blob/main/Dockerfile).
 
 ### Startup the FastAPI app
 

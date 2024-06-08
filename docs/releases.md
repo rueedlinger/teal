@@ -1,12 +1,16 @@
 # Releases
 
+All available releases are listed here:
+
+- [https://github.com/rueedlinger/teal/releases](https://github.com/rueedlinger/teal/releases)
+
 ## Versions
 
-| Version | Docker                          | Description         |
-|---------|---------------------------------|---------------------|
-| main    | ghcr.io/rueedlinger/teal:main   | main branch version |
-| latest  | ghcr.io/rueedlinger/teal:main   | Latest release      |
-| v0.1.0  | ghcr.io/rueedlinger/teal:v0.1.0 | Initial release     |
+| Version                    | Docker                                              | Description                                                                                   |
+|----------------------------|-----------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| `main`                     | `ghcr.io/rueedlinger/teal:main`                     | main branch version                                                                           |
+| `latest`                   | `ghcr.io/rueedlinger/latest:main`                   | Latest release                                                                                |
+| `v{MAJOR}.{MINOR}.{PATCH}` | `ghcr.io/rueedlinger/teal:v{MAJOR}.{MINOR}.{PATCH}` | For a full list of releases see [Teal releases](https://github.com/rueedlinger/teal/releases) |
 
 These are the available releases and their corresponding Docker images for the 'teal' project.
 
@@ -14,13 +18,20 @@ These are the available releases and their corresponding Docker images for the '
 
 **Teal** uses other open-source libraries and provides this functionality through convenient APIs.
 
+A list of used libraries and brines can be queried over the `/app/info` endpoint.
+
+```bash
+curl localhost:8000/app/info
+```
+
 **Docker Base Image**
 
 Currently `python:3.12` is used as Docker base image.
 
 **Python Libraries:**
 
-The following python packages are defiend in the `requirements.in`file.
+The following python packages are defined in
+the [requirements.in](https://github.com/rueedlinger/teal/blob/main/requirements.in) file.
 
 ```text
 fastapi
@@ -45,7 +56,9 @@ black
 ```
 
 You can generate the full list of dependencies with `pip-compile` (
-see [pip-compile](https://pip-tools.readthedocs.io/en/stable/)).
+see [pip-compile](https://pip-tools.readthedocs.io/en/stable/)). This will generate
+the [requirements.txt](https://github.com/rueedlinger/teal/blob/main/requirements.txt) with all
+dependencies.
 
 **Binaries:**
 
@@ -59,9 +72,10 @@ The following binaries (debian packages) are needed:
 - python3-tk
 - libgl1
 - libreoffice
+- libreoffice-java-common
 - default-jre-headless
 
-For more details have a look at the Docker file.
+For more details have a look at the [Dockerfile](https://github.com/rueedlinger/teal/blob/main/Dockerfile).
 
 ## Known Issues
 

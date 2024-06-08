@@ -145,7 +145,7 @@ def test_pdfa_convert_with_pages_range_and_selection():
 def test_pdfa_convert_to_pdfa1():
     client = TestClient(api.app, raise_server_exceptions=False)
     with open(get_path("data/digital_pdf/document_two_pages.pdf"), "rb") as f:
-        response = client.post(url="/pdfa/convert?pdfa=pdfa-1b", files={"file": f})
+        response = client.post(url="/pdfa/convert?profile=pdfa-1b", files={"file": f})
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
             tmp.write(response.content)
@@ -159,7 +159,7 @@ def test_pdfa_convert_to_pdfa1():
 def test_pdfa_convert_to_pdfa2():
     client = TestClient(api.app, raise_server_exceptions=False)
     with open(get_path("data/digital_pdf/document_two_pages.pdf"), "rb") as f:
-        response = client.post(url="/pdfa/convert?pdfa=pdfa-2b", files={"file": f})
+        response = client.post(url="/pdfa/convert?profile=pdfa-2b", files={"file": f})
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
             tmp.write(response.content)
@@ -178,7 +178,7 @@ def test_pdfa_convert_to_pdfa2():
 def test_pdfa_convert_to_pdfa3():
     client = TestClient(api.app, raise_server_exceptions=False)
     with open(get_path("data/digital_pdf/document_two_pages.pdf"), "rb") as f:
-        response = client.post(url="/pdfa/convert?pdfa=pdfa-3b", files={"file": f})
+        response = client.post(url="/pdfa/convert?profile=pdfa-3b", files={"file": f})
         assert response.status_code == 200
         with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
             tmp.write(response.content)

@@ -12,10 +12,10 @@ from pdf2image import convert_from_bytes
 from starlette.responses import JSONResponse
 
 from teal.core import (
-    create_json_err_response,
     make_tesseract_lang_param,
     parse_page_ranges,
 )
+from teal.http import create_json_err_response
 from teal.model import TextExtract, TableExtract, PdfMetaDataReport
 
 _logger = logging.getLogger("teal.pdf")
@@ -29,7 +29,7 @@ class PdfDataExtractor:
         self,
         data: bytes,
         filename: str,
-        page_ranges: str = None,
+        page_ranges: str,
     ) -> list[TextExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
@@ -58,8 +58,8 @@ class PdfDataExtractor:
         self,
         data: bytes,
         filename: str,
-        langs: list[str] = [],
-        page_ranges: str = None,
+        langs: list[str],
+        page_ranges: str,
     ) -> list[TextExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:
@@ -89,7 +89,7 @@ class PdfDataExtractor:
         self,
         data: bytes,
         filename: str,
-        page_ranges: str = None,
+        page_ranges: str,
     ) -> list[TableExtract] | JSONResponse:
         file_ext = os.path.splitext(filename)[1]
         if file_ext not in self.supported_file_extensions:

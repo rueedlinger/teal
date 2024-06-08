@@ -18,24 +18,7 @@ Next you can use the api with the openapi ui.
 
 - [http://localhost:8000/docs](http://localhost:8000/docs)
 
-## Teal REST API Endpoint
-
-**PDF Endpoint**:
-
-* Extracts text from a digital PDF.
-* Extracts text from an image-only PDF or a digital PDF using OCR.
-* Extracts tables as JSON from a digital PDF.
-* Extracts metadata from a PDF.
-
-**PDF/A Endpoint**:
-
-* Converts a PDF to PDF/A (PDF/A-1B, PDF/A-2B or PDF/A-3B) with OCR.
-* Validates a PDF against the PDF/A standard.
-
-**LibreOffice Endpoint**;
-
-* Converts a LibreOffice document to PDF (supported profiles: PDF 1.5, PDF 1.6, PDF 1.7,
-  PDF/A-1B, PDF/A-2B or PDF/A-3B).
+## Examples
 
 ### Extract Text From a PDF
 
@@ -160,7 +143,7 @@ The languages correspond to the Tesseract language codes.
 
 ```bash
 curl -X 'POST' --output pdfa.pdf \
-  'http://127.0.0.1:8000/pdfa//convert?languages=enf&?pdfa=pdfa-3' \
+  'http://127.0.0.1:8000/pdfa/convert?languages=eng&?profile=pdfa-3' \
   -F 'file=@../tests/data/digital_pdf/loadtest.pdf'
 ```
 

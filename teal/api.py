@@ -9,10 +9,14 @@ from prometheus_fastapi_instrumentator import Instrumentator, metrics
 from starlette.responses import FileResponse
 
 from teal.core import (
-    create_json_err_response_from_exception,
     is_feature_enabled,
     get_version,
     get_tesseract_languages,
+    get_app_info,
+)
+from teal.http import (
+    create_json_err_response_from_exception,
+    CheckUnknownQueryParamsRouter,
 )
 from teal.libreoffice import LibreOfficeAdapter
 from teal.model import (
@@ -25,11 +29,14 @@ from teal.model import (
     ValidatePdfProfile,
     PdfMetaDataReport,
     OcrMode,
+    AppInfo,
 )
 from teal.pdf import PdfDataExtractor, PdfMetaDataExtractor
 from teal.pdfa import PdfAValidator, PdfAConverter
 
 app = FastAPI()
+app.router.route_class = CheckUnknownQueryParamsRouter
+
 logger = logging.getLogger("teal.api")
 if "TEAL_LOG_CONF" in os.environ:
     log_conf_file = os.environ["TEAL_LOG_CONF"]
@@ -89,7 +96,7 @@ if is_feature_enabled("TEAL_FEATURE_PDF_TEXT"):
     )
     async def extract_text_from_pdf(
         file: UploadFile,
-        pages: str = Query(None),
+        pages: str = Query(default=None),
     ) -> Any:
         logger.debug(f"extract text from pdf file='{file.filename}', pages='{pages}'")
         pdf = PdfDataExtractor()
@@ -110,7 +117,7 @@ if is_feature_enabled("TEAL_FEATURE_PDF_OCR"):
     async def extract_text_with_ocr_from_pdf(
         file: UploadFile,
         languages: List[str] = Query([]),
-        pages: str = Query(None),
+        pages: str = Query(default=None),
     ) -> Any:
         logger.debug(
             f"extract text with ocr from pdf file='{file.filename}', languages='{languages}', pages='{pages}'"
@@ -135,7 +142,7 @@ if is_feature_enabled("TEAL_FEATURE_PDF_TABLE"):
     )
     async def extract_table_from_pdf(
         file: UploadFile,
-        pages: str = Query(None),
+        pages: str = Query(default=None),
     ) -> Any:
         logger.debug(f"extract table from pdf file='{file.filename}', pages='{pages}'")
         pdf = PdfDataExtractor()
@@ -172,20 +179,20 @@ if is_feature_enabled("TEAL_FEATURE_PDFA_CONVERT"):
     )
     async def convert_pdf_to_pdfa_with_ocr(
         file: UploadFile,
-        languages: List[str] = Query([]),
-        pdfa: OcrPdfAProfile = Query(OcrPdfAProfile.PDFA_1B),
-        ocr: OcrMode = Query(OcrMode.SKIP_TEXT),
-        pages: str = Query(None),
+        languages: List[str] = Query(default=None),
+        profile: OcrPdfAProfile = Query(default=None),
+        ocr: OcrMode = Query(default=None),
+        pages: str = Query(default=None),
     ) -> Any:
         logger.debug(
-            f"extract table from pdf file='{file.filename}', languages='{languages}, pdfa='{pdfa}', ocr={ocr}, pages='{pages}'"
+            f"extract table from pdf file='{file.filename}', languages='{languages}, profile='{profile}', ocr={ocr}, pages='{pages}'"
         )
         pdf = PdfAConverter()
         return pdf.convert_pdfa(
             data=await file.read(),
             filename=file.filename,
             langs=languages,
-            pdfa=pdfa,
+            pdfa_profile=profile,
             ocr_mode=ocr,
             page_ranges=pages,
         )
@@ -202,7 +209,7 @@ if is_feature_enabled("TEAL_FEATURE_PDFA_VALIDATE"):
     )
     async def validate_pdfa(
         file: UploadFile,
-        profile: ValidatePdfProfile = Query(None),
+        profile: ValidatePdfProfile = Query(default=None),
     ) -> Any:
         logger.debug(
             f"extract table from pdf file='{file.filename}', profile='{profile}'"
@@ -224,8 +231,8 @@ if is_feature_enabled("TEAL_FEATURE_LIBREOFFICE_CONVERT"):
     )
     async def convert_libreoffice_docs_to_pdf(
         file: UploadFile,
-        profile: LibreOfficePdfProfile = Query(None),
-        pages: str = Query(None),
+        profile: LibreOfficePdfProfile = Query(default=None),
+        pages: str = Query(default=None),
     ) -> Any:
         logger.debug(
             f"libreoffice convert to pdf file='{file.filename}', profile={profile}, pages='{pages}'"
@@ -243,12 +250,24 @@ if is_feature_enabled("TEAL_FEATURE_APP_HEALTH"):
 
     @app.get(
         "/app/health",
-        tags=["appinfo"],
+        tags=["app"],
         summary="Health Check",
         response_model=HealthCheck,
     )
     def get_health() -> HealthCheck:
         return HealthCheck(status="OK")
+
+
+if is_feature_enabled("TEAL_FEATURE_APP_INFO"):
+
+    @app.get(
+        "/app/info",
+        tags=["app"],
+        summary="Application information's",
+        response_model=AppInfo,
+    )
+    def get_health() -> AppInfo:
+        return get_app_info()
 
 
 def custom_openapi():
@@ -266,7 +285,7 @@ def custom_openapi():
             "description": "Convert LibreOffice documents to PDF.",
         },
         {
-            "name": "appinfo",
+            "name": "app",
             "description": "Application information.",
         },
     ]
@@ -295,6 +314,6 @@ if is_feature_enabled("TEAL_FEATURE_APP_METRICS"):
         excluded_handlers=["/app/*", "/docs/*", "/openapi.json"]
     )
     instrumentator.instrument(app).expose(
-        app, endpoint="/app/metrics", include_in_schema=True, tags=["appinfo"]
+        app, endpoint="/app/metrics", include_in_schema=True, tags=["app"]
     )
     instrumentator.add(metrics.requests())

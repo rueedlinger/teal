@@ -6,7 +6,7 @@ Here's a quick example of how easy it is to work with Teal directly with docker
 
 ```bash
 docker run --pull=always --rm -it -p 8000:8000 -e TEAL_WORKERS=1 \
-  --name teal ghcr.io/rueedlinger/teal:main
+  --name teal ghcr.io/rueedlinger/teal:latest
 ```
 
 or start Teal inside docker compose.
@@ -14,7 +14,7 @@ or start Teal inside docker compose.
 ```yaml
 services:
   teal:
-    image: ghcr.io/rueedlinger/teal:main
+    image: ghcr.io/rueedlinger/teal:latest
     ports:
       - 8000:8000 # Rest API port 
       - 8089:8089 # Locust web ui port
@@ -98,7 +98,7 @@ root:
 You can disable different features in Teal with the env `TEAL_FEATURE_<PATH>`. For example to disable the libreoffice
 endpoint path (`/libreoffice/convert`) you can set `TEAL_FEATURE_LIBREOFFICE_CONVERT=false`.
 
-Currently there are the following feature flags:
+Currently, there are the following feature flags:
 
 - TEAL_FEATURE_PDF_TEXT
 - TEAL_FEATURE_PDF_OCR
@@ -106,5 +106,20 @@ Currently there are the following feature flags:
 - TEAL_FEATURE_PDFA_CONVERT
 - TEAL_FEATURE_PDFA_VALIDATE
 - TEAL_FEATURE_LIBREOFFICE_CONVERT
-- TEAL_FEATURE_HEALTH
-- TEAL_FEATURE_METRICS
+- TEAL_FEATURE_APP_HEALTH
+- TEAL_FEATURE_APP_METRICS
+- TEAL_FEATURE_APP_INFO
+
+## Health & Monitoring
+
+Teal provides several key endpoints for monitoring and information purposes. Below is a summary of each
+endpoint:
+
+| Endpoint       | Description                                                                                                                                                        |
+|----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `/app/health`  | This endpoint returns the health status of the application. It can be used to verify that the application is running properly and is capable of handling requests. |
+| `/app/metrics` | This endpoint provides Prometheus metrics for the application. It can be used for gathering performance data and monitoring the application's usage statistics.    |
+| `/app/info`    | This endpoint returns general information about the application, such as version number, build details, and other relevant metadata.                               |
+
+These endpoints are essential for maintaining the operational integrity and performance of the application, allowing for
+effective monitoring and troubleshooting.
