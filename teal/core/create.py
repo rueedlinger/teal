@@ -65,7 +65,7 @@ class LibreOfficeAdapter:
             pdf_version = output_type.to_param()
 
         pages = parse_page_ranges(page_ranges)
-        _logger.info(f"using pdf version {pdf_version}")
+        _logger.debug(f"using pdf version {pdf_version}")
 
         # https://help.libreoffice.org/latest/en-US/text/shared/guide/pdf_params.html?&DbPAR=SHARED&System=UNIX
         if pages is None:
