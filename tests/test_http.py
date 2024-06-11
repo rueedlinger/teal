@@ -1,6 +1,9 @@
 import json
 
-from teal.http import create_json_err_response_from_exception, create_json_err_response
+from teal.core.http import (
+    create_json_err_response_from_exception,
+    create_json_err_response,
+)
 
 
 def test_exception_mapping():

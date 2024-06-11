@@ -1,7 +1,7 @@
 import logging
 from typing import Callable
 
-from fastapi import HTTPException, Request, Response
+from fastapi import Request, Response
 from fastapi.routing import APIRoute
 from starlette.background import BackgroundTask
 from starlette.responses import JSONResponse
@@ -22,11 +22,13 @@ class CheckUnknownQueryParamsRouter(APIRoute):
 
             if any(unknown_params):
                 _logger.debug(
-                    f"Unknown request parameters: {unknown_params}, supported parameters are {known_params}"
+                    f"Unknown request parameters: {sorted(unknown_params)}, "
+                    f"supported parameters are {sorted(known_params)}"
                 )
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Unknown request parameters: {unknown_params}, supported parameters are {known_params}",
+                return create_json_err_response(
+                    code=400,
+                    message=f"Unknown request parameters: {sorted(unknown_params)}, "
+                    f"supported parameters are {sorted(known_params)}",
                 )
 
             return await original_route_handler(request)

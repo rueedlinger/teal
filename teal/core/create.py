@@ -12,8 +12,8 @@ from teal.core import (
     parse_page_ranges,
     to_page_range,
 )
-from teal.http import create_json_err_response
-from teal.model import LibreOfficePdfProfile
+from teal.core.http import create_json_err_response
+from teal.model.create import OutputType
 
 _logger = logging.getLogger("teal.libreoffice")
 
@@ -21,143 +21,20 @@ _logger = logging.getLogger("teal.libreoffice")
 class LibreOfficeAdapter:
     def __init__(self, libreoffice_cmd="soffice"):
         self.libreoffice_cmd = libreoffice_cmd
-        # copied from gotenberg, not sure if all are supported
         self.supported_file_extensions = [
-            ".123",
-            ".602",
-            ".abw",
-            ".bib",
-            ".bmp",
-            ".cdr",
-            ".cgm",
-            ".cmx",
-            ".csv",
-            ".cwk",
-            ".dbf",
-            ".dif",
             ".doc",
-            ".docm",
             ".docx",
-            ".dot",
-            ".dotm",
-            ".dotx",
-            ".dxf",
-            ".emf",
-            ".eps",
-            ".epub",
-            ".fodg",
-            ".fodp",
-            ".fods",
-            ".fodt",
-            ".fopd",
-            ".gif",
-            ".htm",
-            ".html",
-            ".hwp",
-            ".jpeg",
-            ".jpg",
-            ".key",
-            ".ltx",
-            ".lwp",
-            ".mcw",
-            ".met",
-            ".mml",
-            ".mw",
-            ".numbers",
-            ".odd",
-            ".odg",
-            ".odm",
-            ".odp",
-            ".ods",
             ".odt",
-            ".otg",
-            ".oth",
-            ".otp",
-            ".ots",
-            ".ott",
-            ".pages",
-            ".pbm",
-            ".pcd",
-            ".pct",
-            ".pcx",
-            ".pdb",
-            ".pdf",
-            ".pgm",
-            ".png",
-            ".pot",
-            ".potm",
-            ".potx",
-            ".ppm",
-            ".pps",
-            ".ppt",
-            ".pptm",
-            ".pptx",
-            ".psd",
-            ".psw",
-            ".pub",
-            ".pwp",
-            ".pxl",
-            ".ras",
             ".rtf",
-            ".sda",
-            ".sdc",
-            ".sdd",
-            ".sdp",
-            ".sdw",
-            ".sgl",
-            ".slk",
-            ".smf",
-            ".stc",
-            ".std",
-            ".sti",
-            ".stw",
-            ".svg",
-            ".svm",
-            ".swf",
-            ".sxc",
-            ".sxd",
-            ".sxg",
-            ".sxi",
-            ".sxm",
-            ".sxw",
-            ".tga",
-            ".tif",
-            ".tiff",
             ".txt",
-            ".uof",
-            ".uop",
-            ".uos",
-            ".uot",
-            ".vdx",
-            ".vor",
-            ".vsd",
-            ".vsdm",
-            ".vsdx",
-            ".wb2",
-            ".wk1",
-            ".wks",
-            ".wmf",
-            ".wpd",
-            ".wpg",
-            ".wps",
-            ".xbm",
-            ".xhtml",
-            ".xls",
-            ".xlsb",
-            ".xlsm",
-            ".xlsx",
-            ".xlt",
-            ".xltm",
-            ".xltx",
-            ".xlw",
-            ".xml",
+            ".pdf",
         ]
 
-    def convert_to_pdf(
+    def create_pdf(
         self,
         data: bytes,
         filename: str,
-        pdf_profile: LibreOfficePdfProfile,
+        output_type: OutputType,
         page_ranges: str,
     ) -> FileResponse | JSONResponse:
 
@@ -181,11 +58,11 @@ class LibreOfficeAdapter:
 
         _logger.debug(f"expecting out pdf {tmp_file_in_path}")
 
-        if pdf_profile is None:
+        if output_type is None:
             # use default pdf version from libreoffice
             pdf_version = "0"
         else:
-            pdf_version = pdf_profile.to_libreoffice_pdf_version()
+            pdf_version = output_type.to_param()
 
         pages = parse_page_ranges(page_ranges)
         _logger.info(f"using pdf version {pdf_version}")
