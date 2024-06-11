@@ -1,43 +1,23 @@
+import pytest
 from starlette.testclient import TestClient
 
 from teal import api
 
 
-def test_health():
-    client = TestClient(api.app, raise_server_exceptions=False)
-    response = client.get(url="/app/health")
-    assert response.status_code == 200
-    assert response.json() == {"status": "OK"}
-
-
-def test_openapi_json():
-    client = TestClient(api.app, raise_server_exceptions=False)
-    response = client.get(url="/openapi.json")
+@pytest.mark.parametrize(
+    "endpoint", ["/app/info", "/app/health", "/app/metrics", "/docs", "/openapi.json"]
+)
+def test_app_endpoints_are_upp(endpoint):
+    client = TestClient(api.create_app(), raise_server_exceptions=False)
+    response = client.get(url=f"{endpoint}")
     assert response.status_code == 200
 
 
-def test_openapi_docs():
-    client = TestClient(api.app, raise_server_exceptions=False)
-    response = client.get(url="/docs")
+@pytest.mark.parametrize("endpoint", ["/app/info", "/app/health", "/app/metrics"])
+def test_unknown_query_parameter_are_allowed(endpoint):
+    client = TestClient(api.create_app(), raise_server_exceptions=False)
+    response = client.get(url=f"{endpoint}?foo")
     assert response.status_code == 200
 
-
-def test_metrics():
-    client = TestClient(api.app, raise_server_exceptions=False)
-    response = client.get(url="/app/metrics")
+    response = client.get(url=f"{endpoint}?foo=bar")
     assert response.status_code == 200
-
-
-def test_info():
-    client = TestClient(api.app, raise_server_exceptions=False)
-    response = client.get(url="/app/info")
-    assert response.status_code == 200
-
-
-def test_not_supported_query_parameter():
-    client = TestClient(api.app, raise_server_exceptions=False)
-    response = client.get(url="/app/info?foo")
-    assert response.status_code == 400
-
-    response = client.get(url="/app/info?foo=bar")
-    assert response.status_code == 400

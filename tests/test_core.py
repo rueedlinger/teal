@@ -41,6 +41,8 @@ def test_parse_page_ranges():
     assert core.parse_page_ranges(None) is None
     assert core.parse_page_ranges("") is None
     assert core.parse_page_ranges(" ") is None
+    assert core.parse_page_ranges("1,1,1") == [1]
+    assert core.parse_page_ranges("1,1-1,1") == [1]
     assert core.parse_page_ranges("1,2") == [1, 2]
     assert core.parse_page_ranges("1, 2 ") == [1, 2]
     assert core.parse_page_ranges("1,10") == [1, 10]
@@ -48,6 +50,7 @@ def test_parse_page_ranges():
     assert core.parse_page_ranges("1,2,4-7") == [1, 2, 4, 5, 6, 7]
     assert core.parse_page_ranges("1-2,4-7") == [1, 2, 4, 5, 6, 7]
     assert core.parse_page_ranges("1,4-7,1-5") == [1, 2, 3, 4, 5, 6, 7]
+    assert core.parse_page_ranges("1,4-7,1-5,9") == [1, 2, 3, 4, 5, 6, 7, 9]
     assert core.parse_page_ranges("8,1") == [1, 8]
     assert core.parse_page_ranges("9-1") is None
     assert core.parse_page_ranges("9-1,1-2") == [1, 2]
@@ -59,3 +62,10 @@ def test_to_page_range():
     assert core.to_page_range([1]) == "1"
     assert core.to_page_range([1, 2]) == "1,2"
     assert core.to_page_range([1, 2, 9]) == "1,2,9"
+
+
+def test_get_file_ext():
+    assert core.get_file_ext("file.txt") == ".txt"
+    assert core.get_file_ext("file.TXT") == ".txt"
+    assert core.get_file_ext("file.a") == ".a"
+    assert core.get_file_ext("file") == ""

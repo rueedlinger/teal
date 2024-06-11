@@ -7,41 +7,41 @@ class TealApiRequest(FastHttpUser):
 
     DOC_LOAD_TEST = "data/digital_pdf/loadtest.pdf"
 
-    @tag("libreoffice_convert")
+    @tag("create_pdf")
     @task
     def libreoffice_convert(self):
         with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
-            response = self.client.post("/libreoffice/convert", files={"file": f})
+            response = self.client.post("/create/pdf", files={"file": f})
 
-    @tag("pdfa_validate")
+    @tag("validate_pdfa")
     @task
     def pdfa_validate(self):
         with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
-            response = self.client.post("/pdfa/validate", files={"file": f})
+            response = self.client.post("/validate/pdfa", files={"file": f})
 
-    @tag("pdfa_convert")
+    @tag("ocr_pdf")
     @task
     def pdfa_convert(self):
         with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
-            response = self.client.post("/pdfa/convert", files={"file": f})
+            response = self.client.post("/ocr/pdf", files={"file": f})
 
-    @tag("pdf_text")
+    @tag("extract_text")
     @task
     def pdf_text(self):
         with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
-            response = self.client.post("/pdf/text", files={"file": f})
+            response = self.client.post("/extract/text", files={"file": f})
 
-    @tag("pdf_ocr")
+    @tag("extract_meta")
     @task
     def pdf_ocr(self):
         with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
-            response = self.client.post("/pdf/ocr", files={"file": f})
+            response = self.client.post("/extract/meta", files={"file": f})
 
-    @tag("pdf_table")
+    @tag("extract_table")
     @task
     def pdf_table(self):
         with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
-            response = self.client.post("/pdf/table", files={"file": f})
+            response = self.client.post("/extract/table", files={"file": f})
 
 
 def load_file(file):

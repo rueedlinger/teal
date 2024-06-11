@@ -2,21 +2,41 @@ import logging
 import os
 import re
 import shutil
-
-import PyPDF2
-import camelot
-import cv2
-import fastapi
-import pikepdf
-import pypdfium2
-import pytesseract
-
-from teal.model import AppInfo
+from typing import List
 
 _logger = logging.getLogger("teal.core")
 
 
-def is_feature_enabled(feature_flag) -> bool:
+def default_logging_conf():
+    return {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "simple": {
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                "datefmt": "%Y-%m-%d %H:%M:%S",
+            }
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "simple",
+                "stream": "ext://sys.stdout",
+            },
+        },
+        "loggers": {
+            "teal": {"level": "INFO", "handlers": ["console"], "propagate": False},
+            "uvicorn": {
+                "level": "INFO",
+                "handlers": ["console"],
+                "propagate": False,
+            },
+        },
+        "root": {"handlers": ["console"], "level": "WARN"},
+    }
+
+
+def is_feature_enabled(feature_flag: str) -> bool:
     if feature_flag not in os.environ:
         return True
 
@@ -28,6 +48,10 @@ def get_version() -> str:
     if "TEAL_VERSION" in os.environ and len(os.environ["TEAL_VERSION"]) > 1:
         return os.environ["TEAL_VERSION"]
     return "unknown"
+
+
+def get_file_ext(filename: str) -> str:
+    return os.path.splitext(filename)[1].lower()
 
 
 def cleanup_tmp_dir(tmp_dir: str):
@@ -61,53 +85,6 @@ def get_tesseract_languages() -> list[str]:
         return []
 
 
-def get_app_info() -> AppInfo:
-
-    details = {}
-    for k in os.environ.keys():
-        if k.startswith("TEAL_"):
-            details[k.lower().replace("teal_", "")] = os.environ[k]
-
-    details["tesseract_languages"] = get_tesseract_languages()
-
-    try:
-        details["pike_version"] = pikepdf.__version__
-    except Exception as e:
-        details["pike_version"] = str(e)
-
-    try:
-        details["pytesseract_version"] = pytesseract.__version__
-    except Exception as e:
-        details["pytesseract_version"] = str(e)
-
-    try:
-        details["pypdf2_version"] = PyPDF2.__version__
-    except Exception as e:
-        details["pypdf2_version"] = str(e)
-
-    try:
-        details["pypdfium2_version"] = pypdfium2.V_PYPDFIUM2
-    except Exception as e:
-        details["pypdfium2_version"] = str(e)
-
-    try:
-        details["camelot_version"] = camelot.__version__
-    except Exception as e:
-        details["camelot_version"] = str(e)
-
-    try:
-        details["fastapi_version"] = fastapi.__version__
-    except Exception as e:
-        details["fastapi_version"] = str(e)
-
-    try:
-        details["opencv_version"] = cv2.__version__
-    except Exception as e:
-        details["opencv_version"] = str(e)
-
-    return AppInfo.model_validate({"version": get_version(), "details": details})
-
-
 def make_tesseract_lang_param(langs: list[str] | None) -> str | None:
     if langs is None:
         return None
@@ -118,7 +95,7 @@ def make_tesseract_lang_param(langs: list[str] | None) -> str | None:
     return "+".join(langs)
 
 
-def parse_page_ranges(range_string):
+def parse_page_ranges(range_string: str) -> List[int] | None:
     if range_string is None:
         return None
 

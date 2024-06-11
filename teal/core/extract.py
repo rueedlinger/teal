@@ -14,9 +14,10 @@ from starlette.responses import JSONResponse
 from teal.core import (
     make_tesseract_lang_param,
     parse_page_ranges,
+    get_tesseract_languages,
 )
-from teal.http import create_json_err_response
-from teal.model import TextExtract, TableExtract, PdfMetaDataReport
+from teal.core.http import create_json_err_response
+from teal.model.extract import TextExtract, TableExtract, PdfMetaDataReport, ExtractMode
 
 _logger = logging.getLogger("teal.pdf")
 
@@ -24,6 +25,7 @@ _logger = logging.getLogger("teal.pdf")
 class PdfDataExtractor:
     def __init__(self):
         self.supported_file_extensions = [".pdf"]
+        self.supported_languages = get_tesseract_languages()
 
     def extract_text(
         self,
@@ -49,7 +51,9 @@ class PdfDataExtractor:
                 textpage = pdf[p].get_textpage()
                 text_all = textpage.get_text_bounded()
                 extracts.append(
-                    TextExtract.model_validate({"text": text_all, "page": page_no})
+                    TextExtract.model_validate(
+                        {"text": text_all, "page": page_no, "mode": ExtractMode.RAW}
+                    )
                 )
 
         return extracts
@@ -81,7 +85,9 @@ class PdfDataExtractor:
                     languages = "eng"
                 text = pytesseract.image_to_string(page, lang=languages)
                 extracts.append(
-                    TextExtract.model_validate({"text": text, "page": page_no})
+                    TextExtract.model_validate(
+                        {"text": text, "page": page_no, "mode": ExtractMode.OCR}
+                    )
                 )
         return extracts
 
