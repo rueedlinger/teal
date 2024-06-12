@@ -77,7 +77,6 @@ class PdfAValidator:
                     content=jsonable_encoder(PdfAReport.model_validate(out)),
                     background=BackgroundTask(cleanup_tmp_dir, tmp_dir),
                 )
-                # return report['report']['jobs'][0]['validationResult']
         else:
             _logger.debug(f"cmd was not successful {result}")
             return create_json_err_response(
