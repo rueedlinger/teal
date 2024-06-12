@@ -10,6 +10,7 @@ from starlette.responses import JSONResponse
 
 from teal.core import (
     cleanup_tmp_dir,
+    get_file_ext,
 )
 from teal.core.cmd import AsyncSubprocess
 from teal.core.http import create_json_err_response, create_json_response
@@ -26,7 +27,7 @@ class PdfAValidator:
     async def validate_pdf(
         self, data: bytes, filename: str, profile: ValidatePdfProfile
     ) -> JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."

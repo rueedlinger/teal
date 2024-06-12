@@ -1,7 +1,6 @@
 import io
 import json
 import logging
-import os
 
 import aiofiles
 import camelot.io as camelot
@@ -15,6 +14,7 @@ from teal.core import (
     make_tesseract_lang_param,
     parse_page_ranges,
     get_tesseract_languages,
+    get_file_ext,
 )
 from teal.core.http import create_json_err_response
 from teal.model.extract import TextExtract, TableExtract, PdfMetaDataReport, ExtractMode
@@ -33,7 +33,7 @@ class PdfDataExtractor:
         filename: str,
         page_ranges: str,
     ) -> list[TextExtract] | JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."
@@ -65,7 +65,7 @@ class PdfDataExtractor:
         langs: list[str],
         page_ranges: str,
     ) -> list[TextExtract] | JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."
@@ -97,7 +97,7 @@ class PdfDataExtractor:
         filename: str,
         page_ranges: str,
     ) -> list[TableExtract] | JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."
@@ -145,7 +145,7 @@ class PdfMetaDataExtractor:
         data: bytes,
         filename: str,
     ) -> PdfMetaDataReport | JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."
