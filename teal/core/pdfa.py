@@ -55,16 +55,6 @@ class PdfAValidator:
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         proc = AsyncSubprocess(cmd_convert_pdf, tmp_dir)
         result = await proc.run()
-        """
-        result = subprocess.run(
-            cmd_convert_pdf,
-            shell=True,
-            capture_output=True,
-            text=True,
-            env={"HOME": "/tmp"},
-        )
-        """
-        _logger.debug(f"got result {result}")
 
         if result.returncode == 0 or result.returncode == 1:
 

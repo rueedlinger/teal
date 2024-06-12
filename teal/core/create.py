@@ -89,15 +89,6 @@ class LibreOfficeAdapter:
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
 
         proc = AsyncSubprocess(cmd_convert_pdf, tmp_dir)
-        """
-        result = subprocess.run(
-            cmd_convert_pdf,
-            shell=True,
-            capture_output=True,
-            text=True,
-            env={"HOME": tmp_dir},
-        )
-        """
         result = await proc.run()
 
         converted_file_out = os.path.join(tmp_dir, "out", "tmp.pdf")
