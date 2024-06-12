@@ -29,6 +29,6 @@ if is_feature_enabled("TEAL_FEATURE_VALIDATE_PDFA"):
             f"extract table from pdf file='{file.filename}', profile='{profile}'"
         )
         pdf = PdfAValidator()
-        return pdf.validate_pdf(
+        return await pdf.validate_pdf(
             data=await file.read(), filename=file.filename, profile=profile
         )

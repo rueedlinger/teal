@@ -33,7 +33,7 @@ if is_feature_enabled("TEAL_FEATURE_CREATE_PDFA"):
             f"extract table from pdf file='{file.filename}', languages='{languages}, output='{output}', ocr={ocr}, pages='{pages}'"
         )
         pdf = PdfOcrAdapter()
-        return pdf.create_pdf(
+        return await pdf.create_pdf(
             data=await file.read(),
             filename=file.filename,
             langs=languages,

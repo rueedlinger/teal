@@ -32,7 +32,7 @@ if is_feature_enabled("TEAL_FEATURE_CREATE_PDF"):
         )
 
         libreoffice = LibreOfficeAdapter()
-        return libreoffice.create_pdf(
+        return await libreoffice.create_pdf(
             data=await file.read(),
             filename=file.filename,
             output_type=output,

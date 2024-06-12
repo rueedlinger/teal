@@ -1,6 +1,5 @@
 import logging
 import os
-import subprocess
 import tempfile
 
 import pikepdf
@@ -12,6 +11,7 @@ from teal.core import (
     parse_page_ranges,
     to_page_range,
 )
+from teal.core.cmd import AsyncSubprocess
 from teal.core.http import create_json_err_response
 from teal.model.create import OutputType
 
@@ -30,7 +30,7 @@ class LibreOfficeAdapter:
             ".pdf",
         ]
 
-    def create_pdf(
+    async def create_pdf(
         self,
         data: bytes,
         filename: str,
@@ -86,6 +86,9 @@ class LibreOfficeAdapter:
         cmd_convert_pdf = f'{self.libreoffice_cmd} --headless --convert-to \'{pdf_param}\' --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
 
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
+
+        proc = AsyncSubprocess(cmd_convert_pdf, tmp_dir)
+        """
         result = subprocess.run(
             cmd_convert_pdf,
             shell=True,
@@ -93,6 +96,8 @@ class LibreOfficeAdapter:
             text=True,
             env={"HOME": tmp_dir},
         )
+        """
+        result = await proc.run()
 
         converted_file_out = os.path.join(tmp_dir, "out", "tmp.pdf")
 
