@@ -20,7 +20,7 @@ from teal.core import (
 from teal.core.http import create_json_err_response
 from teal.model.extract import TextExtract, TableExtract, PdfMetaDataReport, ExtractMode
 
-_logger = logging.getLogger("teal.pdf")
+_logger = logging.getLogger("teal.extract")
 
 
 class PdfDataExtractor:

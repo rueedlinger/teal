@@ -60,14 +60,12 @@ class PdfAValidator:
         if result.returncode == 0 or result.returncode == 1:
 
             async with aiofiles.open(tmp_file_out_path) as tmp_json:
-                out = {
-                    "profile": "NONE",
-                    "statement": f"non of the profiles matched {[e.value for e in ValidatePdfProfile]}",
-                    "compliant": False,
-                }
-
                 if profile is None and result.returncode == 1:
-                    pass
+                    out = {
+                        "profile": "NONE",
+                        "statement": f"non of the profiles matched {[e.value for e in ValidatePdfProfile]}",
+                        "compliant": False,
+                    }
                 else:
                     report = json.loads(await tmp_json.read())
                     out = report["report"]["jobs"][0]["validationResult"]

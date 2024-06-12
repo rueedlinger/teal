@@ -17,7 +17,7 @@ from teal.core.cmd import AsyncSubprocess
 from teal.core.http import create_json_err_response
 from teal.model.create import OutputType
 
-_logger = logging.getLogger("teal.libreoffice")
+_logger = logging.getLogger("teal.create")
 
 
 class LibreOfficeAdapter:
