@@ -4,17 +4,18 @@ import logging
 import os
 
 import aiofiles
+import aiopytesseract
 import camelot.io as camelot
 import pikepdf
 import pypdfium2 as pdfium
-import pytesseract
-from pdf2image import convert_from_bytes
+from pdf2image import convert_from_path
 from starlette.responses import JSONResponse
 
 from teal.core import (
     make_tesseract_lang_param,
     parse_page_ranges,
     get_tesseract_languages,
+    get_file_ext,
 )
 from teal.core.http import create_json_err_response
 from teal.model.extract import TextExtract, TableExtract, PdfMetaDataReport, ExtractMode
@@ -33,7 +34,7 @@ class PdfDataExtractor:
         filename: str,
         page_ranges: str,
     ) -> list[TextExtract] | JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."
@@ -65,30 +66,42 @@ class PdfDataExtractor:
         langs: list[str],
         page_ranges: str,
     ) -> list[TextExtract] | JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."
             )
 
         extracts = []
-        images = convert_from_bytes(data)
-        _logger.debug(f"made {len(images)} images with pdf2images")
+        async with aiofiles.tempfile.TemporaryDirectory() as tmp_dir:
+            async with aiofiles.open(
+                os.path.join(tmp_dir, "in.pdf"), mode="wb"
+            ) as tmp_file:
+                await tmp_file.write(data)
+                await tmp_file.flush()
 
-        pages = parse_page_ranges(page_ranges)
-
-        for i, page in enumerate(images):
-            page_no = i + 1
-            if pages is None or page_no in pages:
-                languages = make_tesseract_lang_param(langs)
-                if languages is None:
-                    languages = "eng"
-                text = pytesseract.image_to_string(page, lang=languages)
-                extracts.append(
-                    TextExtract.model_validate(
-                        {"text": text, "page": page_no, "mode": ExtractMode.OCR}
-                    )
+                _logger.debug(f"in file: {tmp_file.name}, tmp_dir: {tmp_dir}")
+                images = convert_from_path(
+                    tmp_file.name, output_folder=tmp_dir, paths_only=True
                 )
+
+                _logger.debug(f"made {len(images)} images with pdf2images")
+                pages = parse_page_ranges(page_ranges)
+
+                for i, page in enumerate(images):
+                    page_no = i + 1
+                    if pages is None or page_no in pages:
+                        languages = make_tesseract_lang_param(langs)
+                        if languages is None:
+                            languages = "eng"
+                        text = await aiopytesseract.image_to_string(
+                            page, lang=languages
+                        )
+                        extracts.append(
+                            TextExtract.model_validate(
+                                {"text": text, "page": page_no, "mode": ExtractMode.OCR}
+                            )
+                        )
         return extracts
 
     async def extract_table(
@@ -97,7 +110,7 @@ class PdfDataExtractor:
         filename: str,
         page_ranges: str,
     ) -> list[TableExtract] | JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."
@@ -145,21 +158,20 @@ class PdfMetaDataExtractor:
         data: bytes,
         filename: str,
     ) -> PdfMetaDataReport | JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."
             )
         meta_data = {}
-        pdf = pikepdf.open(io.BytesIO(data))
-        meta = pdf.open_metadata()
-        for m in meta:
-            meta_data[m] = meta.get(m)
-
         doc_info = {}
-        for key, value in pdf.docinfo.items():
-            doc_info[key] = str(value)
-        pdf.close()
+        with pikepdf.open(io.BytesIO(data)) as pdf:
+            with pdf.open_metadata() as meta:
+                for m in meta:
+                    meta_data[m] = meta.get(m)
+
+                for key, value in pdf.docinfo.items():
+                    doc_info[key] = str(value)
         return PdfMetaDataReport.model_validate(
             {
                 "fileName": filename,

@@ -65,6 +65,8 @@ def test_to_page_range():
 
 
 def test_get_file_ext():
+    assert core.get_file_ext("/foo/file.txt") == ".txt"
+    assert core.get_file_ext("foo/file.txt") == ".txt"
     assert core.get_file_ext("file.txt") == ".txt"
     assert core.get_file_ext("file.TXT") == ".txt"
     assert core.get_file_ext("file.a") == ".a"

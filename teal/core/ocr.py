@@ -13,6 +13,7 @@ from teal.core import (
     make_tesseract_lang_param,
     parse_page_ranges,
     get_tesseract_languages,
+    get_file_ext,
 )
 from teal.core.cmd import AsyncSubprocess
 from teal.core.http import create_json_err_response
@@ -36,7 +37,7 @@ class PdfOcrAdapter:
         ocr_mode: OcrMode,
         page_ranges: str,
     ) -> FileResponse | JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."
@@ -82,15 +83,6 @@ class PdfOcrAdapter:
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         proc = AsyncSubprocess(cmd_convert_pdf, tmp_dir)
         result = await proc.run()
-        """
-        result = subprocess.run(
-            cmd_convert_pdf,
-            shell=True,
-            capture_output=True,
-            text=True,
-            env={"HOME": tmp_dir},
-        )
-        """
 
         if result.returncode == 0:
             if os.path.exists(tmp_file_out_path):

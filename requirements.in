@@ -7,7 +7,7 @@ aiofiles
 pyyaml
 pypdfium2
 pytesseract
-#aiopytesseract
+aiopytesseract
 pdf2image
 camelot-py
 # needed by camelot-py

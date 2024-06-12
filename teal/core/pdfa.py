@@ -10,6 +10,7 @@ from starlette.responses import JSONResponse
 
 from teal.core import (
     cleanup_tmp_dir,
+    get_file_ext,
 )
 from teal.core.cmd import AsyncSubprocess
 from teal.core.http import create_json_err_response, create_json_response
@@ -26,7 +27,7 @@ class PdfAValidator:
     async def validate_pdf(
         self, data: bytes, filename: str, profile: ValidatePdfProfile
     ) -> JSONResponse:
-        file_ext = os.path.splitext(filename)[1]
+        file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
                 400, f"file extension '{file_ext}' is not supported ({filename})."
@@ -55,16 +56,6 @@ class PdfAValidator:
         _logger.debug(f"running cmd: {cmd_convert_pdf}")
         proc = AsyncSubprocess(cmd_convert_pdf, tmp_dir)
         result = await proc.run()
-        """
-        result = subprocess.run(
-            cmd_convert_pdf,
-            shell=True,
-            capture_output=True,
-            text=True,
-            env={"HOME": "/tmp"},
-        )
-        """
-        _logger.debug(f"got result {result}")
 
         if result.returncode == 0 or result.returncode == 1:
 
@@ -87,7 +78,6 @@ class PdfAValidator:
                     content=jsonable_encoder(PdfAReport.model_validate(out)),
                     background=BackgroundTask(cleanup_tmp_dir, tmp_dir),
                 )
-                # return report['report']['jobs'][0]['validationResult']
         else:
             _logger.debug(f"cmd was not successful {result}")
             return create_json_err_response(
