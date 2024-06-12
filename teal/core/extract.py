@@ -2,8 +2,8 @@ import io
 import json
 import logging
 import os
-import tempfile
 
+import aiofiles
 import camelot.io as camelot
 import pikepdf
 import pypdfium2 as pdfium
@@ -27,7 +27,7 @@ class PdfDataExtractor:
         self.supported_file_extensions = [".pdf"]
         self.supported_languages = get_tesseract_languages()
 
-    def extract_text(
+    async def extract_text(
         self,
         data: bytes,
         filename: str,
@@ -58,7 +58,7 @@ class PdfDataExtractor:
 
         return extracts
 
-    def extract_text_with_ocr(
+    async def extract_text_with_ocr(
         self,
         data: bytes,
         filename: str,
@@ -91,7 +91,7 @@ class PdfDataExtractor:
                 )
         return extracts
 
-    def extract_table(
+    async def extract_table(
         self,
         data: bytes,
         filename: str,
@@ -103,8 +103,8 @@ class PdfDataExtractor:
                 400, f"file extension '{file_ext}' is not supported ({filename})."
             )
 
-        with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
-            tmp_pdf_file.write(data)
+        async with aiofiles.tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
+            await tmp_pdf_file.write(data)
             tables = camelot.read_pdf(tmp_pdf_file.name, pages="all")
             _logger.debug(f"found {len(tables)} tables with camelot")
             extracts = []
@@ -112,24 +112,26 @@ class PdfDataExtractor:
             pages = parse_page_ranges(page_ranges)
 
             for p in range(len(tables)):
-                with tempfile.NamedTemporaryFile(suffix=".json") as tmp_json_file:
+                async with aiofiles.tempfile.NamedTemporaryFile(
+                    suffix=".json"
+                ) as tmp_json_file:
                     tables[p].to_json(tmp_json_file.name)
                     report = tables[p].parsing_report
                     page_no = report["page"]
                     if pages is None or page_no in pages:
                         _logger.debug(f"parsing tables report {report}")
-                        f = open(tmp_json_file.name)
-                        table_json = json.load(f)
-                        extracts.append(
-                            TableExtract.model_validate(
-                                {
-                                    "page": page_no,
-                                    "index": report["order"] - 1,
-                                    "table": table_json,
-                                }
+                        async with aiofiles.open(tmp_json_file.name) as f:
+                            content = await f.read()
+                            table_json = json.loads(content)
+                            extracts.append(
+                                TableExtract.model_validate(
+                                    {
+                                        "page": page_no,
+                                        "index": report["order"] - 1,
+                                        "table": table_json,
+                                    }
+                                )
                             )
-                        )
-                        f.close()
 
         return extracts
 
@@ -138,7 +140,7 @@ class PdfMetaDataExtractor:
     def __init__(self):
         self.supported_file_extensions = [".pdf"]
 
-    def extract_meta_data(
+    async def extract_meta_data(
         self,
         data: bytes,
         filename: str,

@@ -3,9 +3,11 @@ prometheus-fastapi-instrumentator
 python-multipart
 uvicorn
 gunicorn
+aiofiles
 pyyaml
 pypdfium2
 pytesseract
+#aiopytesseract
 pdf2image
 camelot-py
 # needed by camelot-py

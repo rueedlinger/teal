@@ -32,14 +32,14 @@ if is_feature_enabled("TEAL_FEATURE_EXTRACT_TEXT"):
         )
         pdf = PdfDataExtractor()
         if mode == ExtractMode.OCR:
-            return pdf.extract_text_with_ocr(
+            return await pdf.extract_text_with_ocr(
                 data=await file.read(),
                 filename=file.filename,
                 langs=languages,
                 page_ranges=pages,
             )
         else:
-            return pdf.extract_text(
+            return await pdf.extract_text(
                 data=await file.read(), filename=file.filename, page_ranges=pages
             )
 
@@ -58,7 +58,7 @@ if is_feature_enabled("TEAL_FEATURE_EXTRACT_TABLE"):
     ) -> Any:
         _logger.debug(f"extract table from pdf file='{file.filename}', pages='{pages}'")
         pdf = PdfDataExtractor()
-        return pdf.extract_table(
+        return await pdf.extract_table(
             data=await file.read(), filename=file.filename, page_ranges=pages
         )
 
@@ -76,4 +76,6 @@ if is_feature_enabled("TEAL_FEATURE_EXTRACT_META"):
     ) -> Any:
         _logger.debug(f"extract meta data from pdf file='{file.filename}'")
         pdf = PdfMetaDataExtractor()
-        return pdf.extract_meta_data(data=await file.read(), filename=file.filename)
+        return await pdf.extract_meta_data(
+            data=await file.read(), filename=file.filename
+        )
