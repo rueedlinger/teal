@@ -151,15 +151,14 @@ class PdfMetaDataExtractor:
                 400, f"file extension '{file_ext}' is not supported ({filename})."
             )
         meta_data = {}
-        pdf = pikepdf.open(io.BytesIO(data))
-        meta = pdf.open_metadata()
-        for m in meta:
-            meta_data[m] = meta.get(m)
-
         doc_info = {}
-        for key, value in pdf.docinfo.items():
-            doc_info[key] = str(value)
-        pdf.close()
+        with pikepdf.open(io.BytesIO(data)) as pdf:
+            with pdf.open_metadata() as meta:
+                for m in meta:
+                    meta_data[m] = meta.get(m)
+
+                for key, value in pdf.docinfo.items():
+                    doc_info[key] = str(value)
         return PdfMetaDataReport.model_validate(
             {
                 "fileName": filename,
