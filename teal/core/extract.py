@@ -1,13 +1,14 @@
 import io
 import json
 import logging
+import os
 
 import aiofiles
+import aiopytesseract
 import camelot.io as camelot
 import pikepdf
 import pypdfium2 as pdfium
-import pytesseract
-from pdf2image import convert_from_bytes
+from pdf2image import convert_from_path
 from starlette.responses import JSONResponse
 
 from teal.core import (
@@ -72,23 +73,35 @@ class PdfDataExtractor:
             )
 
         extracts = []
-        images = convert_from_bytes(data)
-        _logger.debug(f"made {len(images)} images with pdf2images")
+        async with aiofiles.tempfile.TemporaryDirectory() as tmp_dir:
+            async with aiofiles.open(
+                os.path.join(tmp_dir, "in.pdf"), mode="wb"
+            ) as tmp_file:
+                await tmp_file.write(data)
+                await tmp_file.flush()
 
-        pages = parse_page_ranges(page_ranges)
-
-        for i, page in enumerate(images):
-            page_no = i + 1
-            if pages is None or page_no in pages:
-                languages = make_tesseract_lang_param(langs)
-                if languages is None:
-                    languages = "eng"
-                text = pytesseract.image_to_string(page, lang=languages)
-                extracts.append(
-                    TextExtract.model_validate(
-                        {"text": text, "page": page_no, "mode": ExtractMode.OCR}
-                    )
+                _logger.debug(f"in file: {tmp_file.name}, tmp_dir: {tmp_dir}")
+                images = convert_from_path(
+                    tmp_file.name, output_folder=tmp_dir, paths_only=True
                 )
+
+                _logger.debug(f"made {len(images)} images with pdf2images")
+                pages = parse_page_ranges(page_ranges)
+
+                for i, page in enumerate(images):
+                    page_no = i + 1
+                    if pages is None or page_no in pages:
+                        languages = make_tesseract_lang_param(langs)
+                        if languages is None:
+                            languages = "eng"
+                        text = await aiopytesseract.image_to_string(
+                            page, lang=languages
+                        )
+                        extracts.append(
+                            TextExtract.model_validate(
+                                {"text": text, "page": page_no, "mode": ExtractMode.OCR}
+                            )
+                        )
         return extracts
 
     async def extract_table(

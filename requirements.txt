@@ -5,6 +5,10 @@
 #    pip-compile --output-file=requirements.txt
 #
 aiofiles==23.2.1
+    # via
+    #   -r requirements.in
+    #   aiopytesseract
+aiopytesseract==0.14.0
     # via -r requirements.in
 annotated-types==0.7.0
     # via pydantic
@@ -13,6 +17,10 @@ anyio==4.4.0
     #   httpx
     #   starlette
     #   watchfiles
+attrs==23.2.0
+    # via
+    #   aiopytesseract
+    #   cattrs
 black==24.4.2
     # via -r requirements.in
 blinker==1.8.2
@@ -21,6 +29,8 @@ brotli==1.1.0
     # via geventhttpclient
 camelot-py==0.11.0
     # via -r requirements.in
+cattrs==23.2.3
+    # via aiopytesseract
 certifi==2024.2.2
     # via
     #   geventhttpclient
