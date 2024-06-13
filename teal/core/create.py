@@ -99,10 +99,7 @@ class LibreOfficeAdapter:
                 # workaround: fix metadata PDF/A-1b error in libreoffice
                 # edit metadata (this will fix xmp/docinfo metadata creation time difference bug)
                 fixed_file = os.path.join(tmp_dir, "out", "fixed.pdf")
-                with pikepdf.open(converted_file_out) as pdf:
-                    with pdf.open_metadata() as meta:
-                        meta["xmp:CreatorTool"] = "LibreOffice"
-                    pdf.save(fixed_file)
+                await self._modify_pdf_metadata(converted_file_out, fixed_file)
 
                 return FileResponse(
                     fixed_file,
@@ -125,3 +122,10 @@ class LibreOfficeAdapter:
                 f"got return code {result.returncode} '{filename}' {result.stderr}",
                 background=BackgroundTask(cleanup_tmp_dir, tmp_dir),
             )
+
+    @staticmethod
+    async def _modify_pdf_metadata(converted_file_out, fixed_file):
+        with pikepdf.open(converted_file_out) as pdf:
+            with pdf.open_metadata() as meta:
+                meta["xmp:CreatorTool"] = "LibreOffice"
+            pdf.save(fixed_file)
