@@ -75,7 +75,7 @@ def test_extract_text_with_wrong_file_ending():
         response = client.post(url="/extract/text", files={"file": f})
         assert response.status_code == 400
         assert response.json() == {
-            "message": f"file extension '.docx' is not supported (word_document.docx)."
+            "message": f"file extension '.docx' is not supported, supported extensions are ['.pdf']."
         }
 
 

@@ -1,4 +1,3 @@
-import os
 import tempfile
 
 import pytest
@@ -98,9 +97,7 @@ def test_create_pdf_wrong_file_type():
         response = client.post(url="/create/pdf", files={"file": tmp})
         assert response.status_code == 400
         assert response.json() == {
-            "message": "file extension '.xyz' is not supported ("
-            + os.path.basename(tmp.name)
-            + ")."
+            "message": "file extension '.xyz' is not supported, supported extensions are ['.doc', '.docx', '.odt', '.ott', '.pdf', '.rtf', '.text', '.txt']."
         }
 
 

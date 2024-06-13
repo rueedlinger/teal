@@ -44,7 +44,9 @@ class PdfDataExtractor:
         file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
-                400, f"file extension '{file_ext}' is not supported ({filename})."
+                400,
+                f"file extension '{file_ext}' is not supported, supported "
+                f"extensions are {sorted(self.supported_file_extensions)}.",
             )
 
         extracts = []
@@ -76,7 +78,9 @@ class PdfDataExtractor:
         file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
-                400, f"file extension '{file_ext}' is not supported ({filename})."
+                400,
+                f"file extension '{file_ext}' is not supported, supported "
+                f"extensions are {sorted(self.supported_file_extensions)}.",
             )
 
         extracts = []
@@ -125,7 +129,9 @@ class PdfDataExtractor:
         file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
-                400, f"file extension '{file_ext}' is not supported ({filename})."
+                400,
+                f"file extension '{file_ext}' is not supported, supported "
+                f"extensions are {sorted(self.supported_file_extensions)}.",
             )
 
         async with aiofiles.tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
@@ -193,7 +199,9 @@ class PdfMetaDataExtractor:
         file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
-                400, f"file extension '{file_ext}' is not supported ({filename})."
+                400,
+                f"file extension '{file_ext}' is not supported, supported "
+                f"extensions are {sorted(self.supported_file_extensions)}.",
             )
         meta_data = {}
         doc_info = {}
