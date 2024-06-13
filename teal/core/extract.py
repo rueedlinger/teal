@@ -121,7 +121,6 @@ class PdfDataExtractor:
             pages = parse_page_ranges(page_ranges)
             # mode lattice' or 'stream
             tables = await self._extract_tables(tmp_pdf_file, pages)
-            # tables = camelot.read_pdf(tmp_pdf_file.name, pages="all")
             _logger.debug(f"found {len(tables)} tables with camelot")
             extracts = []
 
