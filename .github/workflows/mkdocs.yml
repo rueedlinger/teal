@@ -2,8 +2,10 @@ name: mkdocs
 on:
   push:
     branches:
-      - master
       - main
+    paths:
+      - 'mkdocs.yml'
+      - 'docs/**'
 permissions:
   contents: write
 jobs:
