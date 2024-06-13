@@ -13,7 +13,7 @@ logger = logging.getLogger("teal.routers.validate")
 
 router.route_class = CheckUnknownQueryParamsRouter
 
-if is_feature_enabled("TEAL_FEATURE_VALIDATE_PDFA"):
+if is_feature_enabled("TEAL_ROUTE_VALIDATE_PDFA"):
     logger.info("feature PDF/A validate is enabled")
 
     @router.post(

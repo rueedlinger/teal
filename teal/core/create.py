@@ -12,23 +12,35 @@ from teal.core import (
     parse_page_ranges,
     to_page_range,
     get_file_ext,
+    is_feature_enabled,
 )
 from teal.core.cmd import AsyncSubprocess
 from teal.core.http import create_json_err_response
 from teal.model.create import OutputType
 
-_logger = logging.getLogger("teal.libreoffice")
+_logger = logging.getLogger("teal.create")
 
 
 class LibreOfficeAdapter:
     def __init__(self, libreoffice_cmd="soffice"):
         self.libreoffice_cmd = libreoffice_cmd
+        # at the moment restricted to these file endings
         self.supported_file_extensions = [
-            ".doc",
-            ".docx",
+            # OpenDocument Text
             ".odt",
+            # OpenDocument Text Template
+            ".ott",
+            # Rich Text Format
             ".rtf",
+            # Microsoft Word
+            ".doc",
+            # Microsoft Word XML
+            ".docx",
+            # Plain Text
             ".txt",
+            # Plain Text
+            ".text",
+            # PDF
             ".pdf",
         ]
 
@@ -41,10 +53,13 @@ class LibreOfficeAdapter:
     ) -> FileResponse | JSONResponse:
 
         file_ext = get_file_ext(filename)
-        if file_ext not in self.supported_file_extensions:
-            return create_json_err_response(
-                400, f"file extension '{file_ext}' is not supported ({filename})."
-            )
+        if is_feature_enabled("TEAL_FEATURE_CREATE_PDF_CHECK_FILE_EXTENSION"):
+            if file_ext not in self.supported_file_extensions:
+                return create_json_err_response(
+                    400,
+                    f"file extension '{file_ext}' is not supported, supported "
+                    f"extensions are {sorted(self.supported_file_extensions)}.",
+                )
 
         # create tmp dir for all files
         tmp_dir = tempfile.mktemp(prefix="teal-")
@@ -67,18 +82,19 @@ class LibreOfficeAdapter:
             pdf_version = output_type.to_param()
 
         pages = parse_page_ranges(page_ranges)
-        _logger.debug(f"using pdf version {pdf_version}")
 
         # https://help.libreoffice.org/latest/en-US/text/shared/guide/pdf_params.html?&DbPAR=SHARED&System=UNIX
+        # https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html?DbPAR=SHARED#bm_id541554406270299
+        # https://vmiklos.hu/blog/pdf-convert-to.html
         if pages is None:
             pdf_param = (
-                'pdf:draw_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"'
+                'pdf:writer_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"'
                 + pdf_version
                 + '"}}'
             )
         else:
             pdf_param = (
-                'pdf:draw_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"'
+                'pdf:writer_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"'
                 + pdf_version
                 + '"},"PageRange":{"type":"string","value":"'
                 + to_page_range(pages)
@@ -99,10 +115,7 @@ class LibreOfficeAdapter:
                 # workaround: fix metadata PDF/A-1b error in libreoffice
                 # edit metadata (this will fix xmp/docinfo metadata creation time difference bug)
                 fixed_file = os.path.join(tmp_dir, "out", "fixed.pdf")
-                with pikepdf.open(converted_file_out) as pdf:
-                    with pdf.open_metadata() as meta:
-                        meta["xmp:CreatorTool"] = "LibreOffice"
-                    pdf.save(fixed_file)
+                await self._modify_pdf_metadata(converted_file_out, fixed_file)
 
                 return FileResponse(
                     fixed_file,
@@ -125,3 +138,10 @@ class LibreOfficeAdapter:
                 f"got return code {result.returncode} '{filename}' {result.stderr}",
                 background=BackgroundTask(cleanup_tmp_dir, tmp_dir),
             )
+
+    @staticmethod
+    async def _modify_pdf_metadata(converted_file_out, fixed_file):
+        with pikepdf.open(converted_file_out) as pdf:
+            with pdf.open_metadata() as meta:
+                meta["xmp:CreatorTool"] = "LibreOffice"
+            pdf.save(fixed_file)

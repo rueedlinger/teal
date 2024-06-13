@@ -99,8 +99,14 @@ export TEAL_JAVA_VERSION
 TEAL_ARCH_NAME=$(uname -m | head -n 1)
 export TEAL_ARCH_NAME
 
+TEAL_LINUX_VERSION=$(uname -r | head -n 1)
+export TEAL_LINUX_VERSION
+
 TEAL_ARCH_NPROC=$(nproc)
 export TEAL_ARCH_NPROC
+
+TEAL_DEBIAN_VERSION=$(cat /etc/debian_version | head -n 1)
+export TEAL_DEBIAN_VERSION
 
 echo "see API doc http://$TEAL_IP_BIND:$TEAL_PORT/docs"
 gunicorn teal.api:app --workers "$TEAL_WORKERS" \

@@ -2,8 +2,22 @@ name: pytest with docker
 on:
   push:
     branches: [ "feat/**", "fix/**" ]
+    paths:
+      - 'teal/**'
+      - 'tests/**'
+      - 'dist/**'
+      - 'requirements.txt'
+      - 'Dockerfile'
+      - 'docker-compose.yaml'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'teal/**'
+      - 'tests/**'
+      - 'dist/**'
+      - 'requirements.txt'
+      - 'Dockerfile'
+      - 'docker-compose.yaml'
 jobs:
   test:
     runs-on: ubuntu-latest

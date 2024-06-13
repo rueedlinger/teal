@@ -6,14 +6,20 @@ from fastapi import APIRouter, UploadFile, Query
 from teal import CheckUnknownQueryParamsRouter
 from teal.core import is_feature_enabled
 from teal.core.extract import PdfDataExtractor, PdfMetaDataExtractor
-from teal.model.extract import TextExtract, ExtractMode, TableExtract, PdfMetaDataReport
+from teal.model.extract import (
+    TextExtract,
+    TextExtractMode,
+    TableExtract,
+    PdfMetaDataReport,
+    TableExtractMode,
+)
 
 _logger = logging.getLogger("teal.routers.extract")
 router = APIRouter(prefix="/extract", tags=["extract"])
 
 router.route_class = CheckUnknownQueryParamsRouter
 
-if is_feature_enabled("TEAL_FEATURE_EXTRACT_TEXT"):
+if is_feature_enabled("TEAL_ROUTE_EXTRACT_TEXT"):
     _logger.info("feature PDF text is enabled")
 
     @router.post(
@@ -24,14 +30,14 @@ if is_feature_enabled("TEAL_FEATURE_EXTRACT_TEXT"):
     async def extract_text_from_pdf(
         file: UploadFile,
         pages: str = Query(default=None),
-        mode: ExtractMode = Query(default=None),
+        mode: TextExtractMode = Query(default=None),
         languages: List[str] = Query([]),
     ) -> Any:
         _logger.debug(
             f"extract text from pdf file='{file.filename}', mode='{mode}',languages='{languages}',  pages='{pages}'"
         )
         pdf = PdfDataExtractor()
-        if mode == ExtractMode.OCR:
+        if mode == TextExtractMode.OCR:
             return await pdf.extract_text_with_ocr(
                 data=await file.read(),
                 filename=file.filename,
@@ -44,7 +50,7 @@ if is_feature_enabled("TEAL_FEATURE_EXTRACT_TEXT"):
             )
 
 
-if is_feature_enabled("TEAL_FEATURE_EXTRACT_TABLE"):
+if is_feature_enabled("TEAL_ROUTE_EXTRACT_TABLE"):
     _logger.info("feature PDF table is enabled")
 
     @router.post(
@@ -54,16 +60,19 @@ if is_feature_enabled("TEAL_FEATURE_EXTRACT_TABLE"):
     )
     async def extract_table_from_pdf(
         file: UploadFile,
+        mode: TableExtractMode = Query(default=None),
         pages: str = Query(default=None),
     ) -> Any:
-        _logger.debug(f"extract table from pdf file='{file.filename}', pages='{pages}'")
+        _logger.debug(
+            f"extract table from pdf file='{file.filename}', mode={mode}, pages='{pages}'"
+        )
         pdf = PdfDataExtractor()
         return await pdf.extract_table(
-            data=await file.read(), filename=file.filename, page_ranges=pages
+            data=await file.read(), filename=file.filename, page_ranges=pages, mode=mode
         )
 
 
-if is_feature_enabled("TEAL_FEATURE_EXTRACT_META"):
+if is_feature_enabled("TEAL_ROUTE_EXTRACT_META"):
     _logger.info("feature PDF meta data is enabled")
 
     @router.post(

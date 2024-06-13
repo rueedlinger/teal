@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.12.4-slim-bookworm
 FROM python:$PYTHON_VERSION
 
 ARG USERNAME=worker
@@ -22,14 +22,17 @@ WORKDIR /usr/src/app
 ############################
 RUN groupadd --gid $USER_GID $USERNAME &&\
     useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
-    wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64  &&\
-    chmod +x /usr/local/bin/dumb-init && \
     echo "deb http://deb.debian.org/debian bookworm-backports main" >> /etc/apt/sources.list && \
     apt-get update &&\
+    apt-get install -y -qq wget unzip &&\
+    wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64  &&\
+    chmod +x /usr/local/bin/dumb-init && \
     apt-get install -y tesseract-ocr \
     $TESSERACT_LANGUAGES \
     poppler-utils \
     ghostscript \
+    gcc \
+    python3-dev \
     python3-tk \
     libgl1 \
     ocrmypdf \

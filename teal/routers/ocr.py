@@ -14,7 +14,7 @@ _logger = logging.getLogger("teal.routers.ocr")
 
 router.route_class = CheckUnknownQueryParamsRouter
 
-if is_feature_enabled("TEAL_FEATURE_CREATE_PDFA"):
+if is_feature_enabled("TEAL_ROUTE_OCR_PDF"):
     _logger.info("feature PDF/A convert is enabled")
 
     @router.post(

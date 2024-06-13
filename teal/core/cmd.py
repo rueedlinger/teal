@@ -15,15 +15,14 @@ class AsyncSubprocess:
         )
 
         stdout, stderr = await process.communicate()
-
         return Result(process.returncode, stdout, stderr)
 
 
 class Result:
-    def __init__(self, returncode, stdout, stderrr):
+    def __init__(self, returncode, stdout, stderr):
         self.returncode = returncode
         self.stdout = stdout
-        self.stderrr = stderrr
+        self.stderr = stderr
 
     def __str__(self):
-        return f"returncode: {self.returncode}, stdout: {self.stdout}, stderrr: {self.stderrr}"
+        return f"returncode: {self.returncode}, stdout: {self.stdout}, stderr: {self.stderr}"

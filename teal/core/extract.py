@@ -2,6 +2,7 @@ import io
 import json
 import logging
 import os
+from typing import List
 
 import aiofiles
 import aiopytesseract
@@ -18,9 +19,15 @@ from teal.core import (
     get_file_ext,
 )
 from teal.core.http import create_json_err_response
-from teal.model.extract import TextExtract, TableExtract, PdfMetaDataReport, ExtractMode
+from teal.model.extract import (
+    TextExtract,
+    TableExtract,
+    PdfMetaDataReport,
+    TextExtractMode,
+    TableExtractMode,
+)
 
-_logger = logging.getLogger("teal.pdf")
+_logger = logging.getLogger("teal.extract")
 
 
 class PdfDataExtractor:
@@ -37,7 +44,9 @@ class PdfDataExtractor:
         file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
-                400, f"file extension '{file_ext}' is not supported ({filename})."
+                400,
+                f"file extension '{file_ext}' is not supported, supported "
+                f"extensions are {sorted(self.supported_file_extensions)}.",
             )
 
         extracts = []
@@ -53,7 +62,7 @@ class PdfDataExtractor:
                 text_all = textpage.get_text_bounded()
                 extracts.append(
                     TextExtract.model_validate(
-                        {"text": text_all, "page": page_no, "mode": ExtractMode.RAW}
+                        {"text": text_all, "page": page_no, "mode": TextExtractMode.RAW}
                     )
                 )
 
@@ -69,7 +78,9 @@ class PdfDataExtractor:
         file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
-                400, f"file extension '{file_ext}' is not supported ({filename})."
+                400,
+                f"file extension '{file_ext}' is not supported, supported "
+                f"extensions are {sorted(self.supported_file_extensions)}.",
             )
 
         extracts = []
@@ -99,7 +110,11 @@ class PdfDataExtractor:
                         )
                         extracts.append(
                             TextExtract.model_validate(
-                                {"text": text, "page": page_no, "mode": ExtractMode.OCR}
+                                {
+                                    "text": text,
+                                    "page": page_no,
+                                    "mode": TextExtractMode.OCR,
+                                }
                             )
                         )
         return extracts
@@ -108,21 +123,28 @@ class PdfDataExtractor:
         self,
         data: bytes,
         filename: str,
+        mode: TableExtractMode,
         page_ranges: str,
     ) -> list[TableExtract] | JSONResponse:
         file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
-                400, f"file extension '{file_ext}' is not supported ({filename})."
+                400,
+                f"file extension '{file_ext}' is not supported, supported "
+                f"extensions are {sorted(self.supported_file_extensions)}.",
             )
 
         async with aiofiles.tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
             await tmp_pdf_file.write(data)
-            tables = camelot.read_pdf(tmp_pdf_file.name, pages="all")
+            pages = parse_page_ranges(page_ranges)
+
+            if mode is None:
+                mode = TableExtractMode.LATTICE
+            tables = await self._extract_tables(
+                tmp_pdf_file.name, pages=pages, mode=mode
+            )
             _logger.debug(f"found {len(tables)} tables with camelot")
             extracts = []
-
-            pages = parse_page_ranges(page_ranges)
 
             for p in range(len(tables)):
                 async with aiofiles.tempfile.NamedTemporaryFile(
@@ -142,11 +164,27 @@ class PdfDataExtractor:
                                         "page": page_no,
                                         "index": report["order"] - 1,
                                         "table": table_json,
+                                        "mode": mode,
                                     }
                                 )
                             )
 
         return extracts
+
+    @staticmethod
+    async def _extract_tables(
+        tmp_pdf_file_path: str, pages: List[int], mode: TableExtractMode
+    ):
+
+        if pages is None or len(pages) == 0:
+            tables = camelot.read_pdf(tmp_pdf_file_path, pages="all", flavor=mode.value)
+        else:
+            tables = camelot.read_pdf(
+                tmp_pdf_file_path,
+                pages=",".join([str(s) for s in pages]),
+                flavor=mode.value,
+            )
+        return tables
 
 
 class PdfMetaDataExtractor:
@@ -161,7 +199,9 @@ class PdfMetaDataExtractor:
         file_ext = get_file_ext(filename)
         if file_ext not in self.supported_file_extensions:
             return create_json_err_response(
-                400, f"file extension '{file_ext}' is not supported ({filename})."
+                400,
+                f"file extension '{file_ext}' is not supported, supported "
+                f"extensions are {sorted(self.supported_file_extensions)}.",
             )
         meta_data = {}
         doc_info = {}

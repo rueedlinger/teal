@@ -4,15 +4,15 @@ import pytest
 from starlette.testclient import TestClient
 
 from teal import api
-from teal.model.extract import ExtractMode
+from teal.model.extract import TextExtractMode
 from tests import get_path
 
 
 @pytest.mark.parametrize(
     "file,mode",
     [
-        ("data/ocr/scanned_document.pdf", ExtractMode.OCR),
-        ("data/digital_pdf/document_two_pages.pdf", ExtractMode.RAW),
+        ("data/ocr/scanned_document.pdf", TextExtractMode.OCR),
+        ("data/digital_pdf/document_two_pages.pdf", TextExtractMode.RAW),
     ],
 )
 def test_extract_text_with_mode(file, mode):
@@ -45,7 +45,7 @@ def test_extract_text_with_pages(file, pages, expected):
         assert len(response.json()) == expected
         for i, r in enumerate(response.json()):
             assert len(r["text"]) > 1000
-            assert r["mode"] == ExtractMode.RAW.value
+            assert r["mode"] == TextExtractMode.RAW.value
 
 
 @pytest.mark.parametrize(
@@ -65,7 +65,7 @@ def test_extract_text_with_languages(file, lang1, lang2):
         assert response.status_code == 200
         for i, r in enumerate(response.json()):
             assert len(r["text"]) > 1000
-            assert r["mode"] == ExtractMode.OCR.value
+            assert r["mode"] == TextExtractMode.OCR.value
             assert r["page"] == i + 1
 
 
@@ -75,7 +75,7 @@ def test_extract_text_with_wrong_file_ending():
         response = client.post(url="/extract/text", files={"file": f})
         assert response.status_code == 400
         assert response.json() == {
-            "message": f"file extension '.docx' is not supported (word_document.docx)."
+            "message": f"file extension '.docx' is not supported, supported extensions are ['.pdf']."
         }
 
 

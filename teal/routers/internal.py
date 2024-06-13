@@ -12,7 +12,7 @@ _logger = logging.getLogger("teal.routers.internal")
 
 # router.route_class = CheckUnknownQueryParamsRouter
 
-if is_feature_enabled("TEAL_FEATURE_APP_HEALTH"):
+if is_feature_enabled("TEAL_ROUTE_APP_HEALTH"):
     _logger.info("feature app health is enabled")
 
     @router.get(
@@ -25,7 +25,7 @@ if is_feature_enabled("TEAL_FEATURE_APP_HEALTH"):
         return app.get_health_check()
 
 
-if is_feature_enabled("TEAL_FEATURE_APP_INFO"):
+if is_feature_enabled("TEAL_ROUTE_APP_INFO"):
     _logger.info("feature app info is enabled")
 
     @router.get(
