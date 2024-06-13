@@ -150,7 +150,6 @@ class PdfDataExtractor:
 
     @staticmethod
     async def _extract_tables(tmp_pdf_file, pages, flavor="lattice"):
-        _logger.info(f"pages={pages}")
         if pages is None or len(pages) == 0:
             tables = camelot.read_pdf(tmp_pdf_file.name, pages="all", flavor=flavor)
         else:
