@@ -118,11 +118,12 @@ class PdfDataExtractor:
 
         async with aiofiles.tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
             await tmp_pdf_file.write(data)
-            tables = camelot.read_pdf(tmp_pdf_file.name, pages="all")
+            pages = parse_page_ranges(page_ranges)
+            # mode lattice' or 'stream
+            tables = await self._extract_tables(tmp_pdf_file, pages)
+            # tables = camelot.read_pdf(tmp_pdf_file.name, pages="all")
             _logger.debug(f"found {len(tables)} tables with camelot")
             extracts = []
-
-            pages = parse_page_ranges(page_ranges)
 
             for p in range(len(tables)):
                 async with aiofiles.tempfile.NamedTemporaryFile(
@@ -147,6 +148,19 @@ class PdfDataExtractor:
                             )
 
         return extracts
+
+    @staticmethod
+    async def _extract_tables(tmp_pdf_file, pages, flavor="lattice"):
+        _logger.info(f"pages={pages}")
+        if pages is None or len(pages) == 0:
+            tables = camelot.read_pdf(tmp_pdf_file.name, pages="all", flavor=flavor)
+        else:
+            tables = camelot.read_pdf(
+                tmp_pdf_file.name,
+                pages=",".join([str(s) for s in pages]),
+                flavor=flavor,
+            )
+        return tables
 
 
 class PdfMetaDataExtractor:
