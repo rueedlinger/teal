@@ -14,7 +14,7 @@ _logger = logging.getLogger("teal.routers.create")
 
 router.route_class = CheckUnknownQueryParamsRouter
 
-if is_feature_enabled("TEAL_FEATURE_CREATE_PDF"):
+if is_feature_enabled("TEAL_ROUTE_CREATE_PDF"):
     _logger.info("feature libreoffice convert is enabled")
 
     @router.post(

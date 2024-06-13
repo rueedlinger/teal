@@ -13,3 +13,5 @@ services:
       TEAL_PORT: 8000
       # TEAL_IP_BIND: 0.0.0.0
       # TEAL_START_LOCUST: 'true'
+      # TEAL_ROUTE_OCR_PDF: false
+      # TEAL_FEATURE_CREATE_PDF_CHECK_FILE_EXTENSION: false

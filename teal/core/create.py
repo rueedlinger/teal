@@ -12,6 +12,7 @@ from teal.core import (
     parse_page_ranges,
     to_page_range,
     get_file_ext,
+    is_feature_enabled,
 )
 from teal.core.cmd import AsyncSubprocess
 from teal.core.http import create_json_err_response
@@ -41,10 +42,11 @@ class LibreOfficeAdapter:
     ) -> FileResponse | JSONResponse:
 
         file_ext = get_file_ext(filename)
-        if file_ext not in self.supported_file_extensions:
-            return create_json_err_response(
-                400, f"file extension '{file_ext}' is not supported ({filename})."
-            )
+        if is_feature_enabled("TEAL_FEATURE_CREATE_PDF_CHECK_FILE_EXTENSION"):
+            if file_ext not in self.supported_file_extensions:
+                return create_json_err_response(
+                    400, f"file extension '{file_ext}' is not supported ({filename})."
+                )
 
         # create tmp dir for all files
         tmp_dir = tempfile.mktemp(prefix="teal-")

@@ -19,7 +19,7 @@ router = APIRouter(prefix="/extract", tags=["extract"])
 
 router.route_class = CheckUnknownQueryParamsRouter
 
-if is_feature_enabled("TEAL_FEATURE_EXTRACT_TEXT"):
+if is_feature_enabled("TEAL_ROUTE_EXTRACT_TEXT"):
     _logger.info("feature PDF text is enabled")
 
     @router.post(
@@ -50,7 +50,7 @@ if is_feature_enabled("TEAL_FEATURE_EXTRACT_TEXT"):
             )
 
 
-if is_feature_enabled("TEAL_FEATURE_EXTRACT_TABLE"):
+if is_feature_enabled("TEAL_ROUTE_EXTRACT_TABLE"):
     _logger.info("feature PDF table is enabled")
 
     @router.post(
@@ -72,7 +72,7 @@ if is_feature_enabled("TEAL_FEATURE_EXTRACT_TABLE"):
         )
 
 
-if is_feature_enabled("TEAL_FEATURE_EXTRACT_META"):
+if is_feature_enabled("TEAL_ROUTE_EXTRACT_META"):
     _logger.info("feature PDF meta data is enabled")
 
     @router.post(
