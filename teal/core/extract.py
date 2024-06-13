@@ -2,6 +2,7 @@ import io
 import json
 import logging
 import os
+from typing import List
 
 import aiofiles
 import aiopytesseract
@@ -18,7 +19,13 @@ from teal.core import (
     get_file_ext,
 )
 from teal.core.http import create_json_err_response
-from teal.model.extract import TextExtract, TableExtract, PdfMetaDataReport, ExtractMode
+from teal.model.extract import (
+    TextExtract,
+    TableExtract,
+    PdfMetaDataReport,
+    TextExtractMode,
+    TableExtractMode,
+)
 
 _logger = logging.getLogger("teal.extract")
 
@@ -53,7 +60,7 @@ class PdfDataExtractor:
                 text_all = textpage.get_text_bounded()
                 extracts.append(
                     TextExtract.model_validate(
-                        {"text": text_all, "page": page_no, "mode": ExtractMode.RAW}
+                        {"text": text_all, "page": page_no, "mode": TextExtractMode.RAW}
                     )
                 )
 
@@ -99,7 +106,11 @@ class PdfDataExtractor:
                         )
                         extracts.append(
                             TextExtract.model_validate(
-                                {"text": text, "page": page_no, "mode": ExtractMode.OCR}
+                                {
+                                    "text": text,
+                                    "page": page_no,
+                                    "mode": TextExtractMode.OCR,
+                                }
                             )
                         )
         return extracts
@@ -108,6 +119,7 @@ class PdfDataExtractor:
         self,
         data: bytes,
         filename: str,
+        mode: TableExtractMode,
         page_ranges: str,
     ) -> list[TableExtract] | JSONResponse:
         file_ext = get_file_ext(filename)
@@ -119,8 +131,12 @@ class PdfDataExtractor:
         async with aiofiles.tempfile.NamedTemporaryFile(suffix=".pdf") as tmp_pdf_file:
             await tmp_pdf_file.write(data)
             pages = parse_page_ranges(page_ranges)
-            # mode lattice' or 'stream
-            tables = await self._extract_tables(tmp_pdf_file, pages)
+
+            if mode is None:
+                mode = TableExtractMode.LATTICE
+            tables = await self._extract_tables(
+                tmp_pdf_file.name, pages=pages, mode=mode
+            )
             _logger.debug(f"found {len(tables)} tables with camelot")
             extracts = []
 
@@ -142,6 +158,7 @@ class PdfDataExtractor:
                                         "page": page_no,
                                         "index": report["order"] - 1,
                                         "table": table_json,
+                                        "mode": mode,
                                     }
                                 )
                             )
@@ -149,14 +166,17 @@ class PdfDataExtractor:
         return extracts
 
     @staticmethod
-    async def _extract_tables(tmp_pdf_file, pages, flavor="lattice"):
+    async def _extract_tables(
+        tmp_pdf_file_path: str, pages: List[int], mode: TableExtractMode
+    ):
+
         if pages is None or len(pages) == 0:
-            tables = camelot.read_pdf(tmp_pdf_file.name, pages="all", flavor=flavor)
+            tables = camelot.read_pdf(tmp_pdf_file_path, pages="all", flavor=mode.value)
         else:
             tables = camelot.read_pdf(
-                tmp_pdf_file.name,
+                tmp_pdf_file_path,
                 pages=",".join([str(s) for s in pages]),
-                flavor=flavor,
+                flavor=mode.value,
             )
         return tables
 

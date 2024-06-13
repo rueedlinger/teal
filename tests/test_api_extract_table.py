@@ -4,13 +4,16 @@ import pytest
 from starlette.testclient import TestClient
 
 from teal import api
+from teal.model.extract import TableExtractMode
 from tests import get_path
 
 
-def test_pdf_table_extract_from_single_table():
+def test_pdf_table_extract_from_single_table_default():
     client = TestClient(api.app, raise_server_exceptions=False)
     with open(get_path("data/digital_pdf/document_with_one_table.pdf"), "rb") as f:
-        response = client.post(url="/extract/table", files={"file": f})
+
+        response = client.post(url=f"/extract/table", files={"file": f})
+
         assert response.status_code == 200
         assert len(response.json()) == 1
         assert response.json()[0]["page"] == 1
@@ -21,6 +24,24 @@ def test_pdf_table_extract_from_single_table():
             {"0": "A2", "1": "B22", "2": "C222"},
             {"0": "A3", "1": "B33", "2": "C333"},
         ]
+        assert response.json()[0]["mode"] == "lattice"
+
+
+@pytest.mark.parametrize(
+    "mode",
+    [TableExtractMode.LATTICE.value, TableExtractMode.STREAM.value],
+)
+def test_pdf_table_extract_from_single_table_with_mode(mode):
+    client = TestClient(api.app, raise_server_exceptions=False)
+    with open(get_path("data/digital_pdf/document_with_one_table.pdf"), "rb") as f:
+
+        response = client.post(url=f"/extract/table?mode={mode}", files={"file": f})
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+        assert response.json()[0]["page"] == 1
+        assert response.json()[0]["index"] == 0
+        assert len(response.json()[0]["table"]) > 3
+        assert response.json()[0]["mode"] == mode
 
 
 def test_pdf_table_extract_from_multiple_tables():
@@ -106,7 +127,7 @@ def test_pdf_table_extract_with_unsupported_param():
         response = client.post(url=f"/extract/table?foo=ddd", files={"file": f})
         assert response.status_code == 400
         unknown_params = ["foo"]
-        known_params = ["pages"]
+        known_params = sorted(["pages", "mode"])
         assert response.json() == {
             "message": f"Unknown request parameters: {unknown_params}, supported parameters are {known_params}"
         }
