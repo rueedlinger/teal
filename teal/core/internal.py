@@ -40,7 +40,9 @@ class AppAdapter:
         self.add_app_detail(details, "fastapi_version", lambda: fastapi.__version__)
         self.add_app_detail(details, "opencv_version", lambda: cv2.__version__)
 
-        return AppInfo.model_validate({"version": get_version(), "details": details})
+        return AppInfo.model_validate(
+            {"version": get_version(), "details": dict(sorted(details.items()))}
+        )
 
     @staticmethod
     def add_app_detail(details: dict, key: str, func: Callable[[], str]):
