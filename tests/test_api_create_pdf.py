@@ -4,7 +4,7 @@ import pytest
 from starlette.testclient import TestClient
 
 from teal import api
-from teal.model.create import OutputType
+from teal.model.create import PdfOutputType
 from tests import get_path
 
 
@@ -30,9 +30,9 @@ def test_create_pdf_with_default(file):
 @pytest.mark.parametrize(
     "file,output,expected_version",
     [
-        ("data/doc/text_document.txt", OutputType.PDF_15, "1.5"),
-        ("data/doc/text_document.txt", OutputType.PDF_16, "1.6"),
-        ("data/doc/text_document.txt", OutputType.PDF_17, "1.7"),
+        ("data/doc/text_document.txt", PdfOutputType.PDF_15, "1.5"),
+        ("data/doc/text_document.txt", PdfOutputType.PDF_16, "1.6"),
+        ("data/doc/text_document.txt", PdfOutputType.PDF_17, "1.7"),
     ],
 )
 def test_create_pdf_with_output_pdf(file, output, expected_version):
@@ -56,9 +56,9 @@ def test_create_pdf_with_output_pdf(file, output, expected_version):
 @pytest.mark.parametrize(
     "file,output,expected_version,expected_pdfa",
     [
-        ("data/doc/text_document.txt", OutputType.PDFA_1B, "1.4", "PDF/A-1B"),
-        ("data/doc/text_document.txt", OutputType.PDFA_2B, "1.7", "PDF/A-2B"),
-        ("data/doc/text_document.txt", OutputType.PDFA_3B, "1.7", "PDF/A-3B"),
+        ("data/doc/text_document.txt", PdfOutputType.PDFA_1B, "1.4", "PDF/A-1B"),
+        ("data/doc/text_document.txt", PdfOutputType.PDFA_2B, "1.7", "PDF/A-2B"),
+        ("data/doc/text_document.txt", PdfOutputType.PDFA_3B, "1.7", "PDF/A-3B"),
     ],
 )
 def test_create_pdf_with_output_pdfa(file, output, expected_version, expected_pdfa):
