@@ -62,13 +62,7 @@ class PdfOcrAdapter:
             _logger.debug(
                 f"writing pages {pages} from {filename} to {tmp_file_in_path}"
             )
-            infile = PdfReader(io.BytesIO(data), strict=False)
-            output = PdfWriter()
-            for i in pages:
-                p = infile.pages[i - 1]
-                output.add_page(p)
-            with open(tmp_file_in_path, "wb") as tmp_file_in:
-                output.write(tmp_file_in)
+            await self._reduce_pages(data, pages, tmp_file_in_path)
 
         languages = make_tesseract_lang_param(langs)
         if languages is None:
@@ -108,3 +102,13 @@ class PdfOcrAdapter:
                 f"got return code {result.returncode} '{filename}' {result.stderr}",
                 background=BackgroundTask(cleanup_tmp_dir, tmp_dir),
             )
+
+    @staticmethod
+    async def _reduce_pages(data, pages, tmp_file_in_path):
+        infile = PdfReader(io.BytesIO(data), strict=False)
+        output = PdfWriter()
+        for i in pages:
+            p = infile.pages[i - 1]
+            output.add_page(p)
+        with open(tmp_file_in_path, "wb") as tmp_file_in:
+            output.write(tmp_file_in)

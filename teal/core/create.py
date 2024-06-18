@@ -1,9 +1,11 @@
+import io
 import logging
 import os
 import tempfile
 
 import aiofiles
 import pikepdf
+from PyPDF2 import PdfReader, PdfWriter
 from starlette.background import BackgroundTask
 from starlette.responses import FileResponse, JSONResponse
 
@@ -163,12 +165,16 @@ class LibreOfficeAdapter:
         _logger.debug(f"tmp_file_in_path: {tmp_file_in_path}")
         _logger.debug(f"tmp_out_dir: {tmp_out_dir}")
 
-        async with aiofiles.open(tmp_file_in_path, "wb") as tmp_file_in:
-            _logger.debug(f"writing file {filename} to {tmp_file_in_path}")
-            await tmp_file_in.write(data)
-
-        # remove pages from pdf
         pages = parse_page_ranges(page_ranges)
+        if pages is not None:
+            _logger.debug(
+                f"writing reduced file {filename} ({pages}) to {tmp_file_in_path}"
+            )
+            await self._reduce_pages(data, pages, tmp_file_in_path)
+        else:
+            async with aiofiles.open(tmp_file_in_path, "wb") as tmp_file_in:
+                _logger.debug(f"writing file {filename} to {tmp_file_in_path}")
+                await tmp_file_in.write(data)
 
         if output_type == DocOutputType.ODT:
             doc_param = "odt:writer8"
@@ -179,7 +185,8 @@ class LibreOfficeAdapter:
         else:
             doc_param = "odt:writer8"
 
-        cmd_convert_doc = f'{self.libreoffice_cmd} --infilter="writer_pdf_import" --headless --convert-to "{doc_param}" --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
+        # https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html?DbPAR=SHARED#bm_id541554406270299
+        cmd_convert_doc = f'{self.libreoffice_cmd} --infilter="writer_pdf_import" --headless --convert-to  "{doc_param}" --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
         _logger.debug(f"running cmd: {cmd_convert_doc}")
 
         proc = AsyncSubprocess(cmd_convert_doc, tmp_dir)
@@ -207,6 +214,16 @@ class LibreOfficeAdapter:
                 f"got return code {result.returncode} '{filename}' {result.stderr}",
                 background=BackgroundTask(cleanup_tmp_dir, tmp_dir),
             )
+
+    @staticmethod
+    async def _reduce_pages(data, pages, tmp_file_in_path):
+        infile = PdfReader(io.BytesIO(data), strict=False)
+        output = PdfWriter()
+        for i in pages:
+            p = infile.pages[i - 1]
+            output.add_page(p)
+        with open(tmp_file_in_path, "wb") as tmp_file_in:
+            output.write(tmp_file_in)
 
     @staticmethod
     async def _modify_pdf_metadata(converted_file_out, fixed_file):

@@ -20,6 +20,17 @@ def test_create_doc_with_default(file):
 
 
 @pytest.mark.parametrize(
+    "pages",
+    ["1", "2,3", "2-3", "1,3-4"],
+)
+def test_create_doc_with_pages(pages):
+    client = TestClient(api.create_app(), raise_server_exceptions=False)
+    with open(get_path("data/digital_pdf/document_multiple_pages.pdf"), "rb") as f:
+        response = client.post(url=f"/create/doc?pages={pages}", files={"file": f})
+        assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
     "file,output",
     [
         ("data/digital_pdf/document_one_page.pdf", DocOutputType.DOC),
