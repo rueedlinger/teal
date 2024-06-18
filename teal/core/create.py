@@ -177,7 +177,7 @@ class LibreOfficeAdapter:
         elif output_type == DocOutputType.DOCX:
             doc_param = "docx:MS Word 2007 XML"
         else:
-            output_type = DocOutputType.ODT
+            doc_param = "odt:writer8"
 
         cmd_convert_doc = f'{self.libreoffice_cmd} --infilter="writer_pdf_import" --headless --convert-to "{doc_param}" --outdir "{tmp_out_dir}" "{tmp_file_in_path}"'
         _logger.debug(f"running cmd: {cmd_convert_doc}")
@@ -185,16 +185,19 @@ class LibreOfficeAdapter:
         proc = AsyncSubprocess(cmd_convert_doc, tmp_dir)
         result = await proc.run()
 
-        converted_file_out = os.path.join(
-            tmp_dir, "out", f"tmp{output_type.to_file_ext()}"
-        )
+        if output_type is None:
+            file_ext = ".odt"
+        else:
+            file_ext = output_type.to_file_ext()
+
+        converted_file_out = os.path.join(tmp_dir, "out", f"tmp{file_ext}")
         _logger.info(converted_file_out)
 
         if result.returncode == 0:
             return FileResponse(
                 converted_file_out,
                 media_type="application/octet-stream",
-                filename=f"{os.path.splitext(filename)[0]}{output_type.to_file_ext()}",
+                filename=f"{os.path.splitext(filename)[0]}{file_ext}",
                 # background=BackgroundTask(cleanup_tmp_dir, tmp_dir),
             )
         else:
