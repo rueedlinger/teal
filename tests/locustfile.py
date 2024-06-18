@@ -9,9 +9,15 @@ class TealApiRequest(FastHttpUser):
 
     @tag("create_pdf")
     @task
-    def libreoffice_convert(self):
+    def libreoffice_convert_pdf(self):
         with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
             response = self.client.post("/create/pdf", files={"file": f})
+
+    @tag("create_doc")
+    @task
+    def libreoffice_convert_doc(self):
+        with open(get_path(self.DOC_LOAD_TEST), "rb") as f:
+            response = self.client.post("/create/doc", files={"file": f})
 
     @tag("validate_pdfa")
     @task
